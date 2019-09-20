@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "153813300622",
+    "firebase_url": "https://squirrelly-8fe12.firebaseio.com",
+    "project_id": "squirrelly-8fe12",
+    "storage_bucket": "squirrelly-8fe12.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153813300622:android:08070323489d95a24220df",
+        "android_client_info": {
+          "package_name": "com.example.timil.climateapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153813300622-7b4u1l1fpjhd9mdk0de32901v79ai1dt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM47fo_IeWrL1NPVi3a_BHsSkoLlC_NR4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153813300622-7b4u1l1fpjhd9mdk0de32901v79ai1dt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
