@@ -3,4 +3,5 @@
 
     <string name="start_game">Start</string>
     <string name="txt_question">Question</string>
+    <string name="logout_menu">Sign Out</string>
 </resources>

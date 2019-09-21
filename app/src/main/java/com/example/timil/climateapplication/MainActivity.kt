@@ -7,14 +7,14 @@ import android.util.Log
 import com.example.timil.climateapplication.fragments.QuizFragment
 import com.example.timil.climateapplication.fragments.StartFragment
 import java.util.*
-import java.util.Arrays.asList
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
-
-
+import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
 
 
 class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
@@ -42,6 +42,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
             startFragment = StartFragment()
         }
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, startFragment!!).commit()
+
+        val toolBar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolBar)
     }
 
     override fun onResume() {
@@ -78,6 +81,36 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
             }
         }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.getItemId()) {
+            R.id.logout -> {
+
+                FirebaseAuth.getInstance().signOut()
+
+                user = null
+
+                startActivityForResult(
+                    AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers as MutableList<AuthUI.IdpConfig>)
+                        .build(),
+                    RC_SIGN_IN
+                )
+
+                return true
+            }
+
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
 
     override fun startQRscan() {
         Log.d("tester", "testing button")
