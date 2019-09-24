@@ -113,7 +113,6 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
 
 
     override fun startQRscan() {
-        Log.d("tester", "testing button")
         if (quizFragment == null) {
             quizFragment = QuizFragment()
         }

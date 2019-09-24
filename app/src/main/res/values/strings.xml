@@ -2,6 +2,6 @@
     <string name="app_name">Climate Application</string>
 
     <string name="start_game">Start</string>
-    <string name="txt_question">Question</string>
+    <string name="txt_question">Loading question, please wait</string>
     <string name="logout_menu">Sign Out</string>
 </resources>
