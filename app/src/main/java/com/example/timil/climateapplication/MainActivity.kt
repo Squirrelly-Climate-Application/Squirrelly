@@ -13,29 +13,24 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
-<<<<<<< HEAD
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_main.*
 
-
-class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
-=======
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import com.example.timil.climateapplication.fragments.ScanFragment
 
 
 class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick {
->>>>>>> 34e07087dcece4a60280b3fba211eeb8d3fffbe0
 
     private var providers: List<AuthUI.IdpConfig>? = null
     private var user: FirebaseUser? = null
     val RC_SIGN_IN = 42
 
-    private var startFragment: StartFragment? = null
-    private var quizFragment: QuizFragment? = null
+    private lateinit var startFragment: StartFragment
+    private lateinit var scanFragment: ScanFragment
 
     companion object {
         const val RECORD_REQUEST_CODE = 1
@@ -53,35 +48,13 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if (startFragment == null) {
-            startFragment = StartFragment()
-        }
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, startFragment!!).commit()
+        startFragment = StartFragment()
+        scanFragment = ScanFragment()
 
-<<<<<<< HEAD
-        scanResult.text = if (savedInstanceState == null) {
-            val extras = intent.extras
-            extras?.getString("Result")
-        } else {
-            //savedInstanceState.getSerializable("Tool") as String
-            savedInstanceState.getString("Result")
-        }
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, startFragment).commit()
 
-        scanButton.setOnClickListener {
-            val permission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.CAMERA)
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                makeRequestCamera()
-            }
-            else {
-                val intent = Intent(this, ScanActivity::class.java)
-                startActivity(intent)
-            }
-        }
-=======
         val toolBar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolBar)
->>>>>>> 34e07087dcece4a60280b3fba211eeb8d3fffbe0
     }
 
     override fun onResume() {
@@ -133,7 +106,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.getItemId()) {
+        when (item.itemId) {
             R.id.logout -> {
 
                 FirebaseAuth.getInstance().signOut()
@@ -157,11 +130,14 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
 
     override fun startQRscan() {
-        // TODO: for now this starts the question fragment. Change it so that the QR scanning starts here
-        if (quizFragment == null) {
-            quizFragment = QuizFragment()
+        val permission = ContextCompat.checkSelfPermission(this,
+            Manifest.permission.CAMERA)
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            makeRequestCamera()
         }
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, quizFragment!!).addToBackStack(null).commit()
+        else {
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, scanFragment).addToBackStack(null).commit()
+        }
     }
 
     override fun startArFragment() {
