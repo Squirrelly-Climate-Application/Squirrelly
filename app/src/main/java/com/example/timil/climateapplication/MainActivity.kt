@@ -8,12 +8,12 @@ import android.util.Log
 import com.example.timil.climateapplication.fragments.QuizFragment
 import com.example.timil.climateapplication.fragments.StartFragment
 import java.util.*
-import java.util.Arrays.asList
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
+<<<<<<< HEAD
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -21,6 +21,14 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
+=======
+import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
+
+
+class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick {
+>>>>>>> 34e07087dcece4a60280b3fba211eeb8d3fffbe0
 
     private var providers: List<AuthUI.IdpConfig>? = null
     private var user: FirebaseUser? = null
@@ -50,6 +58,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
         }
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, startFragment!!).commit()
 
+<<<<<<< HEAD
         scanResult.text = if (savedInstanceState == null) {
             val extras = intent.extras
             extras?.getString("Result")
@@ -69,6 +78,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
                 startActivity(intent)
             }
         }
+=======
+        val toolBar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolBar)
+>>>>>>> 34e07087dcece4a60280b3fba211eeb8d3fffbe0
     }
 
     override fun onResume() {
@@ -113,11 +126,46 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.getItemId()) {
+            R.id.logout -> {
+
+                FirebaseAuth.getInstance().signOut()
+
+                user = null
+
+                startActivityForResult(
+                    AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers as MutableList<AuthUI.IdpConfig>)
+                        .build(),
+                    RC_SIGN_IN
+                )
+
+                return true
+            }
+
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+
     override fun startQRscan() {
-        Log.d("tester", "testing button")
+        // TODO: for now this starts the question fragment. Change it so that the QR scanning starts here
         if (quizFragment == null) {
             quizFragment = QuizFragment()
         }
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, quizFragment!!).addToBackStack(null).commit()
+    }
+
+    override fun startArFragment() {
+        // start the AR game/fragment at this point
+        Log.d("TESTER", "ar fragment here")
     }
 }
