@@ -1,6 +1,7 @@
 package com.example.timil.climateapplication.fragments
 
 
+import android.app.Activity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -17,8 +18,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import kotlin.collections.ArrayList
 import android.widget.ProgressBar
-
-
+import android.content.DialogInterface
+import android.content.DialogInterface.BUTTON_NEGATIVE
+import android.os.AsyncTask.execute
+import android.content.DialogInterface.BUTTON_POSITIVE
+import android.support.v7.app.AlertDialog
 
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -36,6 +40,15 @@ class QuizFragment : Fragment() {
 
     interface OnButtonClick {
         fun startArFragment()
+    }
+
+    override fun onAttach(activity: Activity?) {
+        super.onAttach(activity)
+        try {
+            activityCallBack = activity as OnButtonClick
+        } catch (e: ClassCastException) {
+            throw ClassCastException(activity.toString() + " must implement OnButtonClick interface.")
+        }
     }
 
     override fun onCreateView(
@@ -69,14 +82,12 @@ class QuizFragment : Fragment() {
                 Log.d("TESTEr", questionNumber.toString())
 
                 val txtQuestion = root!!.findViewById<TextView>(R.id.txtQuestion)
-                txtQuestion.text = questionsList.get(questionNumber).data.getValue("question").toString()
-
-                val options = questionsList[questionNumber].data.getValue("options") as ArrayList<*>
+                txtQuestion.text = questionsList[questionNumber].data.getValue("question").toString()
 
                 // hide progress bar when the questions have been fetched
                 progressBar.visibility = View.GONE;
 
-                generateAnswerButtons(options)
+                generateAnswerButtons(questionsList[questionNumber])
             } else {
                 Log.w("Error", "Error getting questions.", task.exception)
             }
@@ -93,7 +104,12 @@ class QuizFragment : Fragment() {
     }
 
     // generate buttons based on how many possible options are in the question
-    private fun generateAnswerButtons(options: ArrayList<*>){
+    private fun generateAnswerButtons(question: QueryDocumentSnapshot){
+
+        val options = question.data.getValue("options") as ArrayList<*>
+        val rightAnswer = question.data.getValue("answer") as String
+        val information = question.data.getValue("information") as String
+
         val layout = root!!.findViewById(R.id.btnsLinearLayout) as LinearLayout
         layout.orientation = LinearLayout.VERTICAL
 
@@ -113,6 +129,34 @@ class QuizFragment : Fragment() {
             btnAnswer.id = options.indexOf(options[i])
             btnAnswer.setOnClickListener {
                 Log.d("tester", "clicked "+btnAnswer.text.toString())
+                Log.d("tester", options[i].toString()+" and "+btnAnswer.text.toString()+" and "+rightAnswer)
+
+                val alertDialog = AlertDialog.Builder(context!!).create()
+
+                if(btnAnswer.text.equals(rightAnswer)){
+                    alertDialog.setTitle("Right answer!")
+                    alertDialog.setMessage("Your answer is correct! \n$information")
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") {
+                            dialog, _ ->
+                            dialog.dismiss()
+                            activityCallBack!!.startArFragment()
+                            /*val graduationPlan = GraduationPlan()
+                            graduationPlan.setName(editName.getText().toString())
+                            graduationPlan.setSemestersArrayList(semestersAndCoursesList)
+
+                            val setNewPlan = setNewGraduationPlan()
+                            setNewPlan.execute(graduationPlan)*/
+                        }
+                } else {
+                    alertDialog.setTitle("Wrong answer.")
+                    alertDialog.setMessage("Wrong answer. Better luck next time!")
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") {
+                            dialog, _ ->
+                                dialog.dismiss()
+                                fragmentManager!!.popBackStack()
+                    }
+                }
+                alertDialog.show()
             }
 
             layoutColumn.addView(btnAnswer)

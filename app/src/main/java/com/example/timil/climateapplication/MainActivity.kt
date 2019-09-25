@@ -17,7 +17,7 @@ import android.view.Menu
 import android.view.MenuItem
 
 
-class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
+class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick {
 
     private var providers: List<AuthUI.IdpConfig>? = null
     private var user: FirebaseUser? = null
@@ -113,9 +113,15 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart {
 
 
     override fun startQRscan() {
+        // TODO: for now this starts the question fragment. Change it so that the QR scanning starts here
         if (quizFragment == null) {
             quizFragment = QuizFragment()
         }
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, quizFragment!!).addToBackStack(null).commit()
+    }
+
+    override fun startArFragment() {
+        // start the AR game/fragment at this point
+        Log.d("TESTER", "ar fragment here")
     }
 }
