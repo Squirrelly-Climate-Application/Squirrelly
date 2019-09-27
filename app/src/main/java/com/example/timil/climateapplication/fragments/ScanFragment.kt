@@ -41,7 +41,7 @@ class ScanFragment: Fragment(), ZXingScannerView.ResultHandler  {
     override fun onPause() {
         super.onPause()
         mScannerView.stopCamera()
-    }
+    } 
 
     override fun onStop() {
         super.onStop()
