@@ -18,10 +18,6 @@ class SplashActivity : AppCompatActivity() {
     private val mRunnable: Runnable = Runnable {
         if (!isFinishing) {
 
-            //val intent = Intent(applicationContext, MainActivity::class.java)
-            //startActivity(intent)
-            //finish()
-
             if (!paused) {
                 val mainIntent = Intent(this@SplashActivity, MainActivity::class.java)
                 startActivity(mainIntent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
@@ -36,17 +32,6 @@ class SplashActivity : AppCompatActivity() {
             else {
                 finish()
             }
-            /*
-            val mainIntent = Intent(this@SplashActivity, MainActivity::class.java)
-            startActivity(mainIntent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
-            object : CountDownTimer(wait, wait) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
-                override fun onFinish() {
-                    finish()
-                }
-            }.start()
-            */
         }
     }
 
@@ -54,10 +39,8 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        //Initialize the Handler
         mDelayHandler = Handler()
 
-        //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, delay)
 
     }
@@ -78,45 +61,5 @@ class SplashActivity : AppCompatActivity() {
         super.onResume()
         paused = false
     }
-
-
-
-    /*
-    private val wait: Long = 3000
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-        load3DModels()
-    }
-
-    public override fun onDestroy() {
-        super.onDestroy()
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-
-    private fun load3DModels() {
-
-        //TODO: load 3D models here
-
-        val mainIntent = Intent(this@SplashActivity, MainActivity::class.java)
-        startActivity(mainIntent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
-        object : CountDownTimer(wait, wait) {
-            override fun onTick(millisUntilFinished: Long) {
-            }
-            override fun onFinish() {
-                finish()
-            }
-        }.start()
-    }
-    */
 
 }

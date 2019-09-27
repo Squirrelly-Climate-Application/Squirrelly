@@ -4,4 +4,8 @@
     <string name="start_game">Start</string>
     <string name="txt_question">Loading question, please wait</string>
     <string name="logout_menu">Sign Out</string>
+
+    <string name="close_app">Are you sure you want to quit?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
