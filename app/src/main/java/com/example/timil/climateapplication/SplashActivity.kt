@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import com.example.timil.climateapplication.ar.Static
 
 class SplashActivity : AppCompatActivity() {
 
@@ -18,13 +19,10 @@ class SplashActivity : AppCompatActivity() {
     private val mRunnable: Runnable = Runnable {
         if (!isFinishing) {
 
-            //val intent = Intent(applicationContext, MainActivity::class.java)
-            //startActivity(intent)
-            //finish()
-
             if (!paused) {
                 val mainIntent = Intent(this@SplashActivity, MainActivity::class.java)
                 startActivity(mainIntent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
+
                 object : CountDownTimer(wait, wait) {
                     override fun onTick(millisUntilFinished: Long) {
                     }
@@ -36,17 +34,6 @@ class SplashActivity : AppCompatActivity() {
             else {
                 finish()
             }
-            /*
-            val mainIntent = Intent(this@SplashActivity, MainActivity::class.java)
-            startActivity(mainIntent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
-            object : CountDownTimer(wait, wait) {
-                override fun onTick(millisUntilFinished: Long) {
-                }
-                override fun onFinish() {
-                    finish()
-                }
-            }.start()
-            */
         }
     }
 
@@ -54,12 +41,15 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        // not sure if this works or not, but I guess we need some other context than this activity,
+        // as it will soon be destroyed
+        Static.load3dModelResources(applicationContext)
+
         //Initialize the Handler
         mDelayHandler = Handler()
 
         //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, delay)
-
     }
 
     override fun onDestroy() {
@@ -78,45 +68,5 @@ class SplashActivity : AppCompatActivity() {
         super.onResume()
         paused = false
     }
-
-
-
-    /*
-    private val wait: Long = 3000
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-        load3DModels()
-    }
-
-    public override fun onDestroy() {
-        super.onDestroy()
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-
-    private fun load3DModels() {
-
-        //TODO: load 3D models here
-
-        val mainIntent = Intent(this@SplashActivity, MainActivity::class.java)
-        startActivity(mainIntent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
-        object : CountDownTimer(wait, wait) {
-            override fun onTick(millisUntilFinished: Long) {
-            }
-            override fun onFinish() {
-                finish()
-            }
-        }.start()
-    }
-    */
 
 }

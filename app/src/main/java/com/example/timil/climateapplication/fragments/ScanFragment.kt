@@ -13,7 +13,7 @@ import android.support.v7.app.AppCompatActivity
 
 
 
-class ScanFragment: Fragment(), ZXingScannerView.ResultHandler  {
+class ScanFragment: Fragment(), ZXingScannerView.ResultHandler {
 
     private lateinit var mScannerView: ZXingScannerView
     private lateinit var quizFragment: QuizFragment
@@ -41,7 +41,7 @@ class ScanFragment: Fragment(), ZXingScannerView.ResultHandler  {
     override fun onPause() {
         super.onPause()
         mScannerView.stopCamera()
-    } 
+    }
 
     override fun onStop() {
         super.onStop()
