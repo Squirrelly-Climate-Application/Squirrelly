@@ -9,6 +9,9 @@ import android.widget.Toast
 import com.example.timil.climateapplication.R
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
+import android.support.v7.app.AppCompatActivity
+
+
 
 class ScanFragment: Fragment(), ZXingScannerView.ResultHandler  {
 
@@ -32,11 +35,17 @@ class ScanFragment: Fragment(), ZXingScannerView.ResultHandler  {
         super.onResume()
         mScannerView.setResultHandler(this)
         mScannerView.startCamera()
+        (activity as AppCompatActivity).supportActionBar!!.hide()
     }
 
     override fun onPause() {
         super.onPause()
         mScannerView.stopCamera()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity).supportActionBar!!.show()
     }
 
     override fun handleResult(rawResult: Result) {
