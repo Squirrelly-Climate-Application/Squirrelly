@@ -63,15 +63,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
             // Create and launch sign-in intent
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers as MutableList<AuthUI.IdpConfig>)
-                    .setTheme(R.style.LoginTheme)
-                    .setLogo(R.drawable.helsinki_logo)
-                    .build(),
-                RC_SIGN_IN
-            )
+            startSignIn()
         }
     }
 
@@ -112,16 +104,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             R.id.logout -> {
 
                 FirebaseAuth.getInstance().signOut()
-
                 user = null
-
-                startActivityForResult(
-                    AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers as MutableList<AuthUI.IdpConfig>)
-                        .build(),
-                    RC_SIGN_IN
-                )
+                startSignIn()
 
                 return true
             }
@@ -129,7 +113,6 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             else -> return super.onOptionsItemSelected(item)
         }
     }
-
 
     override fun startQRscan() {
         val permission = ContextCompat.checkSelfPermission(this,
@@ -145,5 +128,17 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun startArFragment() {
         // start the AR game/fragment at this point
         Log.d("TESTER", "ar fragment here")
+    }
+
+    private fun startSignIn(){
+        startActivityForResult(
+            AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers as MutableList<AuthUI.IdpConfig>)
+                .setTheme(R.style.LoginTheme)
+                .setLogo(R.drawable.helsinki_logo)
+                .build(),
+            RC_SIGN_IN
+        )
     }
 }

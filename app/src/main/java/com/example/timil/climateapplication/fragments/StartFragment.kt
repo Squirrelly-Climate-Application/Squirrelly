@@ -40,11 +40,6 @@ class StartFragment : Fragment() {
         }
     }
 
-    /*override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        activityCallBack = context as OnGameStart
-    }*/
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
