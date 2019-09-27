@@ -67,6 +67,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                 AuthUI.getInstance()
                     .createSignInIntentBuilder()
                     .setAvailableProviders(providers as MutableList<AuthUI.IdpConfig>)
+                    .setTheme(R.style.LoginTheme)
+                    .setLogo(R.drawable.helsinki_logo)
                     .build(),
                 RC_SIGN_IN
             )
