@@ -95,7 +95,7 @@ class CustomArFragment : ArFragment() {
 
             if (upwardSwipe) {
 
-                val scaledX = ((motionEvent.x - 525) * 0.0006842105f) // * 1.3f
+                val scaledX = ((motionEvent.x - 525) * 0.0006842105f) * 1.3f
                 val tempY = ((950 - motionEvent.y) * 0.0006315789f)
 
                 // should work for both positive and negative y values
