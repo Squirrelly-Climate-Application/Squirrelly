@@ -67,7 +67,7 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
         Log.d("HUUH", "throwStr: $throwStr")
 
         val finalTarget = Vector3(throwTarget)
-        Log.d("HUUH", "orig. throwTarget: $throwTarget")
+        // Log.d("HUUH", "orig. throwTarget: $throwTarget")
 
         val intermediateTarget = Vector3(throwTarget)
         intermediateTarget.apply {
@@ -80,7 +80,7 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
             // if (y >= 0f) y * 0.5f else (y + localPosition.y) / 2 // only works with 50 % !!
         }
         finalTarget.x += windEffect // gets the full effect
-        Log.d("HUUH", "intermediateTarget: $intermediateTarget")
+        // Log.d("HUUH", "intermediateTarget: $intermediateTarget")
 
         playLaunchAnimation(intermediateTarget, finalTarget)
     } // launch

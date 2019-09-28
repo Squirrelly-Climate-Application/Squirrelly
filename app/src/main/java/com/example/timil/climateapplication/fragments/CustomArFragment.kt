@@ -78,6 +78,12 @@ class CustomArFragment : ArFragment() {
         (activity as AppCompatActivity).supportActionBar!!.show()
     }
 
+    /* // could use this instead of the listener and custom function ??
+    override fun onPeekTouch(hitTestResult: HitTestResult?, motionEvent: MotionEvent?) {
+        super.onPeekTouch(hitTestResult, motionEvent)
+        Log.d("HUUH", "peekTouch detected")
+    } */
+
     private fun onPeekTouchDetect(hitTestResult: HitTestResult, motionEvent: MotionEvent) {
 
         // val hitEntityName = hitTestResult.node?.name ?: "noHit"
@@ -91,50 +97,52 @@ class CustomArFragment : ArFragment() {
 
         if (hitProj && motionEvent.actionMasked == MotionEvent.ACTION_UP) {
 
+            Log.d("HUUH", "motionEvent y: " + motionEvent.y)
+
             val upwardSwipe = motionEvent.y < 1600
 
             if (upwardSwipe) {
 
-                val scaledX = ((motionEvent.x - 525) * 0.0006842105f) * 1.3f
-                val tempY = ((950 - motionEvent.y) * 0.0006315789f)
+                val scaledX = ((motionEvent.x - 540) * 0.0006842105f) * 1.3f
 
-                // should work for both positive and negative y values
+                // should be correct now...
+                val tempY = ((960 - motionEvent.y) * 0.0006315789f)
                 val scaledY = -0.35f + (abs(-0.35f) + tempY) * 1.3f  // -0.35f = local y coordinate of the start location
 
                 val target = Vector3(scaledX, scaledY, -1.0f) // sink it down a little bit, with a lower final z-value
-                // Log.d("HUUH", "target: " + target)
 
-                projNode!!.launch(target)
+                projNode!!.launch(target) // it's only an animation; the actual hit logic is directly below
 
-                // val hitTestResult2 = arFragment.arSceneView.scene.hitTest(screenCenterMEvent)
+                val actualScaledHitPoint = convertMEventCoordsToScaledScreenTargetPoint(motionEvent.x, motionEvent.y, 1.3f)
 
-                // val monsterHitPoint = Point(motionEvent.x, motionEvent.y) // so that we can hit it on the z-level
-                // obtainFakeMotionEvent(monsterHitTarget)
+                // we'll 'touch' the scaled hit point (30 % further than the finger swipe's end point)
+                val actualHitTestMEvent = obtainMotionEvent(actualScaledHitPoint)
+                val actualHitTestResult = arSceneView.scene.hitTest(actualHitTestMEvent)
+                val actuallyHitNode = actualHitTestResult.node
 
-                if (!hitMonster && hitProj && hitNode is Monster) {
+                if (!hitMonster && hitProj && actuallyHitNode is Monster) {
 
                     hitMonster = true
-                    monsterNode = hitNode
+                    monsterNode = actuallyHitNode
                     Log.d("HUUH", "hit monster!")
-                    /*
-                    val x = monsterNode!!.worldPosition.x
-                    val y = monsterNode!!.worldPosition.y
-                    Log.d("HUUH", "x: $x")
-                    Log.d("HUUH", "y: $y") */
                 }
-            } // if
-
+            } // if upwardSwipe
             hitMonster = false
             monsterNode = null
             hitProj = false
             projNode = null
-        } // if
+        } // if real MotionEvent == UP event
     } // onPeekTouchDetect
 
     // creates a 'fake' MotionEvent that 'touches' a given point
-    private fun obtainFakeMotionEvent(point: Point): MotionEvent {
+    private fun obtainMotionEvent(point: Point): MotionEvent {
 
-        // val screenCenter = android.graphics.Point(findViewById<View>(android.R.id.content).width / 2, findViewById<View>(android.R.id.content).height / 2)
+        Log.d("HUUH", "fake x: " + point.x)
+        Log.d("HUUH", "fake y: " + point.y)
+
+        val screenCenter = Point(activity!!.findViewById<View>(android.R.id.content).width / 2, activity!!.findViewById<View>(android.R.id.content).height / 2)
+        // Log.d("HUUH", "screencenter x: " + screenCenter.x) // 540
+        // Log.d("HUUH", "screencenter y: " + screenCenter.y) // 960
 
         val downTime = SystemClock.uptimeMillis()
         val eventTime = SystemClock.uptimeMillis() + 100
@@ -149,7 +157,7 @@ class CustomArFragment : ArFragment() {
             x,
             y,
             metaState)
-    } // end obtainFakeMotionEvent
+    } // end obtainMotionEvent
 
     // disable the plane detection once a plane has been chosen
     private fun disablePlaneDetection() {
@@ -162,6 +170,13 @@ class CustomArFragment : ArFragment() {
     private fun enablePlaneDetection() {
         planeDiscoveryController.show()
         arSceneView.planeRenderer.isEnabled = true
+    }
+
+    private fun convertMEventCoordsToScaledScreenTargetPoint(x: Float, y: Float, scaleFactor: Float): Point {
+
+        val scaledX = 540 + (x - 540) * scaleFactor
+        val scaledY = 1920 - (abs(y - 1920)) * scaleFactor // negative axis (from 1900 to 0)
+        return Point(scaledX.toInt(), scaledY.toInt())
     }
 
 } // CustomArFragment
