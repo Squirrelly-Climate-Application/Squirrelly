@@ -8,6 +8,7 @@ import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -44,7 +45,7 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
 
         override fun onDropAnimEnd() {
 
-            Log.d("HUUH", "localPos at end: $localPosition")
+            // Log.d("HUUH", "localPos at end: $localPosition")
             // Log.d("HUUH", "world pos: $worldPosition")
             dispose() // delete the old nut
             create(cameraNode) // immediately create a new nut
@@ -74,7 +75,9 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
             x = throwTarget.x * 0.5f // 50 %
             x += windEffect * 0.5f // it needs to be scaled as well
             z = -0.8f
-            y = if (y >= 0f) y * 0.5f else (y + localPosition.y) / 2 // only works with 50 % !!
+            y = localPosition.y + (abs(localPosition.y) + throwTarget.y) * 0.5f
+
+            // if (y >= 0f) y * 0.5f else (y + localPosition.y) / 2 // only works with 50 % !!
         }
         finalTarget.x += windEffect // gets the full effect
         Log.d("HUUH", "intermediateTarget: $intermediateTarget")

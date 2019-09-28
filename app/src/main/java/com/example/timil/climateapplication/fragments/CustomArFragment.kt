@@ -91,15 +91,15 @@ class CustomArFragment : ArFragment() {
 
         if (hitProj && motionEvent.actionMasked == MotionEvent.ACTION_UP) {
 
-            val upwardSwipe = motionEvent.y < 1600 // 1600; -0.35 / -0.65 = 1023
+            val upwardSwipe = motionEvent.y < 1600
 
             if (upwardSwipe) {
 
-                val scaledX = ((motionEvent.x - 525) * 0.0006842105f) * 1.3f
+                val scaledX = ((motionEvent.x - 525) * 0.0006842105f) // * 1.3f
                 val tempY = ((950 - motionEvent.y) * 0.0006315789f)
 
-                val scaledY = if (tempY >= 0) tempY * 1.3f else tempY + abs(tempY) * 0.2f // we need to add more force to negative values as well
-                // NOTE: it's not totally correct, but gives good-ish behavior!
+                // should work for both positive and negative y values
+                val scaledY = -0.35f + (abs(-0.35f) + tempY) * 1.3f  // -0.35f = local y coordinate of the start location
 
                 val target = Vector3(scaledX, scaledY, -1.0f) // sink it down a little bit, with a lower final z-value
                 // Log.d("HUUH", "target: " + target)
@@ -116,6 +116,11 @@ class CustomArFragment : ArFragment() {
                     hitMonster = true
                     monsterNode = hitNode
                     Log.d("HUUH", "hit monster!")
+                    /*
+                    val x = monsterNode!!.worldPosition.x
+                    val y = monsterNode!!.worldPosition.y
+                    Log.d("HUUH", "x: $x")
+                    Log.d("HUUH", "y: $y") */
                 }
             } // if
 
