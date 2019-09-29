@@ -12,7 +12,7 @@ import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class Projectile(private val cameraNode: Node): WorldEntity() {
+class Projectile(private val cameraNode: Node, private val observer: IonThrowAnimEndListener): WorldEntity() {
 
     companion object {
 
@@ -24,9 +24,9 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
         private const val secondAnimDura = 1000L
 
         // factory method (this alone should be used for creation!)
-        fun create(cameraNode: Node): Projectile {
+        fun create(cameraNode: Node, obs: IonThrowAnimEndListener): Projectile {
 
-            return Projectile(cameraNode).apply {
+            return Projectile(cameraNode, obs).apply {
                 setPosition(0f, -0.35f, -0.9f) // low center position
                 localRotation = Quaternion.axisAngle(Vector3(1f, 0f, 0f), 40f) // so that it looks good
                 name = Static.DEFAULT_PROJECTILE_NAME
@@ -35,8 +35,8 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
             }
         } // create
     } // companion object
-
-    private val onAnimEndCallbackHolder = object : IonAnimEnd {
+/*
+    private val onThrowAnimEndCallbackHolder = object : IonThrowAnimEndListener {
 
         override fun onRiseAnimEnd() {
 
@@ -50,9 +50,10 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
             dispose() // delete the old nut
             create(cameraNode) // immediately create a new nut
         }
-    } // onAnimEndCallbackHolder
+    } // onthrowAnimEndCallbackHolder */
 
-    interface IonAnimEnd {
+    // for communicating with the AR fragment
+    interface IonThrowAnimEndListener {
 
         fun onRiseAnimEnd()
         fun onDropAnimEnd()
@@ -64,7 +65,7 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
         // name = "thrownNut" // should be unnecessary now
 
         val throwStr = throwStrength(throwTarget) // it should be used somehow... figure out the proper launch speed equation!
-        Log.d("HUUH", "throwStr: $throwStr")
+        // Log.d("HUUH", "throwStr: $throwStr")
 
         val finalTarget = Vector3(throwTarget)
         // Log.d("HUUH", "orig. throwTarget: $throwTarget")
@@ -97,7 +98,7 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
 
                 override fun onAnimationEnd(animation: Animator?) {
 
-                    this@Projectile.onAnimEndCallbackHolder.onRiseAnimEnd()
+                    observer.onRiseAnimEnd()
                     animation?.removeAllListeners()
                 }
             }) // risingAnim
@@ -111,7 +112,7 @@ class Projectile(private val cameraNode: Node): WorldEntity() {
 
                 override fun onAnimationEnd(animation: Animator?) {
 
-                    this@Projectile.onAnimEndCallbackHolder.onDropAnimEnd()
+                    observer.onDropAnimEnd()
                     animation?.removeAllListeners()
                 }
             }) // droppingAnim
