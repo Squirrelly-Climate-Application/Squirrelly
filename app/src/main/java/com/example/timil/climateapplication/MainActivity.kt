@@ -25,6 +25,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import com.example.timil.climateapplication.fragments.ScanFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -131,6 +132,13 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             makeRequestCamera()
         }
         else {
+            setupFragment(scanFragment, SCAN_FRAGMENT_TAG)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             setupFragment(scanFragment, SCAN_FRAGMENT_TAG)
         }
     }
