@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import com.example.timil.climateapplication.ar.Static
 
 class SplashActivity : AppCompatActivity() {
 
@@ -21,6 +22,7 @@ class SplashActivity : AppCompatActivity() {
             if (!paused) {
                 val mainIntent = Intent(this@SplashActivity, MainActivity::class.java)
                 startActivity(mainIntent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
+
                 object : CountDownTimer(wait, wait) {
                     override fun onTick(millisUntilFinished: Long) {
                     }
@@ -39,10 +41,14 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        // not sure if this works or not, but I guess we need some other context than this activity,
+        // as it will soon be destroyed
+        Static.load3dModelResources(applicationContext)
+
+        //Initialize the Handler
         mDelayHandler = Handler()
 
         mDelayHandler!!.postDelayed(mRunnable, delay)
-
     }
 
     override fun onDestroy() {

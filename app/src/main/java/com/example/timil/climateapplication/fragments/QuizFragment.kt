@@ -1,6 +1,5 @@
 package com.example.timil.climateapplication.fragments
 
-
 import android.app.Activity
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -19,7 +18,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 import kotlin.collections.ArrayList
 import android.widget.ProgressBar
 import android.support.v7.app.AlertDialog
-
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 //private const val ARG_PARAM1 = "param1"
@@ -155,7 +153,11 @@ class QuizFragment : Fragment() {
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") {
                             dialog, _ ->
                                 dialog.dismiss()
-                                fragmentManager!!.popBackStack()
+
+                                // NOTE: FOR GAME TESTING ONLY!!! For the final version,
+                                // remove this and re-enable the popBackStack() call
+                                activityCallBack!!.startArFragment()
+                                // fragmentManager!!.popBackStack()
                     }
                 }
                 alertDialog.show()

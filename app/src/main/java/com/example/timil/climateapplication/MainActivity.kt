@@ -23,6 +23,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import com.example.timil.climateapplication.fragments.CustomArFragment
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
     private lateinit var startFragment: StartFragment
     private lateinit var scanFragment: ScanFragment
+    private lateinit var arFragment: CustomArFragment
 
     private var viewGroup: ViewGroup? = null
 
@@ -144,8 +146,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     }
 
     override fun startArFragment() {
-        // start the AR game/fragment at this point
-        Log.d("TESTER", "ar fragment here")
+
+        arFragment = CustomArFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, arFragment).commit()
     }
 
     private fun startSignIn(){

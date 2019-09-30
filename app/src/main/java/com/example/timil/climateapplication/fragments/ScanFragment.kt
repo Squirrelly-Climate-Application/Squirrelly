@@ -13,7 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import com.example.timil.climateapplication.MainActivity.Companion.QUIZ_FRAGMENT_TAG
 
 
-class ScanFragment: Fragment(), ZXingScannerView.ResultHandler  {
+class ScanFragment: Fragment(), ZXingScannerView.ResultHandler {
 
     private lateinit var mScannerView: ZXingScannerView
     private lateinit var quizFragment: QuizFragment
