@@ -48,7 +48,6 @@ class SplashActivity : AppCompatActivity() {
         //Initialize the Handler
         mDelayHandler = Handler()
 
-        //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, delay)
     }
 

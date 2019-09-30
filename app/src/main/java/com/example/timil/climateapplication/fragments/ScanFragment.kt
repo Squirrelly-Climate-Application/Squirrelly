@@ -10,14 +10,13 @@ import com.example.timil.climateapplication.R
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.support.v7.app.AppCompatActivity
-
+import com.example.timil.climateapplication.MainActivity.Companion.QUIZ_FRAGMENT_TAG
 
 
 class ScanFragment: Fragment(), ZXingScannerView.ResultHandler {
 
     private lateinit var mScannerView: ZXingScannerView
     private lateinit var quizFragment: QuizFragment
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         quizFragment = QuizFragment()
@@ -51,7 +50,7 @@ class ScanFragment: Fragment(), ZXingScannerView.ResultHandler {
     override fun handleResult(rawResult: Result) {
 
         if (rawResult.text == "our qr text") {
-            fragmentManager!!.beginTransaction().replace(R.id.fragment_container, quizFragment).addToBackStack(null).commit()
+            fragmentManager!!.beginTransaction().replace(R.id.fragment_container, quizFragment, QUIZ_FRAGMENT_TAG).addToBackStack(null).commit()
         }
         else {
             Toast.makeText(context, "Unidentified code, please try again", Toast.LENGTH_SHORT).show()

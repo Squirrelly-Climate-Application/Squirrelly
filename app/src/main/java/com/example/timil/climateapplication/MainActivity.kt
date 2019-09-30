@@ -14,28 +14,40 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import com.example.timil.climateapplication.fragments.CustomArFragment
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.example.timil.climateapplication.fragments.ScanFragment
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick {
 
     private var providers: List<AuthUI.IdpConfig>? = null
     private var user: FirebaseUser? = null
-    val RC_SIGN_IN = 42
+
 
     private lateinit var startFragment: StartFragment
     private lateinit var scanFragment: ScanFragment
     private lateinit var arFragment: CustomArFragment
 
+    private var viewGroup: ViewGroup? = null
+
     companion object {
+        const val RC_SIGN_IN = 42
         const val RECORD_REQUEST_CODE = 1
+        const val START_FRAGMENT_TAG = "StartFragment"
+        const val SCAN_FRAGMENT_TAG = "ScanFragment"
+        const val QUIZ_FRAGMENT_TAG = "QuizFragment"
     }
 
     override fun onStart() {
@@ -53,7 +65,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         startFragment = StartFragment()
         scanFragment = ScanFragment()
 
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, startFragment).commit()
+        setupFragment(startFragment, START_FRAGMENT_TAG)
 
         val toolBar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolBar)
@@ -102,17 +114,15 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.logout -> {
-
                 FirebaseAuth.getInstance().signOut()
                 user = null
                 startSignIn()
-
-                return true
+                true
             }
 
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -123,7 +133,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             makeRequestCamera()
         }
         else {
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, scanFragment).addToBackStack(null).commit()
+            setupFragment(scanFragment, SCAN_FRAGMENT_TAG)
         }
     }
 
@@ -143,5 +153,32 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                 .build(),
             RC_SIGN_IN
         )
+    }
+
+    private fun setupFragment(fragment: Fragment, name: String) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment, name)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun findFragment(name: String): Boolean = (supportFragmentManager.findFragmentByTag(name) != null
+            && supportFragmentManager.findFragmentByTag(name)!!.isVisible)
+
+    override fun onBackPressed() {
+
+        if (findFragment(SCAN_FRAGMENT_TAG)){
+            super.onBackPressed()
+        }
+        else {
+            val builder = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
+            builder.setView(dialogView)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    finish()
+                }
+                .setNegativeButton(R.string.no) { _, _ ->
+                }.show()
+        }
     }
 }
