@@ -39,6 +39,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+    <!-- Not sure if the best place for the the floating action button. Here it will be seen on every screen. Maybe change later? -->
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabDiscounts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star_yellow_24dp"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="8dp"
+            app:backgroundTint="@color/greenButtonColor"
+            app:borderWidth="1dp"
+            app:elevation="8dp"
+            app:fabSize="normal" />
 
 
 </android.support.design.widget.CoordinatorLayout>

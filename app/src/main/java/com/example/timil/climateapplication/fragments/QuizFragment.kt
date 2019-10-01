@@ -1,6 +1,7 @@
 package com.example.timil.climateapplication.fragments
 
 import android.app.Activity
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -18,6 +19,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 import kotlin.collections.ArrayList
 import android.widget.ProgressBar
 import android.support.v7.app.AlertDialog
+import android.view.Gravity
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 //private const val ARG_PARAM1 = "param1"
@@ -119,18 +121,17 @@ class QuizFragment : Fragment() {
 
         val layout = root!!.findViewById(R.id.btnsLinearLayout) as LinearLayout
         layout.orientation = LinearLayout.VERTICAL
+        layout.gravity = Gravity.CENTER
 
         for (i in 0..(options.size-1)) {
-            val layoutColumn = LinearLayout(context)
-            layoutColumn.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+
             val btnAnswer = Button(context)
             btnAnswer.layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
+            //btnAnswer.setBackgroundColor(resources.getColor(R.color.greenButton))
+            btnAnswer.background.setColorFilter(btnAnswer.context.resources.getColor(R.color.greenButtonColor), PorterDuff.Mode.MULTIPLY)
 
             btnAnswer.text = options[i].toString()
             btnAnswer.id = options.indexOf(options[i])
@@ -143,28 +144,27 @@ class QuizFragment : Fragment() {
                     alertDialog.setMessage("Your answer is correct! \n$information")
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") {
                             dialog, _ ->
-                            dialog.dismiss()
-                            activityCallBack!!.startArFragment()
-                        }
+                        dialog.dismiss()
+                        activityCallBack!!.startArFragment()
+                    }
                 } else {
                     // TODO: app idea changed. Not needed anymore?
                     alertDialog.setTitle("Wrong answer.")
                     alertDialog.setMessage("Wrong answer. Better luck next time!")
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") {
                             dialog, _ ->
-                                dialog.dismiss()
+                        dialog.dismiss()
 
-                                // NOTE: FOR GAME TESTING ONLY!!! For the final version,
-                                // remove this and re-enable the popBackStack() call
-                                activityCallBack!!.startArFragment()
-                                // fragmentManager!!.popBackStack()
+                        // NOTE: FOR GAME TESTING ONLY!!! For the final version,
+                        // remove this and re-enable the popBackStack() call
+                        activityCallBack!!.startArFragment()
+                        // fragmentManager!!.popBackStack()
                     }
                 }
                 alertDialog.show()
             }
 
-            layoutColumn.addView(btnAnswer)
-            layout.addView(layoutColumn)
+            layout.addView(btnAnswer)
         }
     }
 
