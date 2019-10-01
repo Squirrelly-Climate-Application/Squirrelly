@@ -12,9 +12,12 @@ import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class Projectile(private val cameraNode: Node, private val observer: IonThrowAnimEndListener): WorldEntity() {
+class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
     companion object {
+
+        private val DEFAULT_POSITION = Vector3(0f, -0.35f, -0.9f) // low center position
+        private val DEFAULT_ROTATION = Quaternion.axisAngle(Vector3(1f, 0f, 0f), 40f) // not very necessary atm
 
         // set on app start from Static.kt
         lateinit var projRenderable: ModelRenderable
@@ -26,31 +29,15 @@ class Projectile(private val cameraNode: Node, private val observer: IonThrowAni
         // factory method (this alone should be used for creation!)
         fun create(cameraNode: Node, obs: IonThrowAnimEndListener): Projectile {
 
-            return Projectile(cameraNode, obs).apply {
-                setPosition(0f, -0.35f, -0.9f) // low center position
-                localRotation = Quaternion.axisAngle(Vector3(1f, 0f, 0f), 40f) // so that it looks good
+            return Projectile(obs).apply {
+                localPosition = DEFAULT_POSITION
+                localRotation = DEFAULT_ROTATION
                 name = Static.DEFAULT_PROJECTILE_NAME
                 renderable = projRenderable
                 setParent(cameraNode)
             }
         } // create
     } // companion object
-/*
-    private val onThrowAnimEndCallbackHolder = object : IonThrowAnimEndListener {
-
-        override fun onRiseAnimEnd() {
-
-            // Log.d("HUUH", "localPos after rise: $localPosition")
-        }
-
-        override fun onDropAnimEnd() {
-
-            // Log.d("HUUH", "localPos at end: $localPosition")
-            // Log.d("HUUH", "world pos: $worldPosition")
-            dispose() // delete the old nut
-            create(cameraNode) // immediately create a new nut
-        }
-    } // onthrowAnimEndCallbackHolder */
 
     // for communicating with the AR fragment
     interface IonThrowAnimEndListener {

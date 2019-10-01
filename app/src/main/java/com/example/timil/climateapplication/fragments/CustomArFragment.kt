@@ -14,12 +14,9 @@ import com.example.timil.climateapplication.ar.PlasticMonster
 import com.example.timil.climateapplication.ar.Projectile
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.math.Vector3
-import com.google.ar.sceneform.rendering.PlaneRenderer
-import com.google.ar.sceneform.rendering.Texture
 import com.google.ar.sceneform.ux.ArFragment
 import kotlin.math.abs
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 /**
  * Fragment that enables placing and manipulating ar objects in the world space.
@@ -58,8 +55,17 @@ class CustomArFragment : ArFragment() {
     // the factor that the distance of the finger swipe is multiplied by
     private val hitScaleFactor = 1.3f
 
+    // to make the coordinate scaling work for all phone models (hopefully...)
+    private var screenWidth = 0
+    private var screenHeight = 0
+    private var screenCenter = Point(0, 0)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
+
+        screenWidth = activity!!.findViewById<View>(android.R.id.content)!!.width // the activity should always exist
+        screenHeight = activity!!.findViewById<View>(android.R.id.content)!!.height
+        screenCenter = Point(screenWidth / 2, screenHeight / 2)
 
         disablePlaneDetection()
         arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
@@ -126,19 +132,22 @@ class CustomArFragment : ArFragment() {
 
             // Log.d("HUUH", "motionEvent y: " + motionEvent.y)
 
-            val upwardSwipe = motionEvent.y < 1600
+            val upwardSwipe = motionEvent.y < 0.8333 * screenHeight
 
             if (upwardSwipe) {
 
-                val scaledX = ((motionEvent.x - 540) * 0.0006481481f) * hitScaleFactor
+                //TODO: it's not easy to get rid of the remaining hardcoded factors, but it should be done.
+                // their values depend on the relationship between the two coordinate systems (ARCore's and regular screen touch events'),
+                // which is extremely nebulous at the best of times
+                val scaledX = ((motionEvent.x - screenCenter.x) * 0.0006481481f) * hitScaleFactor
 
-                // should be correct now... // old tempY scalefactor: 0.0006315789f
-                //TODO: make this work for all phone screens (now it only works correctly for Samsung Galaxy S7)
-                val tempY = ((960 - motionEvent.y) * 0.0007142857f) // gives -0.35 min value (1450 is the lowest y screen point atm)
-                val scaledY = -0.35f + (abs(-0.35f) + tempY) * hitScaleFactor  // -0.35f = local y coordinate of the start location
+                val localY = projNode!!.localPosition.y
+                val tempY = ((screenCenter.y - motionEvent.y) * 0.0007142857f) // gives -0.35 min value (1450 is the lowest y screen point atm)
+                val scaledY = localY + (abs(localY) + tempY) * hitScaleFactor  // local y coordinate of the start location = -0.35f
 
                 val target = Vector3(scaledX, scaledY, -1.0f) // sink it down a little bit, with a lower final z-value
 
+                // store the end point of the animation that is launched directly below
                 actualScaledHitPoint = convertMEventCoordsToScaledScreenTargetPoint(motionEvent.x, motionEvent.y)
 
                 projNode!!.launch(target) // triggers the animation; at the end of it comes the hit check to the monster
@@ -184,7 +193,7 @@ class CustomArFragment : ArFragment() {
                 }
             } // if Monster
             numOfThrows-- // the game ends if it goes to zero
-            Log.d("HUUH", "numOfThrows after decrease: $numOfThrows")
+            // Log.d("HUUH", "numOfThrows after decrease: $numOfThrows")
             projNode?.dispose() // delete the old nut
             projNode = null
             Projectile.create(arSceneView.scene.camera, this) // immediately create a new nut
@@ -240,8 +249,8 @@ class CustomArFragment : ArFragment() {
     // maybe shorten its name, ehh
     private fun convertMEventCoordsToScaledScreenTargetPoint(x: Float, y: Float): Point {
 
-        val scaledX = 540 + (x - 540) * hitScaleFactor
-        val scaledY = 1920 - (abs(y - 1920)) * hitScaleFactor // reverse axis (from 1900 to 0)
+        val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor
+        val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor // reverse axis (from 1900 to 0) and zero point off-center
         return Point(scaledX.toInt(), scaledY.toInt())
     }
 
