@@ -22,6 +22,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import com.example.timil.climateapplication.fragments.*
+import com.example.timil.climateapplication.services.SoundService
 
 
 class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick {
@@ -59,6 +60,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        startService(Intent(this@MainActivity, SoundService::class.java))
         startFragment = StartFragment()
         scanFragment = ScanFragment()
         discountsFragment = DiscountsFragment()
@@ -74,9 +76,19 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         }
     }
 
+    override fun onDestroy() {
+        stopService(Intent(this@MainActivity, SoundService::class.java))
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopService(Intent(this@MainActivity, SoundService::class.java))
+    }
+
     override fun onResume() {
         super.onResume()
-
+        stopService(Intent(this@MainActivity, SoundService::class.java))
         user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
             // Create and launch sign-in intent
@@ -148,12 +160,11 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     }
 
     override fun startArFragment() {
-
         arFragment = CustomArFragment()
         setupFragment(arFragment, AR_FRAGMENT_TAG)
     }
 
-    private fun startSignIn(){
+    private fun startSignIn() {
         startActivityForResult(
             AuthUI.getInstance()
                 .createSignInIntentBuilder()
@@ -176,7 +187,6 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             && supportFragmentManager.findFragmentByTag(tag)!!.isVisible)
 
     override fun onBackPressed() {
-
         if (findFragment(SCAN_FRAGMENT_TAG)){
             super.onBackPressed()
         }
