@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         const val START_FRAGMENT_TAG = "StartFragment"
         const val SCAN_FRAGMENT_TAG = "ScanFragment"
         const val QUIZ_FRAGMENT_TAG = "QuizFragment"
+        const val AR_FRAGMENT_TAG = "ARFragment"
         const val DISCOUNTS_FRAGMENT_TAG = "DiscountsFragment"
     }
 
@@ -149,7 +150,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun startArFragment() {
 
         arFragment = CustomArFragment()
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, arFragment).commit()
+        setupFragment(arFragment, AR_FRAGMENT_TAG)
     }
 
     private fun startSignIn(){
@@ -164,15 +165,15 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         )
     }
 
-    private fun setupFragment(fragment: Fragment, name: String) {
+    private fun setupFragment(fragment: Fragment, tag: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment, name)
+            .replace(R.id.fragment_container, fragment, tag)
             .addToBackStack(null)
             .commit()
     }
 
-    private fun findFragment(name: String): Boolean = (supportFragmentManager.findFragmentByTag(name) != null
-            && supportFragmentManager.findFragmentByTag(name)!!.isVisible)
+    private fun findFragment(tag: String): Boolean = (supportFragmentManager.findFragmentByTag(tag) != null
+            && supportFragmentManager.findFragmentByTag(tag)!!.isVisible)
 
     override fun onBackPressed() {
 
@@ -184,7 +185,12 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
             builder.setView(dialogView)
                 .setPositiveButton(R.string.yes) { _, _ ->
-                    finish()
+                    if (findFragment(START_FRAGMENT_TAG)){
+                        finish()
+                    }
+                    else {
+                        super.onBackPressed()
+                    }
                 }
                 .setNegativeButton(R.string.no) { _, _ ->
                 }.show()
