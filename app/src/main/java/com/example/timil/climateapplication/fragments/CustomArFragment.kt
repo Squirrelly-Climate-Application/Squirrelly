@@ -18,6 +18,8 @@ import com.google.ar.sceneform.rendering.PlaneRenderer
 import com.google.ar.sceneform.rendering.Texture
 import com.google.ar.sceneform.ux.ArFragment
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 /**
  * Fragment that enables placing and manipulating ar objects in the world space.
@@ -28,7 +30,20 @@ import kotlin.math.abs
 // things like the hit logic in this class. but since the app is simple enough and ViewModels are
 // hard af to use, let's just do it this way for now :D
 
+private const val DEFAULT_THROWS = 5
+
 class CustomArFragment : ArFragment() {
+
+    //TODO: the throw number should arrive from the quiz part
+    // note: these could be in a 'Game' class, but for now I don't think that's necessary
+    private var numOfThrows = DEFAULT_THROWS
+        set(value) {
+            field = value
+            if (value == 0) {
+                endGame(false) // if the monster is dead, the game ends before this call
+            }
+        }
+    private var usedThrows = 0 // not ideal, but things are a lot easier if this exists
 
     // for tracking gesture (swipe) hits to the thrown projectile (acorn)
     private var hitProj = false
@@ -53,7 +68,7 @@ class CustomArFragment : ArFragment() {
         }
 
         // create the first nut and the monster
-        PlasticMonster.create(arSceneView.scene.camera)
+        monsterNode = PlasticMonster.create(arSceneView.scene.camera)
         Projectile.create(arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
 
         //TODO: we may use the plane renderer for placing non-camera-locked monsters
@@ -128,10 +143,10 @@ class CustomArFragment : ArFragment() {
 
                 projNode!!.launch(target) // triggers the animation; at the end of it comes the hit check to the monster
             } // if upwardSwipe
-            hitMonster = false
-            monsterNode = null
+
+            // hitMonster = false
+            // monsterNode = null
             hitProj = false
-            // projNode = null
         } // if real MotionEvent == UP event
     } // onPeekTouchDetect
 
@@ -145,6 +160,8 @@ class CustomArFragment : ArFragment() {
 
         override fun onDropAnimEnd() {
 
+            usedThrows++
+
             // these shenanigans are needed because the hit detection should only happen once the
             // throwing animation has finished
 
@@ -157,15 +174,31 @@ class CustomArFragment : ArFragment() {
             if (/* !hitMonster && hitProj && */ actuallyHitNode is Monster) {
 
                 hitMonster = true
-                monsterNode = actuallyHitNode
-                actuallyHitNode.damage(1)
+                monsterNode!!.damage(1)
                 Log.d("HUUH", "hit monster!")
-            }
+
+                // this looks a bit ugly, but we avoid making another interface to communicate with the fragment
+                if (!monsterNode!!.isAlive) {
+
+                    endGame(true)
+                }
+            } // if Monster
+            numOfThrows-- // the game ends if it goes to zero
+            Log.d("HUUH", "numOfThrows after decrease: $numOfThrows")
             projNode?.dispose() // delete the old nut
             projNode = null
             Projectile.create(arSceneView.scene.camera, this) // immediately create a new nut
         } // onDropAnimEnd
     } // onThrowAnimEndCallbackHolder
+
+    private fun endGame(monsterDead: Boolean) {
+
+        var finalPoints = 10.0 - usedThrows
+        if (monsterDead) finalPoints *= 1.5
+
+        Log.d("HUUH", "final points: " + ceil(finalPoints).toInt()) // always round upwards
+        //TODO: move to the reward screen and send the points there
+    } // endGame
 
     // creates a 'fake' MotionEvent that 'touches' a given screen point
     private fun obtainMotionEvent(point: Point): MotionEvent {
