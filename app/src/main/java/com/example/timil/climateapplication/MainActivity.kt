@@ -18,18 +18,19 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
+import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.fragments.*
 import com.example.timil.climateapplication.services.SoundService
 
 
-class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick {
+class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick, DiscountsRecyclerAdapter.OnDiscountClick {
 
     private var providers: List<AuthUI.IdpConfig>? = null
     private var user: FirebaseUser? = null
-
 
     private lateinit var startFragment: StartFragment
     private lateinit var scanFragment: ScanFragment
@@ -162,6 +163,12 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun startArFragment() {
         arFragment = CustomArFragment()
         setupFragment(arFragment, AR_FRAGMENT_TAG)
+    }
+
+    override fun showDiscount() {
+        // called when opening a discount for more information
+
+        Log.d("Tester", "discount click")
     }
 
     private fun startSignIn() {
