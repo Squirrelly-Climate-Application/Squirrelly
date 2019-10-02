@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
     override fun onResume() {
         super.onResume()
-        stopService(Intent(this@MainActivity, SoundService::class.java))
+        startService(Intent(this@MainActivity, SoundService::class.java))
         user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
             // Create and launch sign-in intent
