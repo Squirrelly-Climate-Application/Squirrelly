@@ -9,9 +9,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import com.example.timil.climateapplication.ar.Monster
-import com.example.timil.climateapplication.ar.PlasticMonster
-import com.example.timil.climateapplication.ar.Projectile
+import com.example.timil.climateapplication.ar.*
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.ux.ArFragment
@@ -19,7 +17,7 @@ import kotlin.math.abs
 import kotlin.math.ceil
 
 /**
- * Fragment that enables placing and manipulating ar objects in the world space.
+ * Fragment that enables placing and manipulating AR objects in the world space.
  * @author Ville Lohkovuori
  * */
 
@@ -60,8 +58,15 @@ class CustomArFragment : ArFragment() {
     private var screenHeight = 0
     private var screenCenter = Point(0, 0)
 
+    private val wind = Wind.create()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
+
+        Log.d("HUUH", "wind x: " + wind.xComp)
+        Log.d("HUUH", "wind y: " + wind.yComp)
+        Log.d("HUUH", "wind force: " + wind.force)
+        Log.d("HUUH", "wind angle: " + wind.radAngle)
 
         screenWidth = activity!!.findViewById<View>(android.R.id.content)!!.width // the activity should always exist
         screenHeight = activity!!.findViewById<View>(android.R.id.content)!!.height
@@ -118,7 +123,8 @@ class CustomArFragment : ArFragment() {
 
     private fun onPeekTouchDetect(hitTestResult: HitTestResult, motionEvent: MotionEvent) {
 
-        // val hitEntityName = hitTestResult.node?.name ?: "noHit"
+        // do not detect hits to already thrown projectiles
+        if (hitTestResult.node?.name == Projectile.THROWN_PROJECTILE_NAME) return
 
         val hitNode = hitTestResult.node
 
@@ -139,11 +145,11 @@ class CustomArFragment : ArFragment() {
                 //TODO: it's not easy to get rid of the remaining hardcoded factors, but it should be done.
                 // their values depend on the relationship between the two coordinate systems (ARCore's and regular screen touch events'),
                 // which is extremely nebulous at the best of times
-                val scaledX = ((motionEvent.x - screenCenter.x) * 0.0006481481f) * hitScaleFactor
+                val scaledX = ((motionEvent.x - screenCenter.x) * 0.0006481481f) * hitScaleFactor + wind.xComp
 
                 val localY = projNode!!.localPosition.y
                 val tempY = ((screenCenter.y - motionEvent.y) * 0.0007142857f) // gives -0.35 min value (1450 is the lowest y screen point atm)
-                val scaledY = localY + (abs(localY) + tempY) * hitScaleFactor  // local y coordinate of the start location = -0.35f
+                val scaledY = localY + (abs(localY) + tempY) * hitScaleFactor + wind.yComp // local y coordinate of the start location = -0.35f
 
                 val target = Vector3(scaledX, scaledY, -1.0f) // sink it down a little bit, with a lower final z-value
 
@@ -249,8 +255,16 @@ class CustomArFragment : ArFragment() {
     // maybe shorten its name, ehh
     private fun convertMEventCoordsToScaledScreenTargetPoint(x: Float, y: Float): Point {
 
-        val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor
-        val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor // reverse axis (from 1900 to 0) and zero point off-center
+        val alterXBy = wind.xComp * screenWidth / 0.55f // experimental constant; only works on the Galaxy S7!
+        // Log.d("HUUH", "alter x by: $alterXBy")
+
+        val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor + alterXBy // valid only for the Galaxy S7...
+
+        val alterYBy = wind.yComp * screenHeight / 3.6f
+        Log.d("HUUH", "subtract from y: $alterYBy")
+
+        // reverse axis (from 1920 to 0) and zero-point off-center
+        val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor // - alterYBy // ditto...
         return Point(scaledX.toInt(), scaledY.toInt())
     }
 

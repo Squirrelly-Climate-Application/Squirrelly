@@ -37,7 +37,7 @@ class PlasticMonster: Monster() {
                 renderable = monsterRenderable
                 setParent(cameraNode)
             }.also {
-                it.monsterAI?.execute()
+                // it.monsterAI?.execute()
             }
         } // create
     } // companion object
