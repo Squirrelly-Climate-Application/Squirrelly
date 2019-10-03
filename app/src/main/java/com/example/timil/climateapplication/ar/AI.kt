@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.util.Log
-import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import java.util.*
 
@@ -19,12 +18,13 @@ enum class AIType {
     //TODO: add various types of move patterns
 }
 
+// NOTE: these numbers should depend on the screen size, but ARCore makes that very tricky to do
 private const val X_MAX_ABS = 0.30f
 private const val Y_MAX = 0.50f
 private const val Y_MIN = 0.10f
 
-private const val ANIM_LENGTH_MAX = 5000L
-private const val ANIM_LENGTH_MIN = 500L
+private const val ANIM_LENGTH_MAX = 4000L
+private const val ANIM_LENGTH_MIN = 1000L
 
 class AI(private val node: WorldEntity) {
 
@@ -48,7 +48,8 @@ class AI(private val node: WorldEntity) {
 
                             override fun onAnimationEnd(animation: Animator?) {
 
-                                execute()
+                                // Log.d("HUUH", "monster position: " + node.localPosition)
+                                execute() // never stop moving until death
                             }
                         }) // linearAnim
                 } // apply
@@ -82,7 +83,7 @@ class AI(private val node: WorldEntity) {
 
         val x = rGen.nextFloat() * X_MAX_ABS * xSign
         val y = Y_MIN + rGen.nextFloat() * (Y_MAX - Y_MIN)
-        return Vector3(x, y, -1.0f)
+        return Vector3(x, y, -1.0f) // could randomize z-value as well, I guess
     }
 
 } // AI

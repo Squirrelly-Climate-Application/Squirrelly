@@ -12,45 +12,40 @@ import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class Projectile(private val cameraNode: Node, private val observer: IonThrowAnimEndListener): WorldEntity() {
+/**
+ * A class for the thrown projectile (acorn in the final app).
+ * @author Ville Lohkovuori
+ * */
+
+private const val RISE_ANIM_Z_TARGET = -0.8f
+
+class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
     companion object {
+
+        const val THROWN_PROJECTILE_NAME = "thrown"
+
+        private val DEFAULT_POSITION = Vector3(0f, -0.35f, -0.9f) // low center position
+        private val DEFAULT_ROTATION = Quaternion.axisAngle(Vector3(1f, 0f, 0f), 40f) // not very necessary atm
 
         // set on app start from Static.kt
         lateinit var projRenderable: ModelRenderable
 
-        private const val windEffect = 0.0f // the wind is always from the left or right atm
         private const val firstAnimDura = 1000L
         private const val secondAnimDura = 1000L
 
         // factory method (this alone should be used for creation!)
         fun create(cameraNode: Node, obs: IonThrowAnimEndListener): Projectile {
 
-            return Projectile(cameraNode, obs).apply {
-                setPosition(0f, -0.35f, -0.9f) // low center position
-                localRotation = Quaternion.axisAngle(Vector3(1f, 0f, 0f), 40f) // so that it looks good
+            return Projectile(obs).apply {
+                localPosition = DEFAULT_POSITION
+                localRotation = DEFAULT_ROTATION
                 name = Static.DEFAULT_PROJECTILE_NAME
                 renderable = projRenderable
                 setParent(cameraNode)
             }
         } // create
     } // companion object
-/*
-    private val onThrowAnimEndCallbackHolder = object : IonThrowAnimEndListener {
-
-        override fun onRiseAnimEnd() {
-
-            // Log.d("HUUH", "localPos after rise: $localPosition")
-        }
-
-        override fun onDropAnimEnd() {
-
-            // Log.d("HUUH", "localPos at end: $localPosition")
-            // Log.d("HUUH", "world pos: $worldPosition")
-            dispose() // delete the old nut
-            create(cameraNode) // immediately create a new nut
-        }
-    } // onthrowAnimEndCallbackHolder */
 
     // for communicating with the AR fragment
     interface IonThrowAnimEndListener {
@@ -62,7 +57,8 @@ class Projectile(private val cameraNode: Node, private val observer: IonThrowAni
     // can't name it 'throw' because it's a reserved keyword
     fun launch(throwTarget: Vector3) {
 
-        // name = "thrownNut" // should be unnecessary now
+        // to prevent hit detection to the thrown nut (in CustomArFragment)
+        name = THROWN_PROJECTILE_NAME
 
         val throwStr = throwStrength(throwTarget) // it should be used somehow... figure out the proper launch speed equation!
         // Log.d("HUUH", "throwStr: $throwStr")
@@ -74,13 +70,13 @@ class Projectile(private val cameraNode: Node, private val observer: IonThrowAni
         intermediateTarget.apply {
 
             x = throwTarget.x * 0.5f // 50 %
-            x += windEffect * 0.5f // it needs to be scaled as well
-            z = -0.8f
+            // x += wind.xComp * 0.5f // it needs to be scaled as well
+            z = RISE_ANIM_Z_TARGET
             y = localPosition.y + (abs(localPosition.y) + throwTarget.y) * 0.5f
-
-            // if (y >= 0f) y * 0.5f else (y + localPosition.y) / 2 // only works with 50 % !!
+            // y += wind.yComp * 0.5f
         }
-        finalTarget.x += windEffect // gets the full effect
+        // finalTarget.x += wind.xComp // gets the full effect
+        // finalTarget.y += wind.yComp
         // Log.d("HUUH", "intermediateTarget: $intermediateTarget")
 
         playLaunchAnimation(intermediateTarget, finalTarget)
