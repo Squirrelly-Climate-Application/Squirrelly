@@ -2,6 +2,7 @@ package com.example.timil.climateapplication
 
 import android.Manifest
 import android.app.Activity
+import android.app.ActivityOptions
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import java.util.*
@@ -25,6 +26,7 @@ import android.view.ViewGroup
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.fragments.*
 import com.example.timil.climateapplication.services.SoundService
+import kotlinx.android.synthetic.main.fragment_custom_ar.*
 
 
 class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick, DiscountsRecyclerAdapter.OnDiscountClick {
@@ -34,7 +36,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
     private lateinit var startFragment: StartFragment
     private lateinit var scanFragment: ScanFragment
-    private lateinit var arFragment: CustomArFragment
+    // private lateinit var arFragment: CustomArFragment
     private lateinit var discountsFragment: DiscountsFragment
 
     private var viewGroup: ViewGroup? = null
@@ -45,7 +47,6 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         const val START_FRAGMENT_TAG = "StartFragment"
         const val SCAN_FRAGMENT_TAG = "ScanFragment"
         const val QUIZ_FRAGMENT_TAG = "QuizFragment"
-        const val AR_FRAGMENT_TAG = "ARFragment"
         const val DISCOUNTS_FRAGMENT_TAG = "DiscountsFragment"
     }
 
@@ -160,9 +161,14 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         }
     }
 
-    override fun startArFragment() {
-        arFragment = CustomArFragment()
-        setupFragment(arFragment, AR_FRAGMENT_TAG)
+    override fun startArActivity() {
+
+        val mainIntent = Intent(this@MainActivity, ArActivity::class.java)
+        startActivity(mainIntent)
+
+        // arFragment = CustomArFragment()
+        // setContentView(R.layout.fragment_custom_ar) // inflates all the child views correctly
+        // setupFragment(arFragment, AR_FRAGMENT_TAG) // should be used, but it loses the child views
     }
 
     override fun showDiscount() {
@@ -213,4 +219,5 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                 }.show()
         }
     }
-}
+
+} // MainActivity

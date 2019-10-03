@@ -5,14 +5,15 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import com.example.timil.climateapplication.ArActivity
+import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.ar.*
+import com.google.ar.sceneform.FrameTime
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.ux.ArFragment
+import kotlinx.android.synthetic.main.fragment_custom_ar.*
 import kotlin.math.abs
 import kotlin.math.ceil
 
@@ -25,19 +26,21 @@ import kotlin.math.ceil
 // things like the hit logic in this class. but since the app is simple enough and ViewModels are
 // hard af to use, let's just do it this way for now :D
 
-private const val DEFAULT_THROWS = 5
-
 class CustomArFragment : ArFragment() {
 
-    //TODO: the throw number should arrive from the quiz part
+    // the game score
+    private var score = 0.0f
+
+    //TODO: the throw number should arrive from the bundle
     // note: these could be in a 'Game' class, but for now I don't think that's necessary
-    private var numOfThrows = DEFAULT_THROWS
+    private var numOfThrows = 0
         set(value) {
             field = value
             if (value == 0) {
                 endGame(false) // if the monster is dead, the game ends before this call
             }
         }
+
     private var usedThrows = 0 // not ideal, but things are a lot easier if this exists
 
     // for tracking gesture (swipe) hits to the thrown projectile (acorn)
@@ -60,16 +63,23 @@ class CustomArFragment : ArFragment() {
 
     private val wind = Wind.create()
 
+    private var setupDone = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
+        // inflater.inflate(R.layout.fragment_custom_ar, container, false)
+/*
         Log.d("HUUH", "wind x: " + wind.xComp)
         Log.d("HUUH", "wind y: " + wind.yComp)
         Log.d("HUUH", "wind force: " + wind.force)
-        Log.d("HUUH", "wind angle: " + wind.radAngle)
+        Log.d("HUUH", "wind angle: " + wind.radAngle) */
 
-        screenWidth = activity!!.findViewById<View>(android.R.id.content)!!.width // the activity should always exist
-        screenHeight = activity!!.findViewById<View>(android.R.id.content)!!.height
+        val display = activity!!.windowManager.defaultDisplay
+        val size = Point()
+        display.getSize(size)
+        screenWidth = size.x
+        screenHeight = size.y
         screenCenter = Point(screenWidth / 2, screenHeight / 2)
 
         disablePlaneDetection()
@@ -82,9 +92,11 @@ class CustomArFragment : ArFragment() {
         monsterNode = PlasticMonster.create(arSceneView.scene.camera)
         Projectile.create(arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
 
+        numOfThrows = (activity as ArActivity).DEFAULT_THROWS
+
         //TODO: we may use the plane renderer for placing non-camera-locked monsters
 
-        // return inflater.inflate(R.layout.fragment_custom_ar, container, false)
+        // return inflater.inflate(R.layout.fragment_custom_ar_2, container, false)
 /*
         // set plane renderer to red
         val sampler = Texture.Sampler.builder()
@@ -107,13 +119,25 @@ class CustomArFragment : ArFragment() {
 
     override fun onResume() {
         super.onResume()
-        (activity as AppCompatActivity).supportActionBar!!.hide()
-    }
+        // (activity as AppCompatActivity).supportActionBar!!.hide()
 
+        if (!setupDone && isAdded) {
+
+            (activity as ArActivity).apply {
+
+                // why tf the views can't be found from the fragment is anyone's guess -.-
+                setHitPoints(monsterNode!!.hitPoints)
+                setWindX(wind.xComp)
+                setWindY(wind.yComp)
+            }
+            setupDone = true
+        } // if
+    } // onResume
+/*
     override fun onStop() {
         super.onStop()
         (activity as AppCompatActivity).supportActionBar!!.show()
-    }
+    } */
 
     /* // could use this instead of the listener and custom function ??
     override fun onPeekTouch(hitTestResult: HitTestResult?, motionEvent: MotionEvent?) {
@@ -136,7 +160,7 @@ class CustomArFragment : ArFragment() {
 
         if (hitProj && motionEvent.actionMasked == MotionEvent.ACTION_UP) {
 
-            // Log.d("HUUH", "motionEvent y: " + motionEvent.y)
+            Log.d("HUUH", "scr height: $screenHeight")
 
             val upwardSwipe = motionEvent.y < 0.8333 * screenHeight
 
@@ -190,6 +214,8 @@ class CustomArFragment : ArFragment() {
 
                 hitMonster = true
                 monsterNode!!.damage(1)
+                score += 2
+                (activity as ArActivity).setHitPoints(monsterNode!!.hitPoints)
                 Log.d("HUUH", "hit monster!")
 
                 // this looks a bit ugly, but we avoid making another interface to communicate with the fragment
@@ -199,6 +225,9 @@ class CustomArFragment : ArFragment() {
                 }
             } // if Monster
             numOfThrows-- // the game ends if it goes to zero
+            score-- // used throw = -1 score
+            (activity as ArActivity).setScore(score)
+            (activity as ArActivity).setThrows(numOfThrows)
             // Log.d("HUUH", "numOfThrows after decrease: $numOfThrows")
             projNode?.dispose() // delete the old nut
             projNode = null
@@ -208,10 +237,10 @@ class CustomArFragment : ArFragment() {
 
     private fun endGame(monsterDead: Boolean) {
 
-        var finalPoints = 10.0 - usedThrows
-        if (monsterDead) finalPoints *= 1.5
+        if (monsterDead) score *= 1.5f
+        (activity as ArActivity).setScore(score)
 
-        Log.d("HUUH", "final points: " + ceil(finalPoints).toInt()) // always round upwards
+        Log.d("HUUH", "final points: $score") // always round upwards
         //TODO: move to the reward screen and send the points there
     } // endGame
 
@@ -252,6 +281,16 @@ class CustomArFragment : ArFragment() {
         arSceneView.planeRenderer.isEnabled = true
     }
 
+    // for communicating with text views through ArActivity (this fragment can't see them)
+    interface FragmentCommunicator {
+
+        fun setScore(score: Float)
+        fun setHitPoints(hp: Int)
+        fun setThrows(throws: Int)
+        fun setWindX(windX: Float)
+        fun setWindY(windY: Float)
+    }
+
     // maybe shorten its name, ehh
     private fun convertMEventCoordsToScaledScreenTargetPoint(x: Float, y: Float): Point {
 
@@ -266,6 +305,6 @@ class CustomArFragment : ArFragment() {
         // reverse axis (from 1920 to 0) and zero-point off-center
         val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor // - alterYBy // ditto...
         return Point(scaledX.toInt(), scaledY.toInt())
-    }
+    } // convertMEventCoordsToScaledScreenTargetPoint
 
 } // CustomArFragment

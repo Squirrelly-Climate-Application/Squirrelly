@@ -36,7 +36,7 @@ class QuizFragment : Fragment() {
     private var savedQuestionData = false
 
     interface OnButtonClick {
-        fun startArFragment()
+        fun startArActivity()
     }
 
     override fun onAttach(activity: Activity?) {
@@ -63,8 +63,8 @@ class QuizFragment : Fragment() {
         // If the fragment has been used/created before, no need to fetch questions data again
         if (!savedQuestionData) {
             // show a progress bar while the questions are being fetched
-            val progressBar: ProgressBar? = root!!.findViewById(R.id.progressBar);
-            progressBar!!.visibility = View.VISIBLE;
+            val progressBar: ProgressBar? = root!!.findViewById(R.id.progressBar)
+            progressBar!!.visibility = View.VISIBLE
 
             val questionsList = ArrayList<QueryDocumentSnapshot>()
 
@@ -145,7 +145,7 @@ class QuizFragment : Fragment() {
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") {
                             dialog, _ ->
                         dialog.dismiss()
-                        activityCallBack!!.startArFragment()
+                        activityCallBack!!.startArActivity()
                     }
                 } else {
                     // TODO: app idea changed. Not needed anymore?
@@ -155,9 +155,7 @@ class QuizFragment : Fragment() {
                             dialog, _ ->
                         dialog.dismiss()
 
-                        // NOTE: FOR GAME TESTING ONLY!!! For the final version,
-                        // remove this and re-enable the popBackStack() call
-                        activityCallBack!!.startArFragment()
+                        activityCallBack!!.startArActivity()
                         // fragmentManager!!.popBackStack()
                     }
                 }
