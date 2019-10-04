@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import com.example.timil.climateapplication.fragments.CustomArFragment
+import com.example.timil.climateapplication.services.SoundService
 import kotlinx.android.synthetic.main.fragment_custom_ar.*
 
 const val AR_FRAGMENT_TAG = "ARFragment"
@@ -19,8 +20,8 @@ class ArActivity : AppCompatActivity(), CustomArFragment.FragmentCommunicator {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.fragment_custom_ar) // inflates all the child views correctly
+        startService(Intent(this@ArActivity, SoundService::class.java))
 
         launchPowerMeter = findViewById(R.id.launch_power_meter)
 /*
@@ -40,11 +41,22 @@ class ArActivity : AppCompatActivity(), CustomArFragment.FragmentCommunicator {
     override fun onResume() {
         super.onResume()
         supportActionBar?.hide()
+        startService(Intent(this@ArActivity, SoundService::class.java))
     }
 
     override fun onStop() {
         super.onStop()
         supportActionBar?.show()
+    }
+
+    override fun onDestroy() {
+        stopService(Intent(this@ArActivity, SoundService::class.java))
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopService(Intent(this@ArActivity, SoundService::class.java))
     }
 
     override fun setScore(score: Float) {

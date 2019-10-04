@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun onStart() {
         super.onStart()
         // Choose authentication providers
-        providers = Arrays.asList(
+        providers = listOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
@@ -62,12 +62,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        startService(Intent(this@MainActivity, SoundService::class.java))
         startFragment = StartFragment()
         scanFragment = ScanFragment()
         discountsFragment = DiscountsFragment()
-
-
 
         setupFragment(startFragment, START_FRAGMENT_TAG)
 
@@ -79,20 +76,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             setupFragment(discountsFragment, DISCOUNTS_FRAGMENT_TAG)
         }
     }
-
-    override fun onDestroy() {
-        stopService(Intent(this@MainActivity, SoundService::class.java))
-        super.onDestroy()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        stopService(Intent(this@MainActivity, SoundService::class.java))
-    }
-
+    
     override fun onResume() {
         super.onResume()
-        startService(Intent(this@MainActivity, SoundService::class.java))
         user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
             // Create and launch sign-in intent
@@ -167,6 +153,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
         val mainIntent = Intent(this@MainActivity, ArActivity::class.java)
         startActivity(mainIntent)
+        finish()
 
         // arFragment = CustomArFragment()
         // setContentView(R.layout.fragment_custom_ar) // inflates all the child views correctly
