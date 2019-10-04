@@ -67,6 +67,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         scanFragment = ScanFragment()
         discountsFragment = DiscountsFragment()
 
+
+
         setupFragment(startFragment, START_FRAGMENT_TAG)
 
         val toolBar = findViewById<Toolbar>(R.id.toolbar)

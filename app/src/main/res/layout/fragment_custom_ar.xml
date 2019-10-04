@@ -86,4 +86,16 @@
             android:textSize="24sp"
             app:layout_constraintBottom_toTopOf="@+id/tv_wind_y"
             app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+            android:id="@+id/launch_power_meter"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_wind_x"
+            app:layout_constraintTop_toTopOf="parent"
+            android:max="1500"
+            android:progressDrawable="@drawable/progressbar_states" />
+
 </android.support.constraint.ConstraintLayout>

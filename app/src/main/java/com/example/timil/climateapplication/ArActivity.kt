@@ -1,7 +1,11 @@
 package com.example.timil.climateapplication
 
+import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.view.ViewGroup
+import android.widget.ProgressBar
 import com.example.timil.climateapplication.fragments.CustomArFragment
 import kotlinx.android.synthetic.main.fragment_custom_ar.*
 
@@ -11,10 +15,14 @@ class ArActivity : AppCompatActivity(), CustomArFragment.FragmentCommunicator {
 
     val DEFAULT_THROWS = 5
 
+    lateinit var launchPowerMeter: ProgressBar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.fragment_custom_ar) // inflates all the child views correctly
+
+        launchPowerMeter = findViewById(R.id.launch_power_meter)
 /*
         supportFragmentManager.beginTransaction()
             .add(R.id.fragment_container_2, CustomArFragment(), AR_FRAGMENT_TAG)
@@ -62,5 +70,24 @@ class ArActivity : AppCompatActivity(), CustomArFragment.FragmentCommunicator {
 
         tv_wind_y.text = "Wind(x): $windY"
     }
+
+    override fun setPower(power: Int) {
+        launchPowerMeter.progress = power
+    }
+
+    override fun onBackPressed() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
+        builder.setView(dialogView)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
+                startActivity(mainIntent)
+                finish()
+            }
+            .setNegativeButton(R.string.no) { _, _ ->
+            }.show()
+    }
+
+    private var viewGroup: ViewGroup? = null
 
 } // ArActivity

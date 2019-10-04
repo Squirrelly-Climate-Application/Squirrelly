@@ -3,9 +3,12 @@ package com.example.timil.climateapplication.fragments
 import android.graphics.Point
 import android.os.Bundle
 import android.os.SystemClock
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.*
+import android.widget.FrameLayout
+import android.widget.ProgressBar
 import com.example.timil.climateapplication.ArActivity
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.ar.*
@@ -16,6 +19,7 @@ import com.google.ar.sceneform.ux.ArFragment
 import kotlinx.android.synthetic.main.fragment_custom_ar.*
 import kotlin.math.abs
 import kotlin.math.ceil
+import kotlin.math.hypot
 
 /**
  * Fragment that enables placing and manipulating AR objects in the world space.
@@ -64,6 +68,9 @@ class CustomArFragment : ArFragment() {
     private val wind = Wind.create()
 
     private var setupDone = false
+
+    var startDistanceY = 0f
+    var startDistanceX = 0f
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
@@ -153,9 +160,14 @@ class CustomArFragment : ArFragment() {
         val hitNode = hitTestResult.node
 
         if (!hitProj && hitNode is Projectile) {
+            startDistanceY = motionEvent.rawY
+            startDistanceX = motionEvent.rawX
 
             hitProj = true
             projNode = hitNode
+        }
+        if (startDistanceY > 0f && startDistanceX > 0f) {
+            (activity as ArActivity).setPower((hypot( abs(startDistanceX - motionEvent.rawX), abs(startDistanceY - motionEvent.rawY))).toInt())
         }
 
         if (hitProj && motionEvent.actionMasked == MotionEvent.ACTION_UP) {
@@ -181,6 +193,8 @@ class CustomArFragment : ArFragment() {
                 actualScaledHitPoint = convertMEventCoordsToScaledScreenTargetPoint(motionEvent.x, motionEvent.y)
 
                 projNode!!.launch(target) // triggers the animation; at the end of it comes the hit check to the monster
+                startDistanceY = 0f
+                startDistanceX = 0f
             } // if upwardSwipe
 
             // hitMonster = false
@@ -232,6 +246,7 @@ class CustomArFragment : ArFragment() {
             projNode?.dispose() // delete the old nut
             projNode = null
             Projectile.create(arSceneView.scene.camera, this) // immediately create a new nut
+            (activity as ArActivity).setPower(0)
         } // onDropAnimEnd
     } // onThrowAnimEndCallbackHolder
 
@@ -289,6 +304,7 @@ class CustomArFragment : ArFragment() {
         fun setThrows(throws: Int)
         fun setWindX(windX: Float)
         fun setWindY(windY: Float)
+        fun setPower(power: Int)
     }
 
     // maybe shorten its name, ehh
