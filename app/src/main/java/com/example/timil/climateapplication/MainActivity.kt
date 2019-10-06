@@ -12,24 +12,25 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.support.design.widget.FloatingActionButton
+import android.content.res.Configuration
+import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 
 import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.fragments.*
-import com.example.timil.climateapplication.services.SoundService
-import kotlinx.android.synthetic.main.fragment_custom_ar.*
 
 
-class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick, DiscountsRecyclerAdapter.OnDiscountClick {
+class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick, DiscountsRecyclerAdapter.OnDiscountClick, NavigationView.OnNavigationItemSelectedListener {
 
     private var providers: List<AuthUI.IdpConfig>? = null
     private var user: FirebaseUser? = null
@@ -38,6 +39,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     private lateinit var scanFragment: ScanFragment
     // private lateinit var arFragment: CustomArFragment
     private lateinit var discountsFragment: DiscountsFragment
+
+    private lateinit var drawer: DrawerLayout
+    private lateinit var toggle: ActionBarDrawerToggle
 
     private var viewGroup: ViewGroup? = null
 
@@ -71,10 +75,16 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         val toolBar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolBar)
 
-        val fabDiscounts = findViewById<FloatingActionButton>(R.id.fabDiscounts)
-        fabDiscounts.setOnClickListener {
-            setupFragment(discountsFragment, DISCOUNTS_FRAGMENT_TAG)
-        }
+        drawer = findViewById(R.id.drawer_layout)
+
+        toggle = ActionBarDrawerToggle(this, drawer, toolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer.addDrawerListener(toggle)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+
+        val navigationView: NavigationView = findViewById(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
+
     }
     
     override fun onResume() {
@@ -112,23 +122,35 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        toggle.syncState()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.logout -> {
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        toggle.onConfigurationChanged(newConfig)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (toggle.onOptionsItemSelected(item)) {
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.nav_logout -> {
                 FirebaseAuth.getInstance().signOut()
                 user = null
                 startSignIn()
-                true
             }
-
-            else -> super.onOptionsItemSelected(item)
+            R.id.nav_discounts -> setupFragment(discountsFragment, DISCOUNTS_FRAGMENT_TAG)
         }
+        drawer.closeDrawer(GravityCompat.START)
+        return true
     }
 
     override fun startQRscan() {
@@ -189,6 +211,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             && supportFragmentManager.findFragmentByTag(tag)!!.isVisible)
 
     override fun onBackPressed() {
+        // use this if we wan't to close the navigation drawer with back button
+        /*if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START)
+        }*/
         if (findFragment(SCAN_FRAGMENT_TAG)){
             super.onBackPressed()
         }

@@ -2,9 +2,31 @@
 <menu xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android"
       tools:ignore="MissingDefaultResource">
 
-    <item android:title="@string/logout_menu"
-          android:id="@+id/logout"
-          android:icon="@drawable/ic_more_vert_white_24dp"
-          app:showAsAction="never"/>
+    <!--group>
+        <item android:id="@+id/nav_discounts"
+                android:icon="@drawable/ic_star_yellow_24dp"
+                android:title="@string/discounts" />
+
+        <item android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_more_vert_white_24dp"
+                android:title="@string/logout_menu"/>
+    </group>
+
+    <group android:id="@+id/group_menu">
+        <item android:id="@+id/nav_item_four"
+                android:title="Item 4" />
+    </group-->
+
+    <item android:title="@string/menu">
+        <menu>
+            <item android:id="@+id/nav_discounts"
+                    android:icon="@drawable/ic_star_yellow_24dp"
+                    android:title="@string/discounts" />
+
+            <item android:id="@+id/nav_logout"
+                    android:icon="@drawable/ic_exit_to_app_black_24dp"
+                    android:title="@string/logout_menu"/>
+        </menu>
+    </item>
 
 </menu>

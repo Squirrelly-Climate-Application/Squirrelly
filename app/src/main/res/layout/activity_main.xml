@@ -9,48 +9,25 @@
         android:id="@+id/main_content"
         tools:context=".MainActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <android.support.v4.widget.DrawerLayout
+            android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/toolbar_background"
-            android:theme="@style/AppTheme.AppBarOverlay"
-            app:elevation="0dp">
+            android:layout_height="match_parent"
+            tools:openDrawer="start">
 
-        <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+        <include
+                layout="@layout/app_bar_main"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@null"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                android:layout_height="match_parent" />
 
-    </android.support.design.widget.AppBarLayout>
+        <android.support.design.widget.NavigationView
+                android:id="@+id/nav_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                app:headerLayout="@layout/nav_header_main"
+                app:menu="@menu/menu_main" />
 
-    <!--TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/-->
-    <FrameLayout
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    <!-- Not sure if the best place for the the floating action button. Here it will be seen on every screen. Maybe change later? -->
-    <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabDiscounts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_star_yellow_24dp"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="8dp"
-            app:backgroundTint="@color/greenButtonColor"
-            app:borderWidth="1dp"
-            app:elevation="8dp"
-            app:fabSize="normal" />
-
+    </android.support.v4.widget.DrawerLayout>
 
 </android.support.design.widget.CoordinatorLayout>
