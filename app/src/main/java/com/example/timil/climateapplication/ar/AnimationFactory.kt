@@ -18,10 +18,10 @@ object AnimationFactory {
 
     // for linear movement between two points
     fun linearMoveAnim(
-        node: Node,
+        node: Node?,
         dura: Long,
-        from: Vector3,
-        to: Vector3,
+        from: Vector3 = Vector3(0f, 0f, 0f),
+        to: Vector3? = Vector3(0f, 0f, 0f),
         endListener: AnimatorListenerAdapter? = null): ObjectAnimator {
 
         return ObjectAnimator().apply {

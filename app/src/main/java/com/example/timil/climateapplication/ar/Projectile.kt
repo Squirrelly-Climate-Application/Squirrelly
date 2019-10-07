@@ -31,7 +31,7 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
         // set on app start from Static.kt
         lateinit var projRenderable: ModelRenderable
 
-        private const val firstAnimDura = 1000L
+        private const val firstAnimDura = 1000L //TODO: make them depend on the throw strength somehow
         private const val secondAnimDura = 1000L
 
         // factory method (this alone should be used for creation!)
@@ -60,9 +60,6 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
         // to prevent hit detection to the thrown nut (in CustomArFragment)
         name = THROWN_PROJECTILE_NAME
 
-        val throwStr = throwStrength(throwTarget) // it should be used somehow... figure out the proper launch speed equation!
-        // Log.d("HUUH", "throwStr: $throwStr")
-
         val finalTarget = Vector3(throwTarget)
         // Log.d("HUUH", "orig. throwTarget: $throwTarget")
 
@@ -70,14 +67,9 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
         intermediateTarget.apply {
 
             x = throwTarget.x * 0.5f // 50 %
-            // x += wind.xComp * 0.5f // it needs to be scaled as well
             z = RISE_ANIM_Z_TARGET
             y = localPosition.y + (abs(localPosition.y) + throwTarget.y) * 0.5f
-            // y += wind.yComp * 0.5f
         }
-        // finalTarget.x += wind.xComp // gets the full effect
-        // finalTarget.y += wind.yComp
-        // Log.d("HUUH", "intermediateTarget: $intermediateTarget")
 
         playLaunchAnimation(intermediateTarget, finalTarget)
     } // launch
@@ -123,13 +115,5 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
             start()
         }
     } // playLaunchAnimation
-
-    private fun throwStrength(throwTarget: Vector3): Double {
-
-        val x = throwTarget.x.toDouble()
-        val y = throwTarget.y.toDouble()
-
-        return sqrt(x.pow(2.0) + y.pow(2.0))
-    }
 
 } // Projectile

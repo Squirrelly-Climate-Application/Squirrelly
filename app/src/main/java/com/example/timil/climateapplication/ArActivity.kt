@@ -2,40 +2,83 @@ package com.example.timil.climateapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.ViewGroup
-import android.widget.ProgressBar
-import com.example.timil.climateapplication.fragments.CustomArFragment
+import android.view.Window
+import android.view.WindowManager
 import com.example.timil.climateapplication.services.SoundService
 import kotlinx.android.synthetic.main.fragment_custom_ar.*
 
+/**
+ * This Activity is only needed because the CustomArFragment's contained UI views cannot be accessed
+ * directly from it (due to null object references).
+ * @author Ville Lohkovuori, Leo Partanen
+ * */
+
 const val AR_FRAGMENT_TAG = "ARFragment"
 
-class ArActivity : AppCompatActivity(), CustomArFragment.FragmentCommunicator {
+private const val DEFAULT_THROWS = 5
 
-    val DEFAULT_THROWS = 5
+class ArActivity : AppCompatActivity() {
 
-    lateinit var launchPowerMeter: ProgressBar
+    // the game score
+    var score = 0.0f
+        set(value) {
+            field = value
+            setUIScore(value)
+        }
+
+    //TODO: the throw number should arrive from the bundle
+    // note: these could be in a 'Game' class, but for now I don't think that's necessary
+    var numOfThrows = DEFAULT_THROWS
+        set(value) {
+            field = value
+            setUIThrows(value)
+            if (value == 0) {
+                endGame(false) // if the monster is dead, the game ends before this call
+            }
+        }
+
+    // we need this reference to manage saving and restoring the Fragment
+    private var customArFragmentInstance: Fragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // hide the top UI bar of the app
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
         setContentView(R.layout.fragment_custom_ar) // inflates all the child views correctly
+
+        // it's only a sub-view in the xml file, but this still works for saving a reference
+        // to the correct Fragment
+        customArFragmentInstance = supportFragmentManager.findFragmentById(R.id.ar_fragment)
+
         startService(Intent(this@ArActivity, SoundService::class.java))
 
-        launchPowerMeter = findViewById(R.id.launch_power_meter)
+        // we're restoring the Activity due to minimizing the app, etc
+        if (savedInstanceState != null) {
+
+            // Restore the fragment's instance
+            customArFragmentInstance = supportFragmentManager.getFragment(savedInstanceState, AR_FRAGMENT_TAG)
+        }
+
+        // doesn't work, which causes a whole slew of problems
 /*
         supportFragmentManager.beginTransaction()
             .add(R.id.fragment_container_2, CustomArFragment(), AR_FRAGMENT_TAG)
             .addToBackStack(null)
             .commit() */
-    }
+    } // onCreate
 
-    override fun onStart() {
-        super.onStart()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
 
-        setScore(0f)
-        setThrows(DEFAULT_THROWS) //TODO: make it come from the bundle
+        // Save the fragment's instance (it should always exist)
+        supportFragmentManager.putFragment(outState, AR_FRAGMENT_TAG, customArFragmentInstance!!)
     }
 
     override fun onResume() {
@@ -59,33 +102,50 @@ class ArActivity : AppCompatActivity(), CustomArFragment.FragmentCommunicator {
         stopService(Intent(this@ArActivity, SoundService::class.java))
     }
 
-    override fun setScore(score: Float) {
+    private fun setUIScore(score: Float) {
 
+        if (tv_score == null) return
         tv_score.text = "Score: $score"
     }
-    override fun setHitPoints(hp: Int) {
 
-        tv_hitpoints.text = "HP: $hp"
-    }
+    private fun setUIThrows(throws: Int) {
 
-    override fun setThrows(throws: Int) {
-
+        if (tv_throws == null) return
         tv_throws.text = "Throws: $throws"
     }
 
-    override fun setWindX(windX: Float) {
+    // these we need to do from the fragment so they're public
+    fun setUIHitPoints(hp: Int) {
 
+        if (tv_hitpoints == null) return
+        tv_hitpoints.text = "HP: $hp"
+    }
+
+    fun setUIWindX(windX: Float) {
+
+        if (tv_wind_x == null) return
         tv_wind_x.text = "Wind(x): $windX"
     }
 
-    override fun setWindY(windY: Float) {
+    fun setUIWindY(windY: Float) {
 
+        if (tv_wind_y == null) return
         tv_wind_y.text = "Wind(x): $windY"
     }
 
-    override fun setPower(power: Int) {
-        launchPowerMeter.progress = power
+    fun setUIPower(power: Int) {
+
+        if (launch_power_meter == null) return
+        launch_power_meter.progress = power
     }
+
+    fun endGame(monsterDead: Boolean) {
+
+        if (monsterDead) score *= 1.5f
+
+        Log.d("HUUH", "final points: $score")
+        //TODO: move to the reward screen and send the points there
+    } // endGame
 
     override fun onBackPressed() {
         val builder = AlertDialog.Builder(this)
@@ -98,7 +158,7 @@ class ArActivity : AppCompatActivity(), CustomArFragment.FragmentCommunicator {
             }
             .setNegativeButton(R.string.no) { _, _ ->
             }.show()
-    }
+    } // onBackPressed
 
     private var viewGroup: ViewGroup? = null
 
