@@ -9,10 +9,12 @@
 
     <TextView
             android:id="@+id/txtQuestion"
+            android:background="@drawable/tv_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/txt_question"
             android:textSize="22sp"
+            android:padding="10dp"
             android:layout_margin="20dp"
             android:gravity="center"
             app:layout_constraintTop_toTopOf="parent"/>

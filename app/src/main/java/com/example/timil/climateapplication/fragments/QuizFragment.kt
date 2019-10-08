@@ -83,7 +83,7 @@ class QuizFragment : Fragment() {
                     txtQuestion.text = questionsList[questionNumber].data.getValue("question").toString()
 
                     // hide progress bar when the questions have been fetched
-                    progressBar.visibility = View.GONE;
+                    progressBar.visibility = View.GONE
 
                     generateAnswerButtons(questionsList[questionNumber])
                 } else {
@@ -126,12 +126,14 @@ class QuizFragment : Fragment() {
         for (i in 0..(options.size-1)) {
 
             val btnAnswer = Button(context)
-            btnAnswer.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            //btnAnswer.setBackgroundColor(resources.getColor(R.color.greenButton))
+            params.setMargins(10, 10, 10, 10)
+            btnAnswer.layoutParams = params
             btnAnswer.background.setColorFilter(btnAnswer.context.resources.getColor(R.color.greenButtonColor), PorterDuff.Mode.MULTIPLY)
+            btnAnswer.textSize = 16F
 
             btnAnswer.text = options[i].toString()
             btnAnswer.id = options.indexOf(options[i])

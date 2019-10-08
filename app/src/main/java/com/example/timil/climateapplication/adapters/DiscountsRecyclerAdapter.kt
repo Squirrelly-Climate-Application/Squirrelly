@@ -7,15 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.timil.climateapplication.R
+import com.google.firebase.firestore.QueryDocumentSnapshot
+
+
 
 class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activity: Activity)
     : RecyclerView.Adapter<DiscountsRecyclerAdapter.DiscountViewHolder>() {
 
     private var mCallback: OnDiscountClick? = null
 
-    // for testing
-    private var discountTitles: MutableList<String>? = null
-    private var discountInformations: MutableList<String>? = null
+    private var discountsList: MutableList<QueryDocumentSnapshot>? = null
 
     interface OnDiscountClick {
         fun showDiscount()
@@ -29,9 +30,8 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         }
     }
 
-    fun setDiscounts(discounts: MutableList<String>, discounts2: MutableList<String>) {
-        discountTitles = discounts
-        discountInformations = discounts2
+    fun setDiscounts(discounts: ArrayList<QueryDocumentSnapshot>) {
+        discountsList = discounts
 
         notifyDataSetChanged()
     }
@@ -42,20 +42,23 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     }
 
     override fun onBindViewHolder(discountViewHolder: DiscountViewHolder, i: Int) {
-        discountViewHolder.discountTitle.setText(discountTitles!![i])
-        discountViewHolder.discountInfo.setText(discountInformations!![i])
+        discountViewHolder.discountTitle.text = discountsList!![i].data.getValue("company").toString()
+        discountViewHolder.discountInfo.text = discountsList!![i].data.getValue("information").toString()
+        discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue("points_needed").toString())
         discountViewHolder.itemRoot.setOnClickListener {
             mCallback!!.showDiscount()
         }
     }
 
     override fun getItemCount(): Int {
-        return discountTitles!!.size
+        return if (discountsList == null) 0 else discountsList!!.size
     }
 
     inner class DiscountViewHolder(var itemRoot: View) : RecyclerView.ViewHolder(itemRoot) {
         var discountTitle: TextView = itemRoot.findViewById(R.id.tvDiscountTitle)
         var discountInfo: TextView = itemRoot.findViewById(R.id.tvDiscountInfo)
+        var discountPoints: TextView = itemRoot.findViewById(R.id.tvDiscountPoints)
+        var view: View = itemRoot
     }
 
 }

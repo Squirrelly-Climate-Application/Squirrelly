@@ -112,7 +112,6 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             if (resultCode == Activity.RESULT_OK) {
                 // Successfully signed in
                 user = FirebaseAuth.getInstance().currentUser
-                // ...
             } else {
                 // Sign in failed. If response is null the user canceled the
                 // sign-in flow using the back button. Otherwise check
@@ -144,10 +143,16 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         when (item.itemId) {
             R.id.nav_logout -> {
                 FirebaseAuth.getInstance().signOut()
+                setupFragment(startFragment, START_FRAGMENT_TAG)
                 user = null
                 startSignIn()
             }
-            R.id.nav_discounts -> setupFragment(discountsFragment, DISCOUNTS_FRAGMENT_TAG)
+            R.id.nav_discounts -> {
+                val bundle = Bundle()
+                bundle.putString("uid", user!!.uid)
+                discountsFragment.arguments = bundle
+                setupFragment(discountsFragment, DISCOUNTS_FRAGMENT_TAG)
+            }
         }
         drawer.closeDrawer(GravityCompat.START)
         return true

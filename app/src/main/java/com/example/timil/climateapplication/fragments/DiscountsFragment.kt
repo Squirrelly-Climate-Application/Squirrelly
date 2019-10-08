@@ -10,8 +10,13 @@ import com.example.timil.climateapplication.R
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.LinearLayoutManager
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
-
-
+import android.util.Log
+import android.widget.ProgressBar
+import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QueryDocumentSnapshot
+import kotlinx.android.synthetic.main.fragment_quiz.*
 
 
 /**
@@ -22,23 +27,7 @@ class DiscountsFragment : Fragment() {
     private var root: View? = null
     private var recyclerView: RecyclerView? = null
     private var adapter: DiscountsRecyclerAdapter? = null
-
-    // just some fake data to test the adapter
-    private val discountTitles =
-        listOf<String>("Title 1", "Title 2", "Title 3", "Title 4", "Title 5", "Title 6", "Title 7", "Title 8", "Title 9", "Title 10") as MutableList
-    private val discountInformation =
-        listOf<String>(
-            "Information about discount 1",
-            "Information about discount 2",
-            "Information about discount 3",
-            "Information about discount 4",
-            "Information about discount 5",
-            "Information about discount 6",
-            "Information about discount 7",
-            "Information about discount 8",
-            "Information about discount 9",
-            "Information about discount 10"
-        ) as MutableList
+    private var progressBar: ProgressBar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,7 +46,80 @@ class DiscountsFragment : Fragment() {
         recyclerView!!.layoutManager = LinearLayoutManager(context)
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(false)
-        adapter!!.setDiscounts(discountTitles, discountInformation)
+
+        progressBar = root!!.findViewById(R.id.progressBarDiscounts)
+        progressBar!!.visibility = View.VISIBLE
+
+        val bundle = arguments
+        try {
+            val userId: String? = bundle!!.getString("uid")
+            if (userId != null) {
+                getUserData(userId)
+                getDiscountsData()
+            }
+        } catch (err: Exception) {
+            Log.d("TEST", "No bundle data")
+        }
+    }
+
+    private fun getUserData(userId: String){
+
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("users").document(userId)
+        docRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+
+                    val tvUserPoints = root!!.findViewById<TextView>(R.id.tvMyPoints)
+                    val userPoints: String?
+
+                    // in case the user is new and doesn't have any data in Firebase yet -> give data to avoid null exceptions
+                    if(document.data == null){
+                        userPoints = "0"
+                        val userData = hashMapOf(
+                            "points" to "0"
+                        )
+                        db.collection("users").document(userId)
+                            .set(userData)
+                            .addOnSuccessListener {
+                                Log.d("tester", "DocumentSnapshot successfully written!")
+                            }
+                            .addOnFailureListener { e -> Log.w("tester", "Error writing document", e) }
+                    }
+                    else {
+                        userPoints = document.data!!.getValue("points").toString()
+                    }
+                    tvUserPoints.text = resources.getString(R.string.user_points, userPoints)
+                    tvUserPoints.visibility = View.VISIBLE
+
+                } else {
+                    Log.d("tester", "No such document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("tester", "get failed with ", exception)
+            }
+
+    }
+
+    private fun getDiscountsData(){
+
+        val discounts = ArrayList<QueryDocumentSnapshot>()
+
+        val db = FirebaseFirestore.getInstance()
+        db.collection("discounts").get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                for (document in task.result!!) {
+                    discounts.add(document)
+                }
+                progressBar!!.visibility = View.GONE
+
+                adapter!!.setDiscounts(discounts)
+
+            } else {
+                Log.w("Error", "Error getting questions.", task.exception)
+            }
+        }
     }
 
 }
