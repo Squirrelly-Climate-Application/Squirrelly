@@ -3,6 +3,7 @@ package com.example.timil.climateapplication.ar
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.util.Log
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
@@ -33,6 +34,9 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
         private const val firstAnimDura = 1000L //TODO: make them depend on the throw strength somehow
         private const val secondAnimDura = 1000L
+
+        // in order to be able to pause the anims, we need this reference
+        private var anims: AnimatorSet? = null
 
         // factory method (this alone should be used for creation!)
         fun create(cameraNode: Node, obs: IonThrowAnimEndListener): Projectile {
@@ -109,11 +113,21 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
         val spinAnim = AnimationFactory.spinAnim(this, firstAnimDura + secondAnimDura, randomSpinQuaternion)
 
-        AnimatorSet().apply {
+        anims = AnimatorSet().apply {
             play(risingAnim).before(droppingAnim)
             play(spinAnim)
             start()
         }
     } // playLaunchAnimation
+
+    fun pauseAnimations() {
+
+        anims?.pause()
+    }
+
+    fun resumeAnimations() {
+
+        anims?.resume()
+    }
 
 } // Projectile

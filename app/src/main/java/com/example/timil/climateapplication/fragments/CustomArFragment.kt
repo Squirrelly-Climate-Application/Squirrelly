@@ -87,6 +87,8 @@ class CustomArFragment : ArFragment() {
 
     private fun onPeekTouchDetect(hitTestResult: HitTestResult, motionEvent: MotionEvent) {
 
+        if ((activity as ArActivity).gamePaused) return
+
         // do not detect hits to already thrown projectiles
         if (hitTestResult.node?.name == Projectile.THROWN_PROJECTILE_NAME) return
 
@@ -177,6 +179,20 @@ class CustomArFragment : ArFragment() {
             (activity as ArActivity).setUIPower(0)
         } // onDropAnimEnd
     } // onThrowAnimEndCallbackHolder
+
+    // called from the ArActivity (which can 'see' the pause button and manages the game state)
+    fun pauseGame() {
+
+        projNode?.pauseAnimations()
+        monsterNode?.monsterAI?.pauseExecution()
+    }
+
+    // ditto
+    fun resumeGame() {
+
+        projNode?.resumeAnimations()
+        monsterNode?.monsterAI?.resumeExecution()
+    }
 
     // creates a 'fake' MotionEvent that 'touches' a given screen point
     private fun obtainMotionEvent(point: Point): MotionEvent {

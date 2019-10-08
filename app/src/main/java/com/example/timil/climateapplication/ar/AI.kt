@@ -72,6 +72,16 @@ class AI(private val node: WorldEntity) {
         anim = null
     }
 
+    fun pauseExecution() {
+
+        anim?.pause()
+    }
+
+    fun resumeExecution() {
+
+        anim?.resume()
+    }
+
     private fun randomDura(): Long {
 
         return (ANIM_LENGTH_MIN + (rGen.nextFloat() * (ANIM_LENGTH_MAX - ANIM_LENGTH_MIN))).toLong()

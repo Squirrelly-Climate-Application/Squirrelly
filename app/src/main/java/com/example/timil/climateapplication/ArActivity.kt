@@ -6,9 +6,11 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import com.example.timil.climateapplication.fragments.CustomArFragment
 import com.example.timil.climateapplication.services.SoundService
 import kotlinx.android.synthetic.main.fragment_custom_ar.*
 
@@ -45,6 +47,9 @@ class ArActivity : AppCompatActivity() {
     // we need this reference to manage saving and restoring the Fragment
     private var customArFragmentInstance: Fragment? = null
 
+    // monitored also from the CustomArFragment (projectiles cannot be launched if it's true)
+    var gamePaused = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // hide the top UI bar of the app
@@ -65,6 +70,21 @@ class ArActivity : AppCompatActivity() {
             // Restore the fragment's instance
             customArFragmentInstance = supportFragmentManager.getFragment(savedInstanceState, AR_FRAGMENT_TAG)
         }
+
+        btn_pause.setOnClickListener {
+
+            val arFragment = (customArFragmentInstance as CustomArFragment)
+
+            if (!gamePaused) {
+                arFragment.pauseGame()
+                gamePaused = true
+                btn_pause.text = "Resume"
+            } else {
+                arFragment.resumeGame()
+                gamePaused = false
+                btn_pause.text = "Pause"
+            }
+        } // onClickListener
 
         // doesn't work, which causes a whole slew of problems
 /*
