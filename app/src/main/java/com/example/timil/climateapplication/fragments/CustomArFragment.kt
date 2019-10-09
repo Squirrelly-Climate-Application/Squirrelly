@@ -3,9 +3,11 @@ package com.example.timil.climateapplication.fragments
 import android.graphics.Point
 import android.os.Bundle
 import android.os.SystemClock
+import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.*
 import com.example.timil.climateapplication.ArActivity
+import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.ar.*
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.math.Vector3
@@ -18,7 +20,9 @@ import kotlin.math.hypot
  * @author Ville Lohkovuori
  * */
 
-class CustomArFragment : ArFragment() {
+class CustomArFragment : Fragment() { // it's a containing View for the actual ArFragment
+/*
+    private lateinit var arFragment: ArFragment
 
     // for tracking gesture (swipe) hits to the thrown projectile (acorn)
     private var hitProj = false
@@ -56,21 +60,13 @@ class CustomArFragment : ArFragment() {
         screenHeight = size.y
         screenCenter = Point(screenWidth / 2, screenHeight / 2)
 
-        disablePlaneDetection()
-        arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
-
-            onPeekTouchDetect(hitTestResult, motionEvent)
-        }
-
-        // create the first nut and the monster
-        monsterNode = PlasticMonster.create(arSceneView.scene.camera)
-        Projectile.create(arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
-
         return view
     } // onCreateView
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        arFragment = fragmentManager?.findFragmentById(R.id.ar_fragment) as ArFragment
 
         (activity as ArActivity).apply {
             setUIHitPoints(monsterNode?.hitPoints ?: 0)
@@ -78,6 +74,20 @@ class CustomArFragment : ArFragment() {
             setUIWindY(wind.yComp)
         }
     } // onActivityCreated
+
+    override fun onStart() {
+        super.onStart()
+
+        disablePlaneDetection()
+        arFragment.arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
+
+            onPeekTouchDetect(hitTestResult, motionEvent)
+        }
+
+        // create the first nut and the monster
+        monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
+        Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
+    }
 
     /* // could use this instead of the listener and custom function ??
     override fun onPeekTouch(hitTestResult: HitTestResult?, motionEvent: MotionEvent?) {
@@ -153,7 +163,7 @@ class CustomArFragment : ArFragment() {
 
             // we'll 'touch' the scaled hit point (30 % further than the finger swipe's end point)
             val actualHitTestMEvent = obtainMotionEvent(actualScaledHitPoint!!) // it always exists if the animation is playing
-            val actualHitTestResult = arSceneView.scene.hitTest(actualHitTestMEvent)
+            val actualHitTestResult = arFragment.arSceneView.scene.hitTest(actualHitTestMEvent)
             val actuallyHitNode = actualHitTestResult.node
 
             if (actuallyHitNode is Monster) {
@@ -175,7 +185,7 @@ class CustomArFragment : ArFragment() {
             // Log.d("HUUH", "numOfThrows after decrease: $numOfThrows")
             projNode?.dispose() // delete the old nut
             projNode = null
-            Projectile.create(arSceneView.scene.camera, this) // immediately create a new nut
+            Projectile.create(arFragment.arSceneView.scene.camera, this) // immediately create a new nut
             (activity as ArActivity).setUIPower(0)
         } // onDropAnimEnd
     } // onThrowAnimEndCallbackHolder
@@ -197,13 +207,6 @@ class CustomArFragment : ArFragment() {
     // creates a 'fake' MotionEvent that 'touches' a given screen point
     private fun obtainMotionEvent(point: Point): MotionEvent {
 
-        // Log.d("HUUH", "fake x: " + point.x)
-        // Log.d("HUUH", "fake y: " + point.y)
-
-        // val screenCenter = Point(activity!!.findViewById<View>(android.R.id.content).width / 2, activity!!.findViewById<View>(android.R.id.content).height / 2)
-        // Log.d("HUUH", "screencenter x: " + screenCenter.x) // 540 on S7
-        // Log.d("HUUH", "screencenter y: " + screenCenter.y) // 960 on S7
-
         val downTime = SystemClock.uptimeMillis()
         val eventTime = SystemClock.uptimeMillis() + 100
         val x = point.x.toFloat()
@@ -221,14 +224,14 @@ class CustomArFragment : ArFragment() {
 
     private fun disablePlaneDetection() {
 
-        planeDiscoveryController.hide()
-        planeDiscoveryController.setInstructionView(null)
-        arSceneView.planeRenderer.isEnabled = false
+        arFragment.planeDiscoveryController.hide()
+        arFragment.planeDiscoveryController.setInstructionView(null)
+        arFragment.arSceneView.planeRenderer.isEnabled = false
     }
 
     private fun enablePlaneDetection() {
-        planeDiscoveryController.show()
-        arSceneView.planeRenderer.isEnabled = true
+        arFragment.planeDiscoveryController.show()
+        arFragment.arSceneView.planeRenderer.isEnabled = true
     }
 
     // maybe shorten its name, ehh
@@ -239,12 +242,12 @@ class CustomArFragment : ArFragment() {
 
         val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor + alterXBy // valid only for the Galaxy S7...
 
-        val alterYBy = wind.yComp * screenHeight / 3.6f
+        // val alterYBy = wind.yComp * screenHeight / 3.6f
         // Log.d("HUUH", "subtract from y: $alterYBy")
 
         // reverse axis (from 1920 to 0) and zero-point off-center
         val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor // - alterYBy // ditto...
         return Point(scaledX.toInt(), scaledY.toInt())
     } // convertMEventCoordsToScaledScreenTargetPoint
-
+*/
 } // CustomArFragment
