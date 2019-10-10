@@ -20,11 +20,13 @@ object Static {
     // these are not strictly needed atm, but might be used in the near future
     const val DEFAULT_PROJECTILE_NAME = "nut"
     const val PLASTIC_MONSTER_NAME = "plasticMonster"
+    const val CO2_MONSTER_NAME = "co2Monster"
 
     private val rGen = Random(System.currentTimeMillis())
 
     fun load3dModelResources(context: Context) {
 
+        // nut
         ModelRenderable.builder()
             .setSource(context, Uri.parse("nuca1.sfb"))
             .build().thenAccept {
@@ -37,6 +39,7 @@ object Static {
                 }
             } // thenAccept
 
+        // bottle
         ModelRenderable.builder()
             .setSource(context, Uri.parse("Bottle A.sfb"))
             .build().thenAccept {
@@ -48,17 +51,30 @@ object Static {
                     collisionShape = Box(Vector3(0.18f, 0.36f, 0.18f), Vector3(0.02f, 0.18f, 0f))
                 }
             } // thenAccept
+
+        // cloud
+        ModelRenderable.builder()
+            .setSource(context, Uri.parse("model.sfb"))
+            .build().thenAccept {
+                Co2Monster.monsterRenderable = it
+                Co2Monster.monsterRenderable.apply {
+
+                    isShadowReceiver = false
+                    isShadowCaster = false
+                    collisionShape = Box(Vector3(0.34f, 0.20f, 0.18f), Vector3(0.02f, 0.18f, 0f))
+                }
+            } // thenAccept
     } // load3dModelResources
 
-    // for randomly spinning things around (the acorns, etc)
-    fun randomizedQuaternion(): Quaternion {
+    // for randomly spinning things around (the acorns, etc).
+    // 180f gives natural-looking roll behavior for the thrown nut
+    fun randomizedQuaternion(baseAngle: Float = 180f): Quaternion {
 
-        val rndX = rGen.nextFloat() // between 0 and 1
-        val rndY = rGen.nextFloat()
-        val rndZ = rGen.nextFloat()
-        val rndAngle = rGen.nextFloat() * 360 // first part could be removed, perhaps
+        val rndX = rGen.nextInt(0,2).toFloat() // between 0 and 1
+        val rndY = rGen.nextInt(0, 2).toFloat()
+        val rndZ = rGen.nextInt(0, 2).toFloat()
 
-        return Quaternion.axisAngle(Vector3(rndX, rndY, rndZ), rndAngle)
+        return Quaternion.axisAngle(Vector3(rndX, rndY, rndZ), baseAngle)
     }
 
     fun randomFloatBetween(min: Float, max: Float): Float {

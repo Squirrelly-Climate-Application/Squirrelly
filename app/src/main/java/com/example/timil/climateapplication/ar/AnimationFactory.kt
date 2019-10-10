@@ -18,10 +18,10 @@ object AnimationFactory {
 
     // for linear movement between two points
     fun linearMoveAnim(
-        node: Node,
+        node: Node?,
         dura: Long,
-        from: Vector3,
-        to: Vector3,
+        from: Vector3 = Vector3(0f, 0f, 0f),
+        to: Vector3? = Vector3(0f, 0f, 0f),
         endListener: AnimatorListenerAdapter? = null): ObjectAnimator {
 
         return ObjectAnimator().apply {
@@ -55,5 +55,24 @@ object AnimationFactory {
             setEvaluator(QuaternionEvaluator())
         } // apply
     } // spinAnim
+
+    // make objects larger or smaller
+    fun scaleAnim(
+        node: Node,
+        dura: Long,
+        newScale: Vector3
+    ): ObjectAnimator {
+
+        return ObjectAnimator().apply {
+
+            target = node
+            propertyName = "localScale"
+            duration = dura
+            interpolator = LinearInterpolator()
+            setAutoCancel(false)
+            setObjectValues(node.localScale, newScale)
+            setEvaluator(Vector3Evaluator())
+        }
+    } // scaleAnim
 
 } // AnimationFactory

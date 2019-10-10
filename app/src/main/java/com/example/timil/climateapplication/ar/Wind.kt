@@ -9,6 +9,7 @@ import kotlin.math.sqrt
  * @author Ville Lohkovuori
  * */
 
+// NOTE: wind is disabled for now (due to coordinate scaling issues). fix asap!
 private const val WIND_X_MIN = -0.15f // NOTE: larger values introduce inaccuracy
 private const val WIND_X_MAX = 0.15f
 private const val WIND_Y_MIN = -0.2f

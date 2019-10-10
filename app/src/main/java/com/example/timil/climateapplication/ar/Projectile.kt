@@ -3,6 +3,7 @@ package com.example.timil.climateapplication.ar
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.util.Log
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
@@ -25,14 +26,19 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
         const val THROWN_PROJECTILE_NAME = "thrown"
 
+        // NOTE: changing the z-value is likely to screw up the hit detection!!!
+        // possibly the y-value as well
         private val DEFAULT_POSITION = Vector3(0f, -0.35f, -0.9f) // low center position
         private val DEFAULT_ROTATION = Quaternion.axisAngle(Vector3(1f, 0f, 0f), 40f) // not very necessary atm
 
         // set on app start from Static.kt
         lateinit var projRenderable: ModelRenderable
 
-        private const val firstAnimDura = 1000L
+        private const val firstAnimDura = 1000L //TODO: make them depend on the throw strength somehow
         private const val secondAnimDura = 1000L
+
+        // in order to be able to pause the anims, we need this reference
+        private var anims: AnimatorSet? = null
 
         // factory method (this alone should be used for creation!)
         fun create(cameraNode: Node, obs: IonThrowAnimEndListener): Projectile {
@@ -57,11 +63,8 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
     // can't name it 'throw' because it's a reserved keyword
     fun launch(throwTarget: Vector3) {
 
-        // to prevent hit detection to the thrown nut (in CustomArFragment)
+        // to prevent hit detection to the thrown nut (in ArActivity)
         name = THROWN_PROJECTILE_NAME
-
-        val throwStr = throwStrength(throwTarget) // it should be used somehow... figure out the proper launch speed equation!
-        // Log.d("HUUH", "throwStr: $throwStr")
 
         val finalTarget = Vector3(throwTarget)
         // Log.d("HUUH", "orig. throwTarget: $throwTarget")
@@ -70,14 +73,9 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
         intermediateTarget.apply {
 
             x = throwTarget.x * 0.5f // 50 %
-            // x += wind.xComp * 0.5f // it needs to be scaled as well
             z = RISE_ANIM_Z_TARGET
             y = localPosition.y + (abs(localPosition.y) + throwTarget.y) * 0.5f
-            // y += wind.yComp * 0.5f
         }
-        // finalTarget.x += wind.xComp // gets the full effect
-        // finalTarget.y += wind.yComp
-        // Log.d("HUUH", "intermediateTarget: $intermediateTarget")
 
         playLaunchAnimation(intermediateTarget, finalTarget)
     } // launch
@@ -117,19 +115,21 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
         val spinAnim = AnimationFactory.spinAnim(this, firstAnimDura + secondAnimDura, randomSpinQuaternion)
 
-        AnimatorSet().apply {
+        anims = AnimatorSet().apply {
             play(risingAnim).before(droppingAnim)
             play(spinAnim)
             start()
         }
     } // playLaunchAnimation
 
-    private fun throwStrength(throwTarget: Vector3): Double {
+    fun pauseAnimations() {
 
-        val x = throwTarget.x.toDouble()
-        val y = throwTarget.y.toDouble()
+        anims?.pause()
+    }
 
-        return sqrt(x.pow(2.0) + y.pow(2.0))
+    fun resumeAnimations() {
+
+        anims?.resume()
     }
 
 } // Projectile
