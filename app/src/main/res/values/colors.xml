@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#222222</color>
     <color name="greenButtonColor">#00b200</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="backgroundIconStart">#abffb3</color>
+    <color name="backgroundIconCenter">#f6ff8f</color>
+    <color name="backgroundIconEnd">#6be0e8</color>
 </resources>
