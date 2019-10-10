@@ -8,12 +8,15 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import com.example.timil.climateapplication.ar.*
 import com.example.timil.climateapplication.services.SoundService
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.ux.ArFragment
 import kotlinx.android.synthetic.main.activity_ar.*
+import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.dialog_end_game.*
 import kotlin.math.abs
 import kotlin.math.hypot
 
@@ -254,8 +257,8 @@ class ArActivity : AppCompatActivity() {
                     endGame(true)
                 }
             } // if Monster
+            score-- // used throw = -1 score. NOTE: must be done before decreasing throws !!!
             numOfThrows-- // the game ends if it goes to zero
-            score-- // used throw = -1 score
 
             projNode?.dispose() // delete the old nut
             projNode = null
@@ -287,8 +290,27 @@ class ArActivity : AppCompatActivity() {
 
         if (monsterDead) score += monsterNode!!.pointsValueOnDeath
 
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_end_game, viewGroup)
+
+        // can't 'see' the views without this trick
+        dialogView.findViewById<TextView>(R.id.tv_end_score).text = "Score: $score"
+        dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (monsterDead) "Victory!" else "Loss!"
+
+        builder.setView(dialogView)
+            .setPositiveButton("Rewards") { _, _ ->
+                val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
+                startActivity(mainIntent)
+                finish()
+            }
+            .setNegativeButton("Start ") { _, _ ->
+                //TODO: move to the reward screen and send the points there
+                finish()
+            }
+            .setCancelable(false)
+            .show()
+
         Log.d("HUUH", "final points: $score")
-        //TODO: move to the reward screen and send the points there
     } // endGame
 
     private fun updateUI(viewType: VIEW_TYPE, value: String) {
