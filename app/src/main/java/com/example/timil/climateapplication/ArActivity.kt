@@ -299,12 +299,12 @@ class ArActivity : AppCompatActivity() {
 
         builder.setView(dialogView)
             .setPositiveButton("Rewards") { _, _ ->
-                val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
-                startActivity(mainIntent)
+                //TODO: move to the reward screen and send the points there
                 finish()
             }
             .setNegativeButton("Start ") { _, _ ->
-                //TODO: move to the reward screen and send the points there
+                val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
+                startActivity(mainIntent)
                 finish()
             }
             .setCancelable(false)
