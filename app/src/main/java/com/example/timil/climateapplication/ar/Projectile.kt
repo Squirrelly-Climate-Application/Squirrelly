@@ -63,7 +63,7 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
     // can't name it 'throw' because it's a reserved keyword
     fun launch(throwTarget: Vector3) {
 
-        // to prevent hit detection to the thrown nut (in CustomArFragment)
+        // to prevent hit detection to the thrown nut (in ArActivity)
         name = THROWN_PROJECTILE_NAME
 
         val finalTarget = Vector3(throwTarget)

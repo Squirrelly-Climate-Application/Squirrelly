@@ -8,10 +8,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.*
-import com.example.timil.climateapplication.ar.Monster
-import com.example.timil.climateapplication.ar.PlasticMonster
-import com.example.timil.climateapplication.ar.Projectile
-import com.example.timil.climateapplication.ar.Wind
+import com.example.timil.climateapplication.ar.*
 import com.example.timil.climateapplication.services.SoundService
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.math.Vector3
@@ -21,14 +18,19 @@ import kotlin.math.abs
 import kotlin.math.hypot
 
 /**
- * This Activity is only needed because the CustomArFragment's contained UI views cannot be accessed
- * directly from it (due to null object references).
+ * Activity that governs the AR game portion of the app.
  * @author Ville Lohkovuori, Leo Partanen
  * */
 
-const val AR_FRAGMENT_TAG = "ARFragment"
-
 private const val DEFAULT_THROWS = 5
+
+private enum class VIEW_TYPE {
+    HP,
+    SCORE,
+    THROWS,
+    WIND_X,
+    WIND_Y
+}
 
 // the percentage of screen space (from the top of the screen)
 // where a projectile-touching finger swipe will have to end to be considered 'upwards'
@@ -40,7 +42,7 @@ class ArActivity : AppCompatActivity() {
     var score = 0
         set(value) {
             field = value
-            setUIScore(value)
+            updateUI(VIEW_TYPE.SCORE, value.toString())
         }
 
     //TODO: the throw number should arrive from the bundle
@@ -48,7 +50,7 @@ class ArActivity : AppCompatActivity() {
     var numOfThrows = DEFAULT_THROWS
         set(value) {
             field = value
-            setUIThrows(value)
+            updateUI(VIEW_TYPE.THROWS, value.toString())
             if (value == 0) {
                 endGame(false) // if the monster is dead, the game ends before this call
             }
@@ -80,9 +82,6 @@ class ArActivity : AppCompatActivity() {
     //TODO: use also for throw strength in Projectile (if needed)
     private var startDistanceY = 0f
     private var startDistanceX = 0f
-
-    // we need this reference to manage saving and restoring the Fragment
-    // private var customArFragmentInstance: Fragment? = null
 
     private var viewGroup: ViewGroup? = null
 
@@ -116,12 +115,13 @@ class ArActivity : AppCompatActivity() {
         }
 
         // create the first nut and the monster
-        monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
-        setUIHitPoints(monsterNode?.hitPoints ?: 0)
+        monsterNode = Co2Monster.create(arFragment.arSceneView.scene.camera)
+        // monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
+        updateUI(VIEW_TYPE.HP, (monsterNode?.hitPoints ?: 0).toString())
         Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
 
-        setUIWindX(wind.xComp)
-        setUIWindY(wind.yComp)
+        updateUI(VIEW_TYPE.WIND_X, wind.xComp.toString())
+        updateUI(VIEW_TYPE.WIND_Y, wind.yComp.toString())
 
         btn_pause.setOnClickListener {
 
@@ -219,8 +219,6 @@ class ArActivity : AppCompatActivity() {
                 startDistanceX = 0f
             } // if upwardSwipe
 
-            // hitMonster = false
-            // monsterNode = null
             hitProj = false
         } // if real MotionEvent == UP event
     } // onPeekTouchDetect
@@ -248,7 +246,7 @@ class ArActivity : AppCompatActivity() {
                 hitMonster = true
                 monsterNode!!.damage(1)
                 score += 2 // each hit is worth 2 points
-                setUIHitPoints(monsterNode!!.hitPoints)
+                updateUI(VIEW_TYPE.HP, monsterNode!!.hitPoints.toString())
                 Log.d("HUUH", "hit monster!")
 
                 if (!monsterNode!!.isAlive) {
@@ -258,10 +256,11 @@ class ArActivity : AppCompatActivity() {
             } // if Monster
             numOfThrows-- // the game ends if it goes to zero
             score-- // used throw = -1 score
-            // Log.d("HUUH", "numOfThrows after decrease: $numOfThrows")
+
             projNode?.dispose() // delete the old nut
             projNode = null
             Projectile.create(arFragment.arSceneView.scene.camera, this) // immediately create a new nut
+
             setUIPower(0)
         } // onDropAnimEnd
     } // onThrowAnimEndCallbackHolder
@@ -292,36 +291,18 @@ class ArActivity : AppCompatActivity() {
         //TODO: move to the reward screen and send the points there
     } // endGame
 
-    private fun setUIScore(score: Int) {
+    private fun updateUI(viewType: VIEW_TYPE, value: String) {
 
-        if (tv_score == null) return
-        tv_score.text = "Score: $score"
-    }
+        when(viewType) {
+            VIEW_TYPE.HP -> tv_hitpoints.text = "HP: $value"
+            VIEW_TYPE.SCORE -> tv_score.text = "Score: $value"
+            VIEW_TYPE.THROWS -> tv_throws.text = "Throws: $value"
+            VIEW_TYPE.WIND_X -> tv_wind_x.text = "Wind(x): $value"
+            VIEW_TYPE.WIND_Y -> tv_wind_y.text = "Wind(y): $value"
+        }
+    } // updateUI
 
-    private fun setUIThrows(throws: Int) {
-
-        if (tv_throws == null) return
-        tv_throws.text = "Throws: $throws"
-    }
-
-    private fun setUIHitPoints(hp: Int) {
-
-        if (tv_hitpoints == null) return
-        tv_hitpoints.text = "HP: $hp"
-    }
-
-    private fun setUIWindX(windX: Float) {
-
-        if (tv_wind_x == null) return
-        tv_wind_x.text = "Wind(x): $windX"
-    }
-
-    private fun setUIWindY(windY: Float) {
-
-        if (tv_wind_y == null) return
-        tv_wind_y.text = "Wind(x): $windY"
-    }
-
+    // it needs an int, so let's keep it as a separate function from other UI stuffs
     private fun setUIPower(power: Int) {
 
         if (launch_power_meter == null) return

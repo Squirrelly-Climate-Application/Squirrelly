@@ -56,4 +56,23 @@ object AnimationFactory {
         } // apply
     } // spinAnim
 
+    // make objects larger or smaller
+    fun scaleAnim(
+        node: Node,
+        dura: Long,
+        newScale: Vector3
+    ): ObjectAnimator {
+
+        return ObjectAnimator().apply {
+
+            target = node
+            propertyName = "localScale"
+            duration = dura
+            interpolator = LinearInterpolator()
+            setAutoCancel(false)
+            setObjectValues(node.localScale, newScale)
+            setEvaluator(Vector3Evaluator())
+        }
+    } // scaleAnim
+
 } // AnimationFactory
