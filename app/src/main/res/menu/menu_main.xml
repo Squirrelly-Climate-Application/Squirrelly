@@ -19,6 +19,10 @@
 
     <item android:title="@string/menu">
         <menu>
+            <item android:id="@+id/nav_home"
+                android:icon="@mipmap/ic_launcher"
+                android:title="@string/home" />
+
             <item android:id="@+id/nav_discounts"
                     android:icon="@drawable/ic_star_yellow_24dp"
                     android:title="@string/discounts" />

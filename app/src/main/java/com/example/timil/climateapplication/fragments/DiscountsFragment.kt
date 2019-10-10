@@ -50,20 +50,12 @@ class DiscountsFragment : Fragment() {
         progressBar = root!!.findViewById(R.id.progressBarDiscounts)
         progressBar!!.visibility = View.VISIBLE
 
-        val bundle = arguments
-        try {
-            val userId: String? = bundle!!.getString("uid")
-            if (userId != null) {
-                getUserData(userId)
-                getDiscountsData()
-            }
-        } catch (err: Exception) {
-            Log.d("TEST", "No bundle data")
-        }
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+        getUserData(userId)
+        getDiscountsData()
     }
 
     private fun getUserData(userId: String){
-
         val db = FirebaseFirestore.getInstance()
         val docRef = db.collection("users").document(userId)
         docRef.get()
@@ -103,7 +95,6 @@ class DiscountsFragment : Fragment() {
     }
 
     private fun getDiscountsData(){
-
         val discounts = ArrayList<QueryDocumentSnapshot>()
 
         val db = FirebaseFirestore.getInstance()

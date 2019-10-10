@@ -2,10 +2,8 @@ package com.example.timil.climateapplication
 
 import android.Manifest
 import android.app.Activity
-import android.app.ActivityOptions
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import java.util.*
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseUser
@@ -38,7 +36,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     private lateinit var startFragment: StartFragment
     private lateinit var scanFragment: ScanFragment
     // private lateinit var arFragment: CustomArFragment
-    private lateinit var discountsFragment: DiscountsFragment
+    private lateinit var tabDiscountsFragment: TabLayoutFragment
 
     private lateinit var drawer: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
@@ -51,7 +49,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         const val START_FRAGMENT_TAG = "StartFragment"
         const val SCAN_FRAGMENT_TAG = "ScanFragment"
         const val QUIZ_FRAGMENT_TAG = "QuizFragment"
-        const val DISCOUNTS_FRAGMENT_TAG = "DiscountsFragment"
+        const val TAB_DISCOUNTS_FRAGMENT_TAG = "TabDiscountsFragment"
     }
 
     override fun onStart() {
@@ -68,9 +66,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         setContentView(R.layout.activity_main)
         startFragment = StartFragment()
         scanFragment = ScanFragment()
-        discountsFragment = DiscountsFragment()
+        tabDiscountsFragment = TabLayoutFragment()
 
-        setupFragment(startFragment, START_FRAGMENT_TAG)
+        setupFragment(startFragment, START_FRAGMENT_TAG, true)
 
         val toolBar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolBar)
@@ -141,17 +139,17 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+            R.id.nav_home -> {
+                setupFragment(startFragment, START_FRAGMENT_TAG, false)
+            }
             R.id.nav_logout -> {
                 FirebaseAuth.getInstance().signOut()
-                setupFragment(startFragment, START_FRAGMENT_TAG)
+                setupFragment(startFragment, START_FRAGMENT_TAG, false)
                 user = null
                 startSignIn()
             }
             R.id.nav_discounts -> {
-                val bundle = Bundle()
-                bundle.putString("uid", user!!.uid)
-                discountsFragment.arguments = bundle
-                setupFragment(discountsFragment, DISCOUNTS_FRAGMENT_TAG)
+                setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
             }
         }
         drawer.closeDrawer(GravityCompat.START)
@@ -165,14 +163,14 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             makeRequestCamera()
         }
         else {
-            setupFragment(scanFragment, SCAN_FRAGMENT_TAG)
+            setupFragment(scanFragment, SCAN_FRAGMENT_TAG, true)
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            setupFragment(scanFragment, SCAN_FRAGMENT_TAG)
+            setupFragment(scanFragment, SCAN_FRAGMENT_TAG, true)
         }
     }
 
@@ -205,15 +203,22 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         )
     }
 
-    private fun setupFragment(fragment: Fragment, tag: String) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment, tag)
-            .addToBackStack(null)
-            .commit()
+    private fun setupFragment(fragment: Fragment, tag: String, addBackStack: Boolean) {
+        if(addBackStack) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment, tag)
+                .addToBackStack(null)
+                .commit()
+        } else {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment, tag)
+                .commit()
+        }
     }
 
     private fun findFragment(tag: String): Boolean = (supportFragmentManager.findFragmentByTag(tag) != null
             && supportFragmentManager.findFragmentByTag(tag)!!.isVisible)
+
 
     override fun onBackPressed() {
         // use this if we wan't to close the navigation drawer with back button
@@ -228,7 +233,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
             builder.setView(dialogView)
                 .setPositiveButton(R.string.yes) { _, _ ->
-                    if (findFragment(START_FRAGMENT_TAG)){
+                    if (findFragment(START_FRAGMENT_TAG) || findFragment(TAB_DISCOUNTS_FRAGMENT_TAG)){
                         finish()
                     }
                     else {
