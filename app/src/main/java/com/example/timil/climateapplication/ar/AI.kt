@@ -18,9 +18,9 @@ enum class AIType {
     //TODO: add various types of move patterns
 }
 
-// NOTE: these numbers should depend on the screen size, but ARCore makes that very tricky to do
-private const val X_MAX_ABS = 0.30f
-private const val Y_MAX = 0.50f
+// NOTE: ideally, these numbers should depend on the screen size, but ARCore makes that very tricky to do
+private const val X_MAX_ABS = 0.25f
+private const val Y_MAX = 0.25f
 private const val Y_MIN = 0.10f
 
 private const val ANIM_LENGTH_MAX = 4000L

@@ -26,6 +26,8 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
         const val THROWN_PROJECTILE_NAME = "thrown"
 
+        // NOTE: changing the z-value is likely to screw up the hit detection!!!
+        // possibly the y-value as well
         private val DEFAULT_POSITION = Vector3(0f, -0.35f, -0.9f) // low center position
         private val DEFAULT_ROTATION = Quaternion.axisAngle(Vector3(1f, 0f, 0f), 40f) // not very necessary atm
 

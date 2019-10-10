@@ -30,6 +30,10 @@ const val AR_FRAGMENT_TAG = "ARFragment"
 
 private const val DEFAULT_THROWS = 5
 
+// the percentage of screen space (from the top of the screen)
+// where a projectile-touching finger swipe will have to end to be considered 'upwards'
+private const val UPWARD_SWIPE_LIMIT_RATIO = 0.833333f
+
 class ArActivity : AppCompatActivity() {
 
     // the game score
@@ -183,25 +187,26 @@ class ArActivity : AppCompatActivity() {
             projNode = hitNode
         }
         if (startDistanceY > 0f && startDistanceX > 0f) {
+
             setUIPower((hypot( abs(startDistanceX - motionEvent.rawX), abs(startDistanceY - motionEvent.rawY))).toInt())
         }
 
         if (hitProj && motionEvent.actionMasked == MotionEvent.ACTION_UP) {
 
-            // Log.d("HUUH", "scr height: $screenHeight")
-
-            val upwardSwipe = motionEvent.rawY < 0.8333 * screenHeight
+            val upwardSwipe = motionEvent.rawY < UPWARD_SWIPE_LIMIT_RATIO * screenHeight
 
             if (upwardSwipe) {
 
-                //TODO: it's not easy to get rid of the remaining hardcoded factors, but it should be done.
-                // their values depend on the relationship between the two coordinate systems (ARCore's and regular screen touch events'),
-                // which is extremely nebulous at the best of times
-                val scaledX = ((motionEvent.rawX - screenCenter.x) * 0.0006481481f) * hitScaleFactor + wind.xComp
+                // 0.36 = the experimentally defined ARCore coordinate system value at the right edge of the screen
+                // on a Samsung Galaxy S7 (at a distance of half the screen from the center-point of the x axis in the regular Android
+                // coordinate system; i.e., 540 pixels)
+                val coordSystemConvertRatio = 0.36f / 540 // we'll have to hope the relationship holds for all screen sizes
+
+                val scaledX = ((motionEvent.rawX - screenCenter.x) * coordSystemConvertRatio) * hitScaleFactor // + wind.xComp
 
                 val localY = projNode!!.localPosition.y
-                val tempY = ((screenCenter.y - motionEvent.rawY) * 0.0007142857f) // gives -0.35 min value (1450 is the lowest y screen point atm)
-                val scaledY = localY + (abs(localY) + tempY) * hitScaleFactor + wind.yComp // local y coordinate of the start location = -0.35f
+                val tempY = ((screenCenter.y - motionEvent.rawY) * coordSystemConvertRatio) // gives -0.33156f min value
+                val scaledY = localY + (abs(localY) + tempY) * hitScaleFactor // + wind.yComp
 
                 val target = Vector3(scaledX, scaledY, -1.0f) // sink it down a little bit, with a lower final z-value
 
@@ -209,6 +214,7 @@ class ArActivity : AppCompatActivity() {
                 actualScaledHitPoint = convertMEventCoordsToScaledScreenTargetPoint(motionEvent.rawX, motionEvent.rawY)
 
                 projNode!!.launch(target) // triggers the animation; at the end of it comes the hit check to the monster
+
                 startDistanceY = 0f
                 startDistanceX = 0f
             } // if upwardSwipe
@@ -280,7 +286,7 @@ class ArActivity : AppCompatActivity() {
 
     private fun endGame(monsterDead: Boolean) {
 
-        if (monsterDead) score += 10
+        if (monsterDead) score += monsterNode!!.pointsValueOnDeath
 
         Log.d("HUUH", "final points: $score")
         //TODO: move to the reward screen and send the points there
@@ -355,16 +361,16 @@ class ArActivity : AppCompatActivity() {
     // maybe shorten its name, ehh
     private fun convertMEventCoordsToScaledScreenTargetPoint(x: Float, y: Float): Point {
 
-        val alterXBy = wind.xComp * screenWidth / 0.55f // experimental constant; only works on the Galaxy S7!
+        // val alterXBy = wind.xComp * screenWidth / 0.55f // experimental constant; only works on the Galaxy S7!
         // Log.d("HUUH", "alter x by: $alterXBy")
 
-        val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor + alterXBy // valid only for the Galaxy S7...
+        val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor // + alterXBy
 
         // val alterYBy = wind.yComp * screenHeight / 3.6f
         // Log.d("HUUH", "subtract from y: $alterYBy")
 
         // reverse axis (from 1920 to 0) and zero-point off-center
-        val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor // - alterYBy // ditto...
+        val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor // - alterYBy
         return Point(scaledX.toInt(), scaledY.toInt())
     } // convertMEventCoordsToScaledScreenTargetPoint
 

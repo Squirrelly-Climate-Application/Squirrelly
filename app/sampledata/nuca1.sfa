@@ -37,7 +37,7 @@
     file: 'sampledata/nuca1.obj',
     name: 'nuca1',
     recenter: 'root',
-    scale: 0.0004268,
+    scale: 0.0004068,
   },
   version: '0.54:2',
 }

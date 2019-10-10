@@ -8,6 +8,7 @@ import android.util.Log
  * */
 
 private const val DEFAULT_HITPOINTS = 10
+private const val DEFAULT_DEATH_POINTS_VALUE = 5
 
 abstract class Monster: WorldEntity() {
 
@@ -20,6 +21,9 @@ abstract class Monster: WorldEntity() {
             field = value
             checkForDeath()
         }
+
+    // how many points you get for killing the monster
+    open val pointsValueOnDeath = DEFAULT_DEATH_POINTS_VALUE
 
     open var monsterAI: AI? = null // it can't be initialized here because of the 'leaking context' warning
 

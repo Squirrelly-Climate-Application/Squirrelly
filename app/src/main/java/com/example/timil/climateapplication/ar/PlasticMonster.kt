@@ -13,6 +13,8 @@ import com.google.ar.sceneform.rendering.ModelRenderable
 
 class PlasticMonster: Monster() {
 
+    override val pointsValueOnDeath = 10
+
     override var hitPoints = 5
         set(value) {
             field = value
