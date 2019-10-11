@@ -222,26 +222,24 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
     override fun onBackPressed() {
         // use this if we wan't to close the navigation drawer with back button
-        /*if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
-        }*/
-        if (findFragment(SCAN_FRAGMENT_TAG)){
-            super.onBackPressed()
-        }
-        else {
-            val builder = AlertDialog.Builder(this)
-            val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
-            builder.setView(dialogView)
-                .setPositiveButton(R.string.yes) { _, _ ->
-                    if (findFragment(START_FRAGMENT_TAG) || findFragment(TAB_DISCOUNTS_FRAGMENT_TAG)){
-                        finish()
+        when {
+            drawer.isDrawerOpen(GravityCompat.START) -> drawer.closeDrawer(GravityCompat.START)
+            findFragment(SCAN_FRAGMENT_TAG) -> super.onBackPressed()
+            else -> {
+                val builder = AlertDialog.Builder(this)
+                val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
+                builder.setView(dialogView)
+                    .setPositiveButton(R.string.yes) { _, _ ->
+                        if (findFragment(START_FRAGMENT_TAG) || findFragment(TAB_DISCOUNTS_FRAGMENT_TAG)){
+                            finish()
+                        }
+                        else {
+                            super.onBackPressed()
+                        }
                     }
-                    else {
-                        super.onBackPressed()
-                    }
-                }
-                .setNegativeButton(R.string.no) { _, _ ->
-                }.show()
+                    .setNegativeButton(R.string.no) { _, _ ->
+                    }.show()
+            }
         }
     }
 
