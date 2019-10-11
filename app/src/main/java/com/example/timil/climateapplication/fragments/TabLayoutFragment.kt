@@ -18,8 +18,6 @@ import com.example.timil.climateapplication.adapters.TabAdapter
 class TabLayoutFragment : Fragment() {
 
     private var root: View? = null
-    private var discountsFragment: DiscountsFragment? = null
-    private var userDiscountsFragment: UserDiscountsFragment? = null
 
     private var tabLayout: TabLayout? = null
     private var viewPager: ViewPager? = null
@@ -30,12 +28,8 @@ class TabLayoutFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_tab_layout, container, false)
-        return root
-    }
 
-
-    override fun onResume() {
-        super.onResume()
+        Log.d("tester", "helloo")
 
         tabLayout = root!!.findViewById(R.id.tabLayout)
         viewPager = root!!.findViewById(R.id.viewPager)
@@ -62,6 +56,8 @@ class TabLayoutFragment : Fragment() {
 
             }
         })
+
+        return root
     }
 
 }
