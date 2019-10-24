@@ -29,8 +29,6 @@ class TabLayoutFragment : Fragment() {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_tab_layout, container, false)
 
-        Log.d("tester", "helloo")
-
         tabLayout = root!!.findViewById(R.id.tabLayout)
         viewPager = root!!.findViewById(R.id.viewPager)
 
