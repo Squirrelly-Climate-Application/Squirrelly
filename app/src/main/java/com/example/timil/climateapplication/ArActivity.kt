@@ -32,7 +32,7 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
  * @author Ville Lohkovuori, Leo Partanen
  * */
 
-private const val DEFAULT_THROWS = 500
+private const val DEFAULT_THROWS = 5
 
 private enum class VIEW_TYPE {
     HP,
