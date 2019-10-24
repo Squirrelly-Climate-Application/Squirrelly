@@ -61,7 +61,7 @@ object Static {
 
                     isShadowReceiver = false
                     isShadowCaster = false
-                    collisionShape = Box(Vector3(0.34f, 0.20f, 0.18f), Vector3(0.02f, 0.18f, 0f))
+                    collisionShape = Box(Vector3(0.34f, 0.30f, 0.18f), Vector3(0.02f, 0.23f, 0f))
                 }
             } // thenAccept
     } // load3dModelResources
@@ -70,7 +70,7 @@ object Static {
     // 180f gives natural-looking roll behavior for the thrown nut
     fun randomizedQuaternion(baseAngle: Float = 180f): Quaternion {
 
-        val rndX = rGen.nextInt(0,2).toFloat() // between 0 and 1
+        val rndX = rGen.nextInt(0,2).toFloat()
         val rndY = rGen.nextInt(0, 2).toFloat()
         val rndZ = rGen.nextInt(0, 2).toFloat()
 

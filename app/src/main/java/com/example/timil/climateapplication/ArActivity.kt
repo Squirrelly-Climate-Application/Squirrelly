@@ -32,7 +32,7 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
  * @author Ville Lohkovuori, Leo Partanen
  * */
 
-private const val DEFAULT_THROWS = 5
+private const val DEFAULT_THROWS = 500
 
 private enum class VIEW_TYPE {
     HP,
@@ -259,7 +259,7 @@ class ArActivity : AppCompatActivity() {
             // these shenanigans are needed because the hit detection should only happen once the
             // throwing animation has finished
 
-            // we'll 'touch' the scaled hit point (30 % further than the finger swipe's end point)
+            // we'll 'touch' the scaled hit point (xx % further than the finger swipe's end point)
             val actualHitTestMEvent = obtainMotionEvent(actualScaledHitPoint!!) // it always exists if the animation is playing
             val actualHitTestResult = arFragment.arSceneView.scene.hitTest(actualHitTestMEvent)
             val actuallyHitNode = actualHitTestResult.node

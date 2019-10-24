@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.util.Log
+import com.google.ar.sceneform.collision.Box
 import com.google.ar.sceneform.math.Vector3
 import java.util.*
 
@@ -32,13 +33,15 @@ class AI(private val node: WorldEntity) {
 
     private var moveAnim: ObjectAnimator? = null
     private var scaleAnim: ObjectAnimator? = null
+    private var boxCollisionShapeScaleAnim: ObjectAnimator? = null
+    private var sphereCollisionShapeScaleAnim: ObjectAnimator? = null
     private var spinAnim: ObjectAnimator? = null
 
     companion object {
 
         private val rGen = Random(System.currentTimeMillis())
 
-        fun create(node: WorldEntity, type: AIType): AI? {
+        fun create(node: WorldEntity, type: AIType): AI {
 
             return when (type) {
                 AIType.BASIC -> AI(node).apply {
@@ -55,7 +58,7 @@ class AI(private val node: WorldEntity) {
                                 // Log.d("HUUH", "monster position: " + node.localPosition)
                                 execute() // never stop moving until death
                             }
-                        }) // linearAnim
+                        }) // moveAnim
                 } // BASIC apply
 
                 AIType.MORPHING -> AI(node).apply {
@@ -74,9 +77,12 @@ class AI(private val node: WorldEntity) {
 
                                 execute() // never stop moving until death
                             }
-                        }) // linearAnim
+                        }) // moveAnim
 
-                    scaleAnim = AnimationFactory.scaleAnim(node, duration, randomScale())
+                    val newScale = randomScale()
+                    scaleAnim = AnimationFactory.scaleAnim(node, duration, newScale)
+
+                    boxCollisionShapeScaleAnim = AnimationFactory.boxCollisionShapeScaleAnim(node, duration, newScale)
 
                     spinAnim = AnimationFactory.spinAnim(node, duration, Static.randomizedQuaternion())
                 } // MORPHING apply
@@ -93,14 +99,26 @@ class AI(private val node: WorldEntity) {
         moveAnim?.duration = dura
         moveAnim?.setObjectValues(node.localPosition, randomTarget())
 
+        val newScale = randomScale()
+
         scaleAnim?.duration = dura
-        scaleAnim?.setObjectValues(node.localScale, randomScale())
+        scaleAnim?.setObjectValues(node.localScale, newScale)
+
+        if (node is Co2Monster) {
+
+            val boxSize = (node.renderable!!.collisionShape as Box).size
+            val newBoxSize = Vector3(boxSize.x * newScale.x, boxSize.y * newScale.y, boxSize.z * newScale.z)
+
+            boxCollisionShapeScaleAnim?.duration = dura
+            boxCollisionShapeScaleAnim?.setObjectValues(boxSize, newBoxSize)
+        }
 
         spinAnim?.duration = dura
         spinAnim?.setObjectValues(node.localRotation, Static.randomizedQuaternion())
 
         moveAnim?.start()
         scaleAnim?.start()
+        boxCollisionShapeScaleAnim?.start()
         spinAnim?.start()
     } // execute
 
@@ -110,6 +128,8 @@ class AI(private val node: WorldEntity) {
         moveAnim = null
         scaleAnim?.removeAllListeners()
         scaleAnim = null
+        boxCollisionShapeScaleAnim?.removeAllListeners()
+        boxCollisionShapeScaleAnim = null
         spinAnim?.removeAllListeners()
         spinAnim = null
     } // terminate
@@ -119,6 +139,7 @@ class AI(private val node: WorldEntity) {
         moveAnim?.pause()
         spinAnim?.pause()
         scaleAnim?.pause()
+        boxCollisionShapeScaleAnim?.pause()
     }
 
     fun resumeExecution() {
@@ -126,6 +147,7 @@ class AI(private val node: WorldEntity) {
         moveAnim?.resume()
         spinAnim?.resume()
         scaleAnim?.resume()
+        boxCollisionShapeScaleAnim?.resume()
     }
 
     private fun randomDura(): Long {

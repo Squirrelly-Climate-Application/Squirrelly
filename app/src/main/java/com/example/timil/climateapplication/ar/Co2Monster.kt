@@ -2,10 +2,7 @@ package com.example.timil.climateapplication.ar
 
 import android.util.Log
 import com.google.ar.sceneform.Node
-import com.google.ar.sceneform.math.Quaternion
-import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
-import kotlin.random.Random
 
 /**
  * A type of monster that looks like a morphing cloud.
@@ -23,8 +20,6 @@ class Co2Monster: Monster() {
             checkForDeath()
         }
 
-    override var monsterAI = AI.create(this, AIType.MORPHING)
-
     companion object {
 
         // set on app start from Static.kt
@@ -40,7 +35,9 @@ class Co2Monster: Monster() {
                 renderable = monsterRenderable
                 setParent(cameraNode)
             }.also {
-                it.monsterAI?.execute()
+                // the AI must be created here in order for node.renderable not to be null
+                it.monsterAI = AI.create(it, AIType.MORPHING)
+                it.monsterAI.execute()
             }
         } // create
     } // companion object
@@ -48,7 +45,7 @@ class Co2Monster: Monster() {
     // auto-called when hp reaches 0
     override fun onDeath() {
         super.onDeath() // destroys the visual monster model
-        monsterAI?.terminate() // destroys the AI
+        monsterAI.terminate() // destroys the AI
         Log.d("HUUH", "monster is dead!")
     }
 

@@ -4,7 +4,10 @@ import android.animation.ObjectAnimator
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import android.animation.AnimatorListenerAdapter
+import android.util.Log
 import android.view.animation.LinearInterpolator
+import com.google.ar.sceneform.collision.Box
+import com.google.ar.sceneform.collision.Sphere
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.QuaternionEvaluator
 import com.google.ar.sceneform.math.Vector3Evaluator
@@ -74,5 +77,46 @@ object AnimationFactory {
             setEvaluator(Vector3Evaluator())
         }
     } // scaleAnim
+
+    // the collisionShape of Renderables needs to be scaled separately from their localScale property
+    fun boxCollisionShapeScaleAnim(
+        node: Node,
+        dura: Long,
+        newSize: Vector3
+    ): ObjectAnimator {
+
+        return ObjectAnimator().apply {
+
+            val box = node.renderable?.collisionShape as Box
+
+            target = box
+            propertyName = "size"
+            duration = dura
+            interpolator = LinearInterpolator()
+            setAutoCancel(false)
+            setObjectValues(box.size, newSize)
+            setEvaluator(Vector3Evaluator())
+        }
+    } // boxCollisionShapeScaleAnim
+
+    // untested; not sure which evaluator would work with it
+    fun sphereCollisionShapeScaleAnim(
+        node: Node,
+        dura: Long,
+        newRadius: Float
+    ): ObjectAnimator {
+
+        return ObjectAnimator().apply {
+
+            val sphere = node.renderable?.collisionShape as Sphere
+
+            target = sphere
+            propertyName = "radius"
+            duration = dura
+            interpolator = LinearInterpolator()
+            setAutoCancel(false)
+            setObjectValues(sphere.radius, newRadius)
+        }
+    } // sphereCollisionShapeScaleAnim
 
 } // AnimationFactory

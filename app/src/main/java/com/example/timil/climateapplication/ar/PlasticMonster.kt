@@ -39,7 +39,7 @@ class PlasticMonster: Monster() {
                 renderable = monsterRenderable
                 setParent(cameraNode)
             }.also {
-                it.monsterAI?.execute()
+                it.monsterAI.execute()
             }
         } // create
     } // companion object
@@ -47,7 +47,7 @@ class PlasticMonster: Monster() {
     // auto-called when hp reaches 0
     override fun onDeath() {
         super.onDeath() // destroys the visual monster model
-        monsterAI?.terminate() // destroys the AI
+        monsterAI.terminate() // destroys the AI
         Log.d("HUUH", "monster is dead!")
     }
 
