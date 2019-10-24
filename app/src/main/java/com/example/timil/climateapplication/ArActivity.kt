@@ -51,8 +51,8 @@ class ArActivity : AppCompatActivity() {
     // the game score
     var score = 0
         set(value) {
-            field = value
-            updateUI(VIEW_TYPE.SCORE, value)
+            field =  if (value <= 0) 0 else value // no negative scores can be assigned
+            updateUI(VIEW_TYPE.SCORE, field)
         }
 
     // note: these could be in a 'Game' class, but for now I don't think that's necessary
@@ -262,7 +262,7 @@ class ArActivity : AppCompatActivity() {
                     endGame(true)
                 }
             } // if Monster
-            score-- // used throw = -1 score. NOTE: must be done before decreasing throws !!!
+            score -= 1 // used throw = -1 score. NOTE: must be done before decreasing throws !!!
             numOfThrows-- // the game ends if it goes to zero
 
             projNode?.dispose() // delete the old nut
