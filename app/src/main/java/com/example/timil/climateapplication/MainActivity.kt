@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun startArActivity(quizAnswerCorrect: Boolean) {
 
         val mainIntent = Intent(this@MainActivity, ArActivity::class.java)
-        mainIntent.putExtra(Static.QUIZ_ANSWER_CORRECT_KEY, quizAnswerCorrect)
+        mainIntent.putExtra(getString(R.string.quiz_answer_correct_key), quizAnswerCorrect)
         startActivity(mainIntent)
         finish()
 

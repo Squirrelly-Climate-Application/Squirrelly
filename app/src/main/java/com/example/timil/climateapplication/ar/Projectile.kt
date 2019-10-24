@@ -22,9 +22,10 @@ private const val RISE_ANIM_Z_TARGET = -0.8f
 
 class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
-    companion object {
+    // affects animation logic in ArActivity
+    var isThrown = false
 
-        const val THROWN_PROJECTILE_NAME = "thrown"
+    companion object {
 
         // NOTE: changing the z-value is likely to screw up the hit detection!!!
         // possibly the y-value as well
@@ -53,7 +54,7 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
         } // create
     } // companion object
 
-    // for communicating with the AR fragment
+    // for communicating with the AR activity
     interface IonThrowAnimEndListener {
 
         fun onRiseAnimEnd()
@@ -63,8 +64,7 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
     // can't name it 'throw' because it's a reserved keyword
     fun launch(throwTarget: Vector3) {
 
-        // to prevent hit detection to the thrown nut (in ArActivity)
-        name = THROWN_PROJECTILE_NAME
+        isThrown = true
 
         val finalTarget = Vector3(throwTarget)
         // Log.d("HUUH", "orig. throwTarget: $throwTarget")

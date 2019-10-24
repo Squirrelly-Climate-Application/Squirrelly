@@ -52,14 +52,14 @@ class ArActivity : AppCompatActivity() {
     var score = 0
         set(value) {
             field = value
-            updateUI(VIEW_TYPE.SCORE, value.toString())
+            updateUI(VIEW_TYPE.SCORE, value)
         }
 
     // note: these could be in a 'Game' class, but for now I don't think that's necessary
     var numOfThrows = DEFAULT_THROWS
         set(value) {
             field = value
-            updateUI(VIEW_TYPE.THROWS, value.toString())
+            updateUI(VIEW_TYPE.THROWS, value)
             if (value == 0) {
                 endGame(false) // if the monster is dead, the game ends before this call
             }
@@ -94,8 +94,7 @@ class ArActivity : AppCompatActivity() {
 
     private var viewGroup: ViewGroup? = null
 
-    private var outOfTime = false
-
+    private var throwTimerExpired = false
     private var gamePaused = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,8 +111,12 @@ class ArActivity : AppCompatActivity() {
 
         startService(Intent(this@ArActivity, SoundService::class.java))
 
-        val quizAnswerCorrect = intent?.extras?.getBoolean(Static.QUIZ_ANSWER_CORRECT_KEY) ?: false
-        if (quizAnswerCorrect) numOfThrows = CORRECT_ANSWER_THROWS
+        val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
+        numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
+
+        score = 0 // to update the UI, we need to do these assignments once it has been initialized
+        updateUI(VIEW_TYPE.WIND_X, wind.xComp)
+        updateUI(VIEW_TYPE.WIND_Y, wind.yComp)
 
         disablePlaneDetection()
         arFragment.arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
@@ -124,24 +127,14 @@ class ArActivity : AppCompatActivity() {
         // create the first nut and the monster
         monsterNode = Co2Monster.create(arFragment.arSceneView.scene.camera)
         // monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
-        updateUI(VIEW_TYPE.HP, (monsterNode?.hitPoints ?: 0).toString())
+        updateUI(VIEW_TYPE.HP, monsterNode?.hitPoints ?: 0)
         Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
-
-        updateUI(VIEW_TYPE.WIND_X, wind.xComp.toString())
-        updateUI(VIEW_TYPE.WIND_Y, wind.yComp.toString())
 
         btn_pause.setOnClickListener {
 
             if (!gamePaused) pauseGame() else resumeGame()
         } // onClickListener
     } // onCreate
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        // Save the fragment's instance (it should always exist)
-        // supportFragmentManager.putFragment(outState, AR_FRAGMENT_TAG, customArFragmentInstance!!)
-    }
 
     override fun onResume() {
         super.onResume()
@@ -181,15 +174,12 @@ class ArActivity : AppCompatActivity() {
 
         if (gamePaused) return
 
-        // do not detect hits to already thrown projectiles
-        if (hitTestResult.node?.name == Projectile.THROWN_PROJECTILE_NAME) return
-
         val hitNode = hitTestResult.node
 
         if (!hitProj && hitNode is Projectile) {
 
-            outOfTime = false
-            Log.d("HUUH", "set outOfTime to false")
+            // do not detect hits to already thrown projectiles
+            if (hitNode.isThrown) return
 
             startDistanceY = motionEvent.rawY
             startDistanceX = motionEvent.rawX
@@ -197,11 +187,12 @@ class ArActivity : AppCompatActivity() {
             hitProj = true
             projNode = hitNode
 
+            throwTimerExpired = false
             // we must throw the nut within a certain amount of time or the throw is canceled
             startThrowTimer(hitNode, THROW_TIME_LIMIT)
         } // if !hitProj && is Projectile
 
-        if (outOfTime) return
+        if (throwTimerExpired) return
 
         if (startDistanceY > 0f && startDistanceX > 0f) {
 
@@ -263,7 +254,7 @@ class ArActivity : AppCompatActivity() {
                 hitMonster = true
                 monsterNode!!.damage(1)
                 score += 2 // each hit is worth 2 points
-                updateUI(VIEW_TYPE.HP, monsterNode!!.hitPoints.toString())
+                updateUI(VIEW_TYPE.HP, monsterNode!!.hitPoints)
                 Log.d("HUUH", "hit monster!")
 
                 if (!monsterNode!!.isAlive) {
@@ -287,7 +278,7 @@ class ArActivity : AppCompatActivity() {
         gamePaused = true
         projNode?.pauseAnimations()
         monsterNode?.monsterAI?.pauseExecution()
-        btn_pause.text = "Resume"
+        btn_pause.text = getString(R.string.txt_resume)
         stopService(Intent(this@ArActivity, SoundService::class.java))
     }
 
@@ -296,7 +287,7 @@ class ArActivity : AppCompatActivity() {
         gamePaused = false
         projNode?.resumeAnimations()
         monsterNode?.monsterAI?.resumeExecution()
-        btn_pause.text = "Pause"
+        btn_pause.text = getString(R.string.txt_pause)
         startService(Intent(this@ArActivity, SoundService::class.java))
     }
 
@@ -308,15 +299,15 @@ class ArActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_end_game, viewGroup)
 
         // can't 'see' the views without this trick
-        dialogView.findViewById<TextView>(R.id.tv_end_score).text = "Score: $score"
-        dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (monsterDead) "Victory!" else "Loss!"
+        dialogView.findViewById<TextView>(R.id.tv_end_score).text = getString(R.string.txt_score, score)
+        dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (monsterDead) getString(R.string.txt_victory) else getString(R.string.txt_loss)
 
         builder.setView(dialogView)
-            .setPositiveButton("Rewards") { _, _ ->
+            .setPositiveButton(getString(R.string.txt_rewards)) { _, _ ->
                 //TODO: move to the reward screen and send the points there
                 finish()
             }
-            .setNegativeButton("Start ") { _, _ ->
+            .setNegativeButton(getString(R.string.txt_start)) { _, _ ->
                 val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
                 startActivity(mainIntent)
                 finish()
@@ -327,14 +318,15 @@ class ArActivity : AppCompatActivity() {
         Log.d("HUUH", "final points: $score")
     } // endGame
 
-    private fun updateUI(viewType: VIEW_TYPE, value: String) {
+    private fun updateUI(viewType: VIEW_TYPE, value: Any) {
 
         when(viewType) {
-            VIEW_TYPE.HP -> tv_hitpoints.text = "HP: $value"
-            VIEW_TYPE.SCORE -> tv_score.text = "Score: $value"
-            VIEW_TYPE.THROWS -> tv_throws.text = "Throws: $value"
-            VIEW_TYPE.WIND_X -> tv_wind_x.text = "Wind(x): $value"
-            VIEW_TYPE.WIND_Y -> tv_wind_y.text = "Wind(y): $value"
+            // i'm sure there's a better way to do this than these idiotic casts...
+            VIEW_TYPE.HP -> tv_hitpoints.text = getString(R.string.txt_HP, value as Int)
+            VIEW_TYPE.THROWS -> tv_throws.text = getString(R.string.txt_throws, value as Int)
+            VIEW_TYPE.WIND_X -> tv_wind_x.text = getString(R.string.txt_wind_x, "%.1f".format(value as Float))
+            VIEW_TYPE.WIND_Y -> tv_wind_y.text = getString(R.string.txt_wind_y, "%.1f".format(value as Float))
+            VIEW_TYPE.SCORE -> tv_score.text = getString(R.string.txt_score, value as Int)
         }
     } // updateUI
 
@@ -413,12 +405,11 @@ class ArActivity : AppCompatActivity() {
 
             override fun onFinish() {
 
-                outOfTime = true
+                throwTimerExpired = true
                 hitProj = false // this assignment is needed, but it's bad code; change if possible
 
                 // for thrown projectiles, the power bar animation should keep playing for the throw's whole length
-                //TODO: maybe add an 'isThrown' value to Projectile, to make this a bit tidier
-                if (projectile.name != Projectile.THROWN_PROJECTILE_NAME) {
+                if (!projectile.isThrown) {
 
                     setUIPower(0)
                 }

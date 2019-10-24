@@ -22,10 +22,6 @@ object Static {
     const val PLASTIC_MONSTER_NAME = "plasticMonster"
     const val CO2_MONSTER_NAME = "co2Monster"
 
-    //TODO: this should be in the string resource file, but I'm not sure how to refer
-    // to those things as strings (and not ints, as is given by R.string.whatever)
-    const val QUIZ_ANSWER_CORRECT_KEY = "quizAnswerCorrect"
-
     private val rGen = Random(System.currentTimeMillis())
 
     fun load3dModelResources(context: Context) {
