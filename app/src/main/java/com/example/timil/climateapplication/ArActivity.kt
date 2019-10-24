@@ -19,6 +19,13 @@ import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.dialog_end_game.*
 import kotlin.math.abs
 import kotlin.math.hypot
+import android.os.CountDownTimer
+import android.support.v4.app.SupportActivity
+import android.support.v4.app.SupportActivity.ExtraData
+import android.support.v4.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 /**
  * Activity that governs the AR game portion of the app.
@@ -38,6 +45,7 @@ private enum class VIEW_TYPE {
 // the percentage of screen space (from the top of the screen)
 // where a projectile-touching finger swipe will have to end to be considered 'upwards'
 private const val UPWARD_SWIPE_LIMIT_RATIO = 0.833333f
+private const val THROW_TIME_LIMIT = 1200L // how long you have to throw the nut
 
 class ArActivity : AppCompatActivity() {
 
@@ -88,7 +96,9 @@ class ArActivity : AppCompatActivity() {
 
     private var viewGroup: ViewGroup? = null
 
-    var gamePaused = false
+    private var outOfTime = false
+
+    private var gamePaused = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -183,12 +193,22 @@ class ArActivity : AppCompatActivity() {
         val hitNode = hitTestResult.node
 
         if (!hitProj && hitNode is Projectile) {
+
+            outOfTime = false
+            Log.d("HUUH", "set outOfTime to false")
+
             startDistanceY = motionEvent.rawY
             startDistanceX = motionEvent.rawX
 
             hitProj = true
             projNode = hitNode
-        }
+
+            // we must throw the nut within a certain amount of time or the throw is canceled
+            startThrowTimer(hitNode, THROW_TIME_LIMIT)
+        } // if !hitProj && is Projectile
+
+        if (outOfTime) return
+
         if (startDistanceY > 0f && startDistanceX > 0f) {
 
             setUIPower((hypot( abs(startDistanceX - motionEvent.rawX), abs(startDistanceY - motionEvent.rawY))).toInt())
@@ -386,5 +406,31 @@ class ArActivity : AppCompatActivity() {
         screenHeight = size.y
         screenCenter = Point(screenWidth / 2, screenHeight / 2)
     } // setScreenSizeConstants
+
+    // we have a limited amount of time to throw the nut
+    private fun startThrowTimer(projectile: Projectile, timeInMs: Long) {
+
+        object : CountDownTimer(timeInMs, 200) {
+
+            override fun onTick(millisUntilFinished: Long) {
+
+                // Log.d("HUUH", "ticking down!")
+            }
+
+            override fun onFinish() {
+
+                outOfTime = true
+                hitProj = false // this assignment is needed, but it's bad code; change if possible
+
+                // for thrown projectiles, the power bar animation should keep playing for the throw's whole length
+                //TODO: maybe add an 'isThrown' value to Projectile, to make this a bit tidier
+                if (projectile.name != Projectile.THROWN_PROJECTILE_NAME) {
+
+                    setUIPower(0)
+                }
+                // Log.d("HUUH", "out of time!")
+            }
+        }.start()
+    } // startThrowTimer
 
 } // ArActivity
