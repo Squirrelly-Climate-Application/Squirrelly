@@ -35,7 +35,6 @@ private const val CORRECT_ANSWER_THROWS = 10
 
 private enum class VIEW_TYPE {
     HP,
-    SCORE,
     THROWS,
     WIND_X,
     WIND_Y
@@ -47,13 +46,6 @@ private const val UPWARD_SWIPE_LIMIT_RATIO = 0.833333f
 private const val THROW_TIME_LIMIT = 1200L // how long you have to throw the nut
 
 class ArActivity : AppCompatActivity() {
-
-    // the game score
-    var score = 0
-        set(value) {
-            field =  if (value <= 0) 0 else value // no negative scores can be assigned
-            updateUI(VIEW_TYPE.SCORE, field)
-        }
 
     // note: these could be in a 'Game' class, but for now I don't think that's necessary
     var numOfThrows = DEFAULT_THROWS
@@ -97,6 +89,9 @@ class ArActivity : AppCompatActivity() {
     private var throwTimerExpired = false
     private var gamePaused = false
 
+    // needed for the final score calculation
+    private var monsterMaxHp = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // hide the top UI bar of the app
@@ -114,7 +109,7 @@ class ArActivity : AppCompatActivity() {
         val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
         numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
 
-        score = 0 // to update the UI, we need to do these assignments once it has been initialized
+        // to update the UI, we need to do these assignments once it has been initialized
         updateUI(VIEW_TYPE.WIND_X, wind.xComp)
         updateUI(VIEW_TYPE.WIND_Y, wind.yComp)
 
@@ -126,6 +121,7 @@ class ArActivity : AppCompatActivity() {
 
         // create the first nut and the monster
         monsterNode = Co2Monster.create(arFragment.arSceneView.scene.camera)
+        monsterMaxHp = monsterNode!!.hitPoints
         // monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
         updateUI(VIEW_TYPE.HP, monsterNode?.hitPoints ?: 0)
         Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
@@ -253,7 +249,6 @@ class ArActivity : AppCompatActivity() {
 
                 hitMonster = true
                 monsterNode!!.damage(1)
-                score += 2 // each hit is worth 2 points
                 updateUI(VIEW_TYPE.HP, monsterNode!!.hitPoints)
                 Log.d("HUUH", "hit monster!")
 
@@ -262,7 +257,7 @@ class ArActivity : AppCompatActivity() {
                     endGame(true)
                 }
             } // if Monster
-            score -= 1 // used throw = -1 score. NOTE: must be done before decreasing throws !!!
+
             numOfThrows-- // the game ends if it goes to zero
 
             projNode?.dispose() // delete the old nut
@@ -293,7 +288,8 @@ class ArActivity : AppCompatActivity() {
 
     private fun endGame(monsterDead: Boolean) {
 
-        if (monsterDead) score += monsterNode!!.pointsValueOnDeath
+        var score = numOfThrows
+        score += if (monsterDead) monsterNode!!.pointsValueOnDeath else monsterMaxHp - monsterNode!!.hitPoints
 
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_end_game, viewGroup)
@@ -326,7 +322,6 @@ class ArActivity : AppCompatActivity() {
             VIEW_TYPE.THROWS -> tv_throws.text = getString(R.string.txt_throws, value as Int)
             VIEW_TYPE.WIND_X -> tv_wind_x.text = getString(R.string.txt_wind_x, "%.1f".format(value as Float))
             VIEW_TYPE.WIND_Y -> tv_wind_y.text = getString(R.string.txt_wind_y, "%.1f".format(value as Float))
-            VIEW_TYPE.SCORE -> tv_score.text = getString(R.string.txt_score, value as Int)
         }
     } // updateUI
 
