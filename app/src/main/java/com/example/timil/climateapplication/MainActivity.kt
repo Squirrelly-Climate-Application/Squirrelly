@@ -25,6 +25,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.ViewGroup
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
+import com.example.timil.climateapplication.ar.Static
 import com.example.timil.climateapplication.fragments.*
 
 
@@ -174,9 +175,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         }
     }
 
-    override fun startArActivity() {
+    override fun startArActivity(quizAnswerCorrect: Boolean) {
 
         val mainIntent = Intent(this@MainActivity, ArActivity::class.java)
+        mainIntent.putExtra(Static.QUIZ_ANSWER_CORRECT_KEY, quizAnswerCorrect)
         startActivity(mainIntent)
         finish()
 

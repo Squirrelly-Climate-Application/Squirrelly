@@ -36,7 +36,7 @@ class QuizFragment : Fragment() {
     private var savedQuestionData = false
 
     interface OnButtonClick {
-        fun startArActivity()
+        fun startArActivity(quizAnswerCorrect: Boolean)
     }
 
     override fun onAttach(activity: Activity?) {
@@ -147,7 +147,7 @@ class QuizFragment : Fragment() {
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") {
                             dialog, _ ->
                         dialog.dismiss()
-                        activityCallBack!!.startArActivity()
+                        activityCallBack!!.startArActivity(true)
                     }
                 } else {
                     // TODO: app idea changed. Not needed anymore?
@@ -157,7 +157,7 @@ class QuizFragment : Fragment() {
                             dialog, _ ->
                         dialog.dismiss()
 
-                        activityCallBack!!.startArActivity()
+                        activityCallBack!!.startArActivity(false)
                         // fragmentManager!!.popBackStack()
                     }
                 }

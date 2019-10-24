@@ -25,14 +25,13 @@ import android.support.v4.app.SupportActivity.ExtraData
 import android.support.v4.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
-
-
 /**
  * Activity that governs the AR game portion of the app.
  * @author Ville Lohkovuori, Leo Partanen
  * */
 
 private const val DEFAULT_THROWS = 5
+private const val CORRECT_ANSWER_THROWS = 10
 
 private enum class VIEW_TYPE {
     HP,
@@ -56,7 +55,6 @@ class ArActivity : AppCompatActivity() {
             updateUI(VIEW_TYPE.SCORE, value.toString())
         }
 
-    //TODO: the throw number should arrive from the bundle
     // note: these could be in a 'Game' class, but for now I don't think that's necessary
     var numOfThrows = DEFAULT_THROWS
         set(value) {
@@ -114,12 +112,8 @@ class ArActivity : AppCompatActivity() {
 
         startService(Intent(this@ArActivity, SoundService::class.java))
 
-        // we're restoring the Activity due to minimizing the app, etc
-        if (savedInstanceState != null) {
-
-            // Restore the fragment's instance
-            // customArFragmentInstance = supportFragmentManager.getFragment(savedInstanceState, AR_FRAGMENT_TAG)
-        }
+        val quizAnswerCorrect = intent?.extras?.getBoolean(Static.QUIZ_ANSWER_CORRECT_KEY) ?: false
+        if (quizAnswerCorrect) numOfThrows = CORRECT_ANSWER_THROWS
 
         disablePlaneDetection()
         arFragment.arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
