@@ -325,7 +325,7 @@ class ArActivity : AppCompatActivity() {
         }
     } // updateUI
 
-    // it needs an int, so let's keep it as a separate function from other UI stuffs
+    // the functionality is a bit different, so let's keep it as a separate function from other UI stuffs
     private fun setUIPower(power: Int) {
 
         if (launch_power_meter == null) return
