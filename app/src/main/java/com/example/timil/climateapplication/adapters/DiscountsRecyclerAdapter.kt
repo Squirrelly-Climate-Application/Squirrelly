@@ -17,9 +17,10 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     private var mCallback: OnDiscountClick? = null
 
     private var discountsList: MutableList<QueryDocumentSnapshot>? = null
+    private var userPoints: Int? = null
 
     interface OnDiscountClick {
-        fun showDiscount()
+        fun showDiscount(document: QueryDocumentSnapshot, userPoints: Int)
     }
 
     init {
@@ -30,8 +31,9 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         }
     }
 
-    fun setDiscounts(discounts: ArrayList<QueryDocumentSnapshot>) {
+    fun setDiscounts(discounts: ArrayList<QueryDocumentSnapshot>, points: Int) {
         discountsList = discounts
+        userPoints = points
 
         notifyDataSetChanged()
     }
@@ -46,7 +48,7 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         discountViewHolder.discountInfo.text = discountsList!![i].data.getValue("information").toString()
         discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue("points_needed").toString())
         discountViewHolder.itemRoot.setOnClickListener {
-            mCallback!!.showDiscount()
+            mCallback!!.showDiscount(discountsList!![i], userPoints!!)
         }
     }
 

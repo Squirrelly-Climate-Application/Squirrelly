@@ -16,7 +16,8 @@ import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
-import kotlinx.android.synthetic.main.fragment_quiz.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -28,6 +29,8 @@ class DiscountsFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
     private var adapter: DiscountsRecyclerAdapter? = null
     private var progressBar: ProgressBar? = null
+
+    private var userPoints: Int? = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,7 +55,7 @@ class DiscountsFragment : Fragment() {
 
         val userId = FirebaseAuth.getInstance().currentUser!!.uid
         getUserData(userId)
-        getDiscountsData()
+        getDiscountsData(userId)
     }
 
     private fun getUserData(userId: String){
@@ -60,16 +63,12 @@ class DiscountsFragment : Fragment() {
         val docRef = db.collection("users").document(userId)
         docRef.get()
             .addOnSuccessListener { document ->
+
                 if (document != null) {
-
-                    val tvUserPoints = root!!.findViewById<TextView>(R.id.tvMyPoints)
-                    val userPoints: String?
-
                     // in case the user is new and doesn't have any data in Firebase yet -> give data to avoid null exceptions
                     if(document.data == null){
-                        userPoints = "0"
                         val userData = hashMapOf(
-                            "points" to "0"
+                            "points" to userPoints
                         )
                         db.collection("users").document(userId)
                             .set(userData)
@@ -79,9 +78,11 @@ class DiscountsFragment : Fragment() {
                             .addOnFailureListener { e -> Log.w("tester", "Error writing document", e) }
                     }
                     else {
-                        userPoints = document.data!!.getValue("points").toString()
+                        userPoints = document.data!!.getValue("points").toString().toInt()
                     }
-                    tvUserPoints.text = resources.getString(R.string.user_points, userPoints)
+
+                    val tvUserPoints = root!!.findViewById<TextView>(R.id.tvMyPoints)
+                    tvUserPoints.text = resources.getString(R.string.user_points, userPoints.toString())
                     tvUserPoints.visibility = View.VISIBLE
 
                 } else {
@@ -94,18 +95,48 @@ class DiscountsFragment : Fragment() {
 
     }
 
-    private fun getDiscountsData(){
-        val discounts = ArrayList<QueryDocumentSnapshot>()
-
+    private fun getDiscountsData(userId: String){
         val db = FirebaseFirestore.getInstance()
-        db.collection("discounts").get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                for (document in task.result!!) {
-                    discounts.add(document)
-                }
-                progressBar!!.visibility = View.GONE
 
-                adapter!!.setDiscounts(discounts)
+        db.collection("users").document(userId).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val document = task.result
+                if (document != null) {
+                    var usedDiscountsArrayList: ArrayList<Map<String, Date>>? = null
+                    if (document.get("used_discounts") != null) {
+                        usedDiscountsArrayList = document.get("used_discounts") as ArrayList<Map<String, Date>>
+                    }
+
+                    db.collection("discounts").get().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val discounts = ArrayList<QueryDocumentSnapshot>()
+                            for (discountDocument in task.result!!) {
+                                discounts.add(discountDocument)
+                            }
+
+                            // if user has already used some of the discounts -> do not show it on the list
+                            if (usedDiscountsArrayList != null) {
+                                if (usedDiscountsArrayList.size > 0) {
+                                    for (usedDiscount in usedDiscountsArrayList) {
+                                        for (discount in discounts) {
+                                            if (usedDiscount["id"].toString() == discount.id) {
+                                                discounts.remove(discount)
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            progressBar!!.visibility = View.GONE
+
+                            adapter!!.setDiscounts(discounts, userPoints!!)
+
+                        } else {
+                            Log.w("Error", "Error getting questions.", task.exception)
+                        }
+                    }
+                }
 
             } else {
                 Log.w("Error", "Error getting questions.", task.exception)
