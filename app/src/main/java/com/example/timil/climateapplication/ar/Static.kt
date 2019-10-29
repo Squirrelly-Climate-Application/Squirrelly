@@ -67,7 +67,6 @@ object Static {
     } // load3dModelResources
 
     // for randomly spinning things around (the acorns, etc).
-    // 180f gives natural-looking roll behavior for the thrown nut
     fun randomizedQuaternion(baseAngle: Float = 180f): Quaternion {
 
         val rndX = rGen.nextInt(0,2).toFloat()

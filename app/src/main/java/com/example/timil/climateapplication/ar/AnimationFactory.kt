@@ -25,7 +25,7 @@ object AnimationFactory {
     fun linearMoveAnim(
         node: Node?,
         dura: Long,
-        from: Vector3 = Vector3(0f, 0f, 0f),
+        from: Vector3? = Vector3(0f, 0f, 0f),
         to: Vector3? = Vector3(0f, 0f, 0f),
         endListener: AnimatorListenerAdapter? = null): ObjectAnimator {
 

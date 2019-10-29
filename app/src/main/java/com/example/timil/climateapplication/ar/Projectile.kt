@@ -35,8 +35,8 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
         // set on app start from Static.kt
         lateinit var projRenderable: ModelRenderable
 
-        private const val firstAnimDura = 1000L //TODO: make them depend on the throw strength somehow
-        private const val secondAnimDura = 1000L
+        private const val FIRST_ANIM_DURA = 1000L //TODO: make them depend on the throw strength somehow
+        private const val SECOND_ANIM_DURA = 1000L
 
         // in order to be able to pause the anims, we need this reference
         private var anims: AnimatorSet? = null
@@ -52,6 +52,7 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
                 setParent(cameraNode)
             }
         } // create
+
     } // companion object
 
     // for communicating with the AR activity
@@ -85,7 +86,7 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
         val risingAnim = AnimationFactory.linearMoveAnim(
             this,
-            firstAnimDura,
+            FIRST_ANIM_DURA,
             localPosition,
             firstTarget,
             object : AnimatorListenerAdapter() {
@@ -99,7 +100,7 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
 
         val droppingAnim = AnimationFactory.linearMoveAnim(
             this,
-            secondAnimDura,
+            SECOND_ANIM_DURA,
             firstTarget,
             endTarget,
             object : AnimatorListenerAdapter() {
@@ -111,9 +112,9 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
                 }
             }) // droppingAnim
 
-        val randomSpinQuaternion = Static.randomizedQuaternion()
+        val randomSpinQuaternion = Static.randomizedQuaternion(90f)
 
-        val spinAnim = AnimationFactory.spinAnim(this, firstAnimDura + secondAnimDura, randomSpinQuaternion)
+        val spinAnim = AnimationFactory.spinAnim(this, FIRST_ANIM_DURA + SECOND_ANIM_DURA, randomSpinQuaternion)
 
         anims = AnimatorSet().apply {
             play(risingAnim).before(droppingAnim)
