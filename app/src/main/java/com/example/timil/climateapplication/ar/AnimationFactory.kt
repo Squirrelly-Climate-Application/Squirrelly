@@ -4,6 +4,8 @@ import android.animation.ObjectAnimator
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import android.animation.AnimatorListenerAdapter
+import android.animation.FloatEvaluator
+import android.animation.ValueAnimator
 import android.util.Log
 import android.view.animation.LinearInterpolator
 import com.google.ar.sceneform.collision.Box
@@ -99,7 +101,6 @@ object AnimationFactory {
         }
     } // boxCollisionShapeScaleAnim
 
-    // untested; not sure which evaluator would work with it
     fun sphereCollisionShapeScaleAnim(
         node: Node,
         dura: Long,
@@ -116,6 +117,7 @@ object AnimationFactory {
             interpolator = LinearInterpolator()
             setAutoCancel(false)
             setObjectValues(sphere.radius, newRadius)
+            setEvaluator(FloatEvaluator())
         }
     } // sphereCollisionShapeScaleAnim
 

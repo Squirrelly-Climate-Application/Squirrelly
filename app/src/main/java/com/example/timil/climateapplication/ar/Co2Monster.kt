@@ -13,6 +13,8 @@ class Co2Monster: Monster() {
 
     override val pointsValueOnDeath = 10
 
+    override val maxHitPoints = 5
+
     override var hitPoints = 5
         set(value) {
             field = value

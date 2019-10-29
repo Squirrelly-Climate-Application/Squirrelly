@@ -16,6 +16,9 @@ abstract class Monster: WorldEntity() {
         get() = this.hitPoints > 0
         private set
 
+    // used for score-counting purposes
+    open val maxHitPoints = DEFAULT_HITPOINTS
+
     open var hitPoints = DEFAULT_HITPOINTS
         set(value) { // it seems that this custom setter is *not* auto-inherited, but i'm keeping the template for it here just for clarity
             field = value

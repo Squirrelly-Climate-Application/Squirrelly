@@ -30,8 +30,8 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
  * @author Ville Lohkovuori, Leo Partanen
  * */
 
-private const val DEFAULT_THROWS = 5
-private const val CORRECT_ANSWER_THROWS = 10
+private const val DEFAULT_THROWS = 50
+private const val CORRECT_ANSWER_THROWS = 100
 
 private enum class VIEW_TYPE {
     HP,
@@ -89,9 +89,6 @@ class ArActivity : AppCompatActivity() {
     private var throwTimerExpired = false
     private var gamePaused = false
 
-    // needed for the final score calculation
-    private var monsterMaxHp = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // hide the top UI bar of the app
@@ -121,7 +118,6 @@ class ArActivity : AppCompatActivity() {
 
         // create the first nut and the monster
         monsterNode = Co2Monster.create(arFragment.arSceneView.scene.camera)
-        monsterMaxHp = monsterNode!!.hitPoints
         // monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
         updateUI(VIEW_TYPE.HP, monsterNode?.hitPoints ?: 0)
         Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
@@ -289,7 +285,7 @@ class ArActivity : AppCompatActivity() {
     private fun endGame(monsterDead: Boolean) {
 
         var score = numOfThrows
-        score += if (monsterDead) monsterNode!!.pointsValueOnDeath else monsterMaxHp - monsterNode!!.hitPoints
+        score += if (monsterDead) monsterNode!!.pointsValueOnDeath else monsterNode!!.maxHitPoints - monsterNode!!.hitPoints
 
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_end_game, viewGroup)

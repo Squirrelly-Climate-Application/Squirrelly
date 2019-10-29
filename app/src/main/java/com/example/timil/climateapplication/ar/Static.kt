@@ -61,7 +61,7 @@ object Static {
 
                     isShadowReceiver = false
                     isShadowCaster = false
-                    collisionShape = Box(Vector3(0.34f, 0.30f, 0.18f), Vector3(0.02f, 0.23f, 0f))
+                    collisionShape = Sphere(0.14f, Vector3(0f, 0.25f, 0f))
                 }
             } // thenAccept
     } // load3dModelResources
