@@ -11,7 +11,7 @@ import android.widget.RelativeLayout
 import kotlinx.android.synthetic.main.custom_swipe_button_layout.view.*
 import android.view.LayoutInflater
 import android.widget.TextView
-import kotlinx.android.synthetic.main.fragment_user_discounts.view.*
+import kotlinx.android.synthetic.main.fragment_view_discount.view.*
 
 class SwipeButton @JvmOverloads constructor(
     context: Context,
