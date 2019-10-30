@@ -47,7 +47,6 @@ class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
             return Projectile(obs).apply {
                 localPosition = DEFAULT_POSITION
                 localRotation = DEFAULT_ROTATION
-                name = Static.DEFAULT_PROJECTILE_NAME
                 renderable = projRenderable
                 setParent(cameraNode)
             }
