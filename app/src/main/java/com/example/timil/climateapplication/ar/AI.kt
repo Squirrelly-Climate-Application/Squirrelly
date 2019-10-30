@@ -30,7 +30,8 @@ private const val Y_MIN = 0.10f
 private const val ANIM_LENGTH_MAX = 4000L
 private const val ANIM_LENGTH_MIN = 1000L
 
-// needed when scaling the Co2Monster's collisionShape radius
+// needed when scaling the Co2Monster's collisionShape radius;
+// it's simply a value that gives good results
 private const val RADIUS_HIT_SCALE_FACTOR = 3.8f
 
 class AI(private val node: WorldEntity) {

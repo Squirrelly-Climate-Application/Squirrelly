@@ -17,11 +17,6 @@ import kotlin.random.Random
 
 object Static {
 
-    // these are not strictly needed atm, but might be used in the near future
-    const val DEFAULT_PROJECTILE_NAME = "nut"
-    const val PLASTIC_MONSTER_NAME = "plasticMonster"
-    const val CO2_MONSTER_NAME = "co2Monster"
-
     private val rGen = Random(System.currentTimeMillis())
 
     fun load3dModelResources(context: Context) {

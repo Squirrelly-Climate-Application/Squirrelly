@@ -32,8 +32,6 @@ class Co2Monster: Monster() {
 
             return Co2Monster().apply {
                 setPosition(0f, 0.05f, -1.0f) // high center position
-                // localRotation = Quaternion.axisAngle(Vector3(1f, 0f, 0f), 20f)
-                name = Static.CO2_MONSTER_NAME
                 renderable = monsterRenderable
                 setParent(cameraNode)
             }.also {
@@ -43,12 +41,5 @@ class Co2Monster: Monster() {
             }
         } // create
     } // companion object
-
-    // auto-called when hp reaches 0
-    override fun onDeath() {
-        super.onDeath() // destroys the visual monster model
-        monsterAI.terminate() // destroys the AI
-        Log.d("HUUH", "monster is dead!")
-    }
 
 } // Co2Monster

@@ -33,7 +33,8 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 private const val DEFAULT_THROWS = 5
 private const val CORRECT_ANSWER_THROWS = 10
 
-private enum class VIEW_TYPE {
+// for UI updates
+private enum class ViewType {
     HP,
     THROWS,
     WIND_X,
@@ -43,17 +44,16 @@ private enum class VIEW_TYPE {
 // the percentage of screen space (from the top of the screen)
 // where a projectile-touching finger swipe will have to end to be considered 'upwards'
 private const val UPWARD_SWIPE_LIMIT_RATIO = 0.833333f
-private const val THROW_TIME_LIMIT = 1200L // how long you have to throw the nut
+private const val THROW_TIME_LIMIT = 1200L // how long you have to throw the nut (in ms)
 
 class ArActivity : AppCompatActivity() {
 
-    // note: these could be in a 'Game' class, but for now I don't think that's necessary
     var numOfThrows = DEFAULT_THROWS
         set(value) {
             field = value
-            updateUI(VIEW_TYPE.THROWS, value)
+            updateUI(ViewType.THROWS, value)
             if (value == 0) {
-                endGame(false) // if the monster is dead, the game ends before this call
+                endGame(false) // if the monster dies, the game ends before this call
             }
         }
 
@@ -63,7 +63,6 @@ class ArActivity : AppCompatActivity() {
     private var hitProj = false
     private var projNode: Projectile? = null
 
-    private var hitMonster = false
     private var monsterNode: Monster? = null
 
     private val wind = Wind.create()
@@ -91,25 +90,26 @@ class ArActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // hide the top UI bar of the app
+        // hide the top UI bar (that shows battery level etc)
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
-        // it gets *and* sets them
-        setScreenSizeConstants()
-        setContentView(R.layout.activity_ar) // inflates all the child views correctly
+        setContentView(R.layout.activity_ar)
 
-        arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
+        // it 'gets' *and* sets them
+        setScreenSizeConstants()
+
 
         startService(Intent(this@ArActivity, SoundService::class.java))
 
         val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
         numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
 
-        // to update the UI, we need to do these assignments once it has been initialized
-        updateUI(VIEW_TYPE.WIND_X, wind.xComp)
-        updateUI(VIEW_TYPE.WIND_Y, wind.yComp)
+        // to properly update the UI, we need to do these assignments once it has been initialized
+        updateUI(ViewType.WIND_X, wind.xComp)
+        updateUI(ViewType.WIND_Y, wind.yComp)
 
+        arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
         disablePlaneDetection()
         arFragment.arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
 
@@ -119,7 +119,7 @@ class ArActivity : AppCompatActivity() {
         // create the first nut and the monster
         monsterNode = Co2Monster.create(arFragment.arSceneView.scene.camera)
         // monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
-        updateUI(VIEW_TYPE.HP, monsterNode?.hitPoints ?: 0)
+        updateUI(ViewType.HP, monsterNode?.hitPoints ?: 0)
         Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
 
         btn_pause.setOnClickListener {
@@ -184,7 +184,7 @@ class ArActivity : AppCompatActivity() {
             startThrowTimer(hitNode, THROW_TIME_LIMIT)
         } // if !hitProj && is Projectile
 
-        if (throwTimerExpired) return
+        if (throwTimerExpired) return // note: this check should remain exactly here!
 
         if (startDistanceY > 0f && startDistanceX > 0f) {
 
@@ -243,9 +243,8 @@ class ArActivity : AppCompatActivity() {
 
             if (actuallyHitNode is Monster) {
 
-                hitMonster = true
                 monsterNode!!.damage(1)
-                updateUI(VIEW_TYPE.HP, monsterNode!!.hitPoints)
+                updateUI(ViewType.HP, monsterNode!!.hitPoints)
                 Log.d("HUUH", "hit monster!")
 
                 if (!monsterNode!!.isAlive) {
@@ -268,7 +267,7 @@ class ArActivity : AppCompatActivity() {
 
         gamePaused = true
         projNode?.pauseAnimations()
-        monsterNode?.monsterAI?.pauseExecution()
+        monsterNode?.pauseAI()
         btn_pause.text = getString(R.string.txt_resume)
         stopService(Intent(this@ArActivity, SoundService::class.java))
     }
@@ -277,7 +276,7 @@ class ArActivity : AppCompatActivity() {
 
         gamePaused = false
         projNode?.resumeAnimations()
-        monsterNode?.monsterAI?.resumeExecution()
+        monsterNode?.resumeAI()
         btn_pause.text = getString(R.string.txt_pause)
         startService(Intent(this@ArActivity, SoundService::class.java))
     }
@@ -296,11 +295,12 @@ class ArActivity : AppCompatActivity() {
 
         builder.setView(dialogView)
             .setPositiveButton(getString(R.string.txt_rewards)) { _, _ ->
-                //TODO: move to the reward screen and send the points there
+                //TODO: save the points in the database & move to the reward screen
                 finish()
             }
             .setNegativeButton(getString(R.string.txt_start)) { _, _ ->
                 val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
+                //TODO: save the points in the database
                 startActivity(mainIntent)
                 finish()
             }
@@ -310,14 +310,14 @@ class ArActivity : AppCompatActivity() {
         Log.d("HUUH", "final points: $score")
     } // endGame
 
-    private fun updateUI(viewType: VIEW_TYPE, value: Any) {
+    private fun updateUI(viewType: ViewType, value: Any) {
 
         when(viewType) {
             // i'm sure there's a better way to do this than these idiotic casts...
-            VIEW_TYPE.HP -> tv_hitpoints.text = getString(R.string.txt_HP, value as Int)
-            VIEW_TYPE.THROWS -> tv_throws.text = getString(R.string.txt_throws, value as Int)
-            VIEW_TYPE.WIND_X -> tv_wind_x.text = getString(R.string.txt_wind_x, "%.1f".format(value as Float))
-            VIEW_TYPE.WIND_Y -> tv_wind_y.text = getString(R.string.txt_wind_y, "%.1f".format(value as Float))
+            ViewType.HP -> tv_hitpoints.text = getString(R.string.txt_HP, value as Int)
+            ViewType.THROWS -> tv_throws.text = getString(R.string.txt_throws, value as Int)
+            ViewType.WIND_X -> tv_wind_x.text = getString(R.string.txt_wind_x, "%.1f".format(value as Float))
+            ViewType.WIND_Y -> tv_wind_y.text = getString(R.string.txt_wind_y, "%.1f".format(value as Float))
         }
     } // updateUI
 
@@ -356,7 +356,7 @@ class ArActivity : AppCompatActivity() {
             x,
             y,
             metaState)
-    } // end obtainMotionEvent
+    } // obtainMotionEvent
 
     // maybe shorten its name, ehh
     private fun convertMEventCoordsToScaledScreenTargetPoint(x: Float, y: Float): Point {
