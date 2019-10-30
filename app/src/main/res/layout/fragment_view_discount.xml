@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toTopOf="parent">
+
+    <TextView
+        android:id="@+id/tvViewDiscountTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:layout_margin="8dp"/>
+
+    <TextView
+        android:id="@+id/tvViewDiscountInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:backgroundTint="@color/fui_transparent"/>
+
+    <TextView
+        android:id="@+id/tvViewDiscountPoints"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:backgroundTint="@color/fui_transparent"/>
+
+    <Button
+        android:id="@+id/btnUseDiscount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="USE DISCOUNT"/>
+
+    <!-- TODO: Here is the discount swipe button -->
+    <com.example.timil.climateapplication.SwipeButton
+        android:id="@+id/swipe_btn"
+        android:layout_width="match_parent"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_height="72dp" />
+
+</LinearLayout>

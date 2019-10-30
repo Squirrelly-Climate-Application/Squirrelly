@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.ar.Static
 import com.example.timil.climateapplication.fragments.*
+import com.google.firebase.firestore.QueryDocumentSnapshot
 
 
 class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick, DiscountsRecyclerAdapter.OnDiscountClick, NavigationView.OnNavigationItemSelectedListener {
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     private lateinit var scanFragment: ScanFragment
     // private lateinit var arFragment: CustomArFragment
     private lateinit var tabDiscountsFragment: TabLayoutFragment
+    private lateinit var viewDiscountFragment: ViewDiscountFragment
 
     private lateinit var drawer: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
@@ -51,6 +53,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         const val SCAN_FRAGMENT_TAG = "ScanFragment"
         const val QUIZ_FRAGMENT_TAG = "QuizFragment"
         const val TAB_DISCOUNTS_FRAGMENT_TAG = "TabDiscountsFragment"
+        const val VIEW_DISCOUNT_FRAGMENT = "ViewDiscountFragment"
     }
 
     override fun onStart() {
@@ -68,6 +71,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         startFragment = StartFragment()
         scanFragment = ScanFragment()
         tabDiscountsFragment = TabLayoutFragment()
+        viewDiscountFragment = ViewDiscountFragment()
 
         setupFragment(startFragment, START_FRAGMENT_TAG, true)
 
@@ -187,10 +191,16 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         // setupFragment(arFragment, AR_FRAGMENT_TAG) // should be used, but it loses the child views
     }
 
-    override fun showDiscount() {
-        // called when opening a discount for more information
-
-        Log.d("Tester", "discount click")
+    // called when opening a discount for more information
+    override fun showDiscount(document: QueryDocumentSnapshot, userPoints: Int) {
+        val bundle = Bundle()
+        bundle.putString("discountId", document.id)
+        bundle.putString("discountCompany", document.data["company"].toString())
+        bundle.putString("discountInformation", document.data["information"].toString())
+        bundle.putInt("discountPoints", document.data["points_needed"].toString().toInt())
+        bundle.putInt("userPoints", userPoints)
+        viewDiscountFragment.arguments = bundle
+        setupFragment(viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT, true)
     }
 
     private fun startSignIn() {
@@ -223,10 +233,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
 
     override fun onBackPressed() {
-        // use this if we wan't to close the navigation drawer with back button
         when {
             drawer.isDrawerOpen(GravityCompat.START) -> drawer.closeDrawer(GravityCompat.START)
             findFragment(SCAN_FRAGMENT_TAG) -> super.onBackPressed()
+            findFragment(VIEW_DISCOUNT_FRAGMENT) -> super.onBackPressed()
             else -> {
                 val builder = AlertDialog.Builder(this)
                 val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
