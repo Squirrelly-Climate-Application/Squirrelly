@@ -129,7 +129,7 @@ class ArActivity : AppCompatActivity() {
             onPeekTouchDetect(hitTestResult, motionEvent)
         }
 
-        // this needs to arrive from the Bundle (etc)
+        //TODO: this needs to arrive from the Bundle (etc)
         val monsterType = MonsterType.OIL
 
         if (monsterType == MonsterType.OIL) {
@@ -271,6 +271,7 @@ class ArActivity : AppCompatActivity() {
                 if (!monsterNode!!.isAlive) {
 
                     endGame(true)
+                    return // so that we won't decrease the throws and 'end' the game twice (edge case)
                 }
             } // if Monster
 
