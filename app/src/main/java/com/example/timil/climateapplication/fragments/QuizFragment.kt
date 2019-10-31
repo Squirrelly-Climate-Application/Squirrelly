@@ -150,15 +150,12 @@ class QuizFragment : Fragment() {
                         activityCallBack!!.startArActivity(true)
                     }
                 } else {
-                    // TODO: app idea changed. Not needed anymore?
                     alertDialog.setTitle("Wrong answer.")
-                    alertDialog.setMessage("Wrong answer. Better luck next time!")
+                    alertDialog.setMessage("Wrong answer. $information")
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") {
                             dialog, _ ->
                         dialog.dismiss()
-
                         activityCallBack!!.startArActivity(false)
-                        // fragmentManager!!.popBackStack()
                     }
                 }
                 alertDialog.show()

@@ -33,7 +33,7 @@ class UsedDiscountsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        root = inflater.inflate(R.layout.fragment_user_discounts, container, false)
+        root = inflater.inflate(R.layout.fragment_used_discounts, container, false)
         return root
     }
 

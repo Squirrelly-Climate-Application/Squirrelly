@@ -24,6 +24,8 @@ import android.support.v4.app.SupportActivity
 import android.support.v4.app.SupportActivity.ExtraData
 import android.support.v4.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 /**
  * Activity that governs the AR game portion of the app.
@@ -293,14 +295,17 @@ class ArActivity : AppCompatActivity() {
         dialogView.findViewById<TextView>(R.id.tv_end_score).text = getString(R.string.txt_score, score)
         dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (monsterDead) getString(R.string.txt_victory) else getString(R.string.txt_loss)
 
+        // save the points in the database
+        saveScoreToDb(score)
+
         builder.setView(dialogView)
             .setPositiveButton(getString(R.string.txt_rewards)) { _, _ ->
-                //TODO: save the points in the database & move to the reward screen
+                val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
+                startActivity(mainIntent)
                 finish()
             }
             .setNegativeButton(getString(R.string.txt_start)) { _, _ ->
                 val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
-                //TODO: save the points in the database
                 startActivity(mainIntent)
                 finish()
             }
@@ -408,5 +413,38 @@ class ArActivity : AppCompatActivity() {
             }
         }.start()
     } // startThrowTimer
+
+    private fun saveScoreToDb(score: Int){
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("users").document(userId)
+        docRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    var userPoints = 0
+                    if(document.data != null){
+                        if(document.data!!.getValue("points") != null){
+                            userPoints = document.data!!.getValue("points").toString().toInt()
+                        }
+                    }
+                    val total = userPoints+score
+
+                    val userData = hashMapOf(
+                        "points" to total
+                    )
+                    db.collection("users").document(userId)
+                        .set(userData)
+                        .addOnSuccessListener {
+                            Log.d("tester", "DocumentSnapshot successfully written!")
+                        }
+                        .addOnFailureListener { e -> Log.w("tester", "Error writing document", e) }
+                } else {
+                    Log.d("tester", "No such document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("tester", "get failed with ", exception)
+            }
+    } // saveScoreToDb
 
 } // ArActivity
