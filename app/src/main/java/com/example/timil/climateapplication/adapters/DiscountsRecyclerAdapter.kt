@@ -18,6 +18,7 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
 
     private var discountsList: MutableList<QueryDocumentSnapshot>? = null
     private var userPoints: Int? = null
+    private var proceedToViewFragment: Boolean? = null
 
     interface OnDiscountClick {
         fun showDiscount(document: QueryDocumentSnapshot, userPoints: Int)
@@ -31,9 +32,10 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         }
     }
 
-    fun setDiscounts(discounts: ArrayList<QueryDocumentSnapshot>, points: Int) {
+    fun setDiscounts(discounts: ArrayList<QueryDocumentSnapshot>, points: Int, proceedToViewFragment: Boolean) {
         discountsList = discounts
         userPoints = points
+        this.proceedToViewFragment = proceedToViewFragment
 
         notifyDataSetChanged()
     }
@@ -47,8 +49,10 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         discountViewHolder.discountTitle.text = discountsList!![i].data.getValue("company").toString()
         discountViewHolder.discountInfo.text = discountsList!![i].data.getValue("information").toString()
         discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue("points_needed").toString())
-        discountViewHolder.itemRoot.setOnClickListener {
-            mCallback!!.showDiscount(discountsList!![i], userPoints!!)
+        if (proceedToViewFragment!!) {
+            discountViewHolder.itemRoot.setOnClickListener {
+                mCallback!!.showDiscount(discountsList!![i], userPoints!!)
+            }
         }
     }
 

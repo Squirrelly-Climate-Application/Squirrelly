@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import com.example.timil.climateapplication.fragments.DiscountsFragment
-import com.example.timil.climateapplication.fragments.UserDiscountsFragment
+import com.example.timil.climateapplication.fragments.UsedDiscountsFragment
 
 
 class TabAdapter(private val myContext: Context, fm: FragmentManager, internal var totalTabs: Int) :
@@ -18,7 +18,7 @@ class TabAdapter(private val myContext: Context, fm: FragmentManager, internal v
                 return DiscountsFragment()
             }
             1 -> {
-                return UserDiscountsFragment()
+                return UsedDiscountsFragment()
             }
             else -> return null
         }

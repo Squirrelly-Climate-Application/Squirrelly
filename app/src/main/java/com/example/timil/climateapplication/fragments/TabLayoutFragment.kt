@@ -33,7 +33,7 @@ class TabLayoutFragment : Fragment() {
         viewPager = root!!.findViewById(R.id.viewPager)
 
         tabLayout!!.addTab(tabLayout!!.newTab().setText("Discounts"))
-        tabLayout!!.addTab(tabLayout!!.newTab().setText("My Discounts"))
+        tabLayout!!.addTab(tabLayout!!.newTab().setText("Used Discounts"))
         tabLayout!!.tabGravity = TabLayout.GRAVITY_FILL
 
         val adapter = TabAdapter(context!!, childFragmentManager, tabLayout!!.tabCount)
