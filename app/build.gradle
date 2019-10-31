@@ -64,3 +64,8 @@ sceneform.asset('sampledata/model.obj',
         'default',
         'sampledata/model.sfa',
         'src/main/assets/model')
+
+sceneform.asset('sampledata/stylized_ink_drop.obj',
+        'default',
+        'sampledata/stylized_ink_drop.sfa',
+        'src/main/assets/stylized_ink_drop')

@@ -59,6 +59,19 @@ object Static {
                     collisionShape = Sphere(0.14f, Vector3(0f, 0.25f, 0f))
                 }
             } // thenAccept
+
+        // oil drop
+        ModelRenderable.builder()
+            .setSource(context, Uri.parse("stylized_ink_drop.sfb"))
+            .build().thenAccept {
+                OilMonster.monsterRenderable = it
+                OilMonster.monsterRenderable.apply {
+
+                    isShadowReceiver = false
+                    isShadowCaster = false
+                    collisionShape = Sphere(0.24f, Vector3(0f, 0.05f, 0f))
+                }
+            } // thenAccept
     } // load3dModelResources
 
     // for randomly spinning things around (the acorns, etc).
