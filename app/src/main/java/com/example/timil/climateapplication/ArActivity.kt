@@ -24,6 +24,9 @@ import android.support.v4.app.SupportActivity
 import android.support.v4.app.SupportActivity.ExtraData
 import android.support.v4.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.rendering.PlaneRenderer
+import com.google.ar.sceneform.rendering.Texture
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -43,6 +46,12 @@ private enum class ViewType {
     WIND_Y
 }
 
+private enum class MonsterType {
+    PLASTIC,
+    CO2,
+    OIL
+}
+
 // the percentage of screen space (from the top of the screen)
 // where a projectile-touching finger swipe will have to end to be considered 'upwards'
 private const val UPWARD_SWIPE_LIMIT_RATIO = 0.833333f
@@ -60,12 +69,16 @@ class ArActivity : AppCompatActivity() {
         }
 
     private lateinit var arFragment: ArFragment
+    private var anchorNode: AnchorNode? = null // for placing the oil monster
 
     // for tracking gesture (swipe) hits to the thrown projectile (acorn)
     private var hitProj = false
     private var projNode: Projectile? = null
-
     private var monsterNode: Monster? = null
+        set (value) {
+            field = value
+            updateUI(ViewType.HP, monsterNode?.hitPoints ?: 0)
+        }
 
     private val wind = Wind.create()
 
@@ -101,7 +114,6 @@ class ArActivity : AppCompatActivity() {
         // it 'gets' *and* sets them
         setScreenSizeConstants()
 
-
         startService(Intent(this@ArActivity, SoundService::class.java))
 
         val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
@@ -112,17 +124,24 @@ class ArActivity : AppCompatActivity() {
         updateUI(ViewType.WIND_Y, wind.yComp)
 
         arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
-        disablePlaneDetection()
         arFragment.arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
 
             onPeekTouchDetect(hitTestResult, motionEvent)
         }
 
-        // create the first nut and the monster
-        monsterNode = Co2Monster.create(arFragment.arSceneView.scene.camera)
-        // monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
-        updateUI(ViewType.HP, monsterNode?.hitPoints ?: 0)
-        Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
+        // this needs to arrive from the Bundle (etc)
+        val monsterType = MonsterType.OIL
+
+        if (monsterType == MonsterType.OIL) {
+
+            enableArObjectPlacement() // the monster is spawned after choosing where to place it
+        } else {
+            disablePlaneDetection()
+
+            // create the first nut and the monster
+            monsterNode = Co2Monster.create(arFragment.arSceneView.scene.camera)
+            Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
+        }
 
         btn_pause.setOnClickListener {
 
@@ -344,6 +363,49 @@ class ArActivity : AppCompatActivity() {
         arFragment.planeDiscoveryController.show()
         arFragment.arSceneView.planeRenderer.isEnabled = true
     }
+
+    private fun enableArObjectPlacement() {
+
+        setCustomPlaneTexture()
+
+        arFragment.setOnTapArPlaneListener { hitResult, _, _ ->
+
+            val anchor = hitResult.createAnchor()
+            anchorNode = AnchorNode(anchor)
+            anchorNode?.setParent(arFragment.arSceneView.scene)
+
+            monsterNode = OilMonster.create(anchorNode!!)
+            Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
+
+            // Disable the placement ability after one monster has been placed
+            disablePlaneDetection()
+            arFragment.setOnTapArPlaneListener(null)
+        }
+    } // enableArObjectPlacement
+
+    private fun setCustomPlaneTexture() {
+
+        // set plane renderer to red
+        val sampler = Texture.Sampler.builder()
+            .setMagFilter(Texture.Sampler.MagFilter.LINEAR)
+            .setWrapMode(Texture.Sampler.WrapMode.REPEAT)
+            .build()
+
+        Texture.builder()
+            .setSource(this, R.drawable.plane_texture)
+            .setSampler(sampler)
+            .build()
+            .thenAccept { texture ->
+                arFragment
+                    .arSceneView
+                    .planeRenderer
+                    .material
+                    .thenAccept { material ->
+                        material.setTexture(
+                    PlaneRenderer.MATERIAL_TEXTURE, texture)
+                    }
+            } // outer thenAccept
+    } // setCustomPlaneTexture
 
     // creates a 'fake' MotionEvent that 'touches' a given screen point
     private fun obtainMotionEvent(point: Point): MotionEvent {

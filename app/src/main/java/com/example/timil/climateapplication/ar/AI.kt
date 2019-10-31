@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.util.Log
+import android.view.animation.AccelerateDecelerateInterpolator
 import com.google.ar.sceneform.collision.Box
 import com.google.ar.sceneform.collision.Sphere
 import com.google.ar.sceneform.math.Vector3
@@ -18,8 +19,8 @@ import java.util.*
 
 enum class AIType {
     BASIC,
-    MORPHING
-    //TODO: add various types of move patterns
+    MORPHING,
+    BOUNCING
 }
 
 // NOTE: ideally, these numbers should depend on the screen size, but ARCore makes that very tricky to do
@@ -30,15 +31,21 @@ private const val Y_MIN = 0.10f
 private const val ANIM_LENGTH_MAX = 4000L
 private const val ANIM_LENGTH_MIN = 1000L
 
+private const val BOUNCE_ANIM_DURA = 3000L
+
 // needed when scaling the Co2Monster's collisionShape radius;
 // it's simply a value that gives good results
 private const val RADIUS_HIT_SCALE_FACTOR = 3.8f
 
 class AI(private val node: WorldEntity) {
 
+    // we must store the AI type to differentiate logic in execute().
+    // (consider subclassing the AI class to make for prettier code)
+    private var type = AIType.BASIC
+
     private var moveAnim: ObjectAnimator? = null
     private var scaleAnim: ObjectAnimator? = null
-    private var boxCollisionShapeScaleAnim: ObjectAnimator? = null
+    private var boxCollisionShapeScaleAnim: ObjectAnimator? = null // remove if not used (eventually)
     private var sphereCollisionShapeScaleAnim: ObjectAnimator? = null
     private var spinAnim: ObjectAnimator? = null
 
@@ -46,10 +53,18 @@ class AI(private val node: WorldEntity) {
 
         private val rGen = Random(System.currentTimeMillis())
 
-        fun create(node: WorldEntity, type: AIType): AI {
+        private val bounceAnimLowTarget = Vector3(0f, 0f, -0.3f)
+        private val bounceAnimTopTarget = Vector3(0f, 0.17f, -0.3f)
+        private val bounceAnimUpScale = Vector3(0.9f, 1.1f, 0.9f) // stretch the drop when it floats up...
+        private val bounceAnimDownScale = Vector3(1.1111111f, 0.909090909f, 1.1111111f) // ... and squeeze it when it floats back down
 
-            return when (type) {
+        fun create(node: WorldEntity, AItype: AIType): AI {
+
+            return when (AItype) {
+
                 AIType.BASIC -> AI(node).apply {
+
+                    type = AItype
 
                     moveAnim = AnimationFactory.linearMoveAnim(
                         node,
@@ -67,6 +82,8 @@ class AI(private val node: WorldEntity) {
                 } // BASIC apply
 
                 AIType.MORPHING -> AI(node).apply {
+
+                    type = AItype
 
                     val duration = randomDura()
 
@@ -95,41 +112,81 @@ class AI(private val node: WorldEntity) {
 
                     spinAnim = AnimationFactory.spinAnim(node, duration, Static.randomizedQuaternion())
                 } // MORPHING apply
+                AIType.BOUNCING -> AI(node).apply {
+
+                    type = AItype
+
+                    moveAnim = AnimationFactory.linearMoveAnim(
+                        node,
+                        BOUNCE_ANIM_DURA,
+                        node.localPosition,
+                        bounceAnimTopTarget,
+                        object : AnimatorListenerAdapter() {
+
+                            // the ending of the move anim also governs the other animations' 'lifecycles'
+                            override fun onAnimationEnd(animation: Animator?) {
+
+                                execute() // never stop moving until death
+                            }
+                        }) // moveAnim
+                    moveAnim?.interpolator = AccelerateDecelerateInterpolator() // makes the bounce look better
+
+                    scaleAnim = AnimationFactory.scaleAnim(node, BOUNCE_ANIM_DURA, bounceAnimUpScale)
+                } // BOUNCING apply
             } // when
         } // create
     } // companion object
 
     fun execute() {
 
-        // clumsy, but AnimatorSet doesn't seem to work here for some reason
+        when (type) {
 
-        val dura = randomDura()
+            AIType.BASIC -> {
 
-        moveAnim?.duration = dura
-        moveAnim?.setObjectValues(node.localPosition, randomTarget())
+                moveAnim?.duration = randomDura()
+                moveAnim?.setObjectValues(node.localPosition, randomTarget())
+            }
 
-        val newScale = randomScale()
+            AIType.MORPHING -> {
 
-        scaleAnim?.duration = dura
-        scaleAnim?.setObjectValues(node.localScale, newScale)
+                val dura = randomDura()
 
-        if (node is Co2Monster) {
+                moveAnim?.duration = dura
+                moveAnim?.setObjectValues(node.localPosition, randomTarget())
 
-            val oldRadius = (node.renderable!!.collisionShape as Sphere).radius
-            // Log.d("HUUH", "oldRadius: $oldRadius")
-            val newRadius = maxOf(newScale.x, newScale.y, newScale.z) / 2 / RADIUS_HIT_SCALE_FACTOR
-            // Log.d("HUUH", "newRadius: $newRadius")
+                val newScale = randomScale()
 
-            sphereCollisionShapeScaleAnim?.duration = dura
-            sphereCollisionShapeScaleAnim?.setObjectValues(oldRadius, newRadius)
-        }
+                scaleAnim?.duration = dura
+                scaleAnim?.setObjectValues(node.localScale, newScale)
 
-        spinAnim?.duration = dura
-        spinAnim?.setObjectValues(node.localRotation, Static.randomizedQuaternion())
+                val oldRadius = (node.renderable!!.collisionShape as Sphere).radius
+                val newRadius = maxOf(newScale.x, newScale.y, newScale.z) / 2 / RADIUS_HIT_SCALE_FACTOR
+
+                sphereCollisionShapeScaleAnim?.duration = dura
+                sphereCollisionShapeScaleAnim?.setObjectValues(oldRadius, newRadius)
+
+                spinAnim?.duration = dura
+                spinAnim?.setObjectValues(node.localRotation, Static.randomizedQuaternion())
+            } // AIType.MORPHING
+
+            AIType.BOUNCING -> {
+
+                // down position, so we'll bounce upwards
+                if (node.localPosition == bounceAnimLowTarget) {
+
+                    moveAnim?.setObjectValues(node.localPosition, bounceAnimTopTarget)
+                    scaleAnim?.setObjectValues(node.localScale, bounceAnimUpScale)
+                } else {
+
+                    moveAnim?.setObjectValues(node.localPosition, bounceAnimLowTarget)
+                    scaleAnim?.setObjectValues(node.localScale, bounceAnimDownScale)
+                }
+            } // AIType.BOUNCING
+        } // when
 
         moveAnim?.start()
         scaleAnim?.start()
-        boxCollisionShapeScaleAnim?.start()
+        // boxCollisionShapeScaleAnim?.start()
         sphereCollisionShapeScaleAnim?.start()
         spinAnim?.start()
     } // execute
@@ -140,8 +197,8 @@ class AI(private val node: WorldEntity) {
         moveAnim = null
         scaleAnim?.removeAllListeners()
         scaleAnim = null
-        boxCollisionShapeScaleAnim?.removeAllListeners()
-        boxCollisionShapeScaleAnim = null
+        // boxCollisionShapeScaleAnim?.removeAllListeners()
+        // boxCollisionShapeScaleAnim = null
         sphereCollisionShapeScaleAnim?.removeAllListeners()
         sphereCollisionShapeScaleAnim = null
         spinAnim?.removeAllListeners()
@@ -153,7 +210,7 @@ class AI(private val node: WorldEntity) {
         moveAnim?.pause()
         spinAnim?.pause()
         scaleAnim?.pause()
-        boxCollisionShapeScaleAnim?.pause()
+        // boxCollisionShapeScaleAnim?.pause()
         sphereCollisionShapeScaleAnim?.pause()
     }
 
@@ -162,7 +219,7 @@ class AI(private val node: WorldEntity) {
         moveAnim?.resume()
         spinAnim?.resume()
         scaleAnim?.resume()
-        boxCollisionShapeScaleAnim?.resume()
+        // boxCollisionShapeScaleAnim?.resume()
         sphereCollisionShapeScaleAnim?.resume()
     }
 
