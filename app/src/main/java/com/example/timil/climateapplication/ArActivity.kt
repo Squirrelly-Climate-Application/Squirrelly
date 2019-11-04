@@ -15,15 +15,9 @@ import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.ux.ArFragment
 import kotlinx.android.synthetic.main.activity_ar.*
-import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.dialog_end_game.*
 import kotlin.math.abs
 import kotlin.math.hypot
 import android.os.CountDownTimer
-import android.support.v4.app.SupportActivity
-import android.support.v4.app.SupportActivity.ExtraData
-import android.support.v4.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.rendering.PlaneRenderer
 import com.google.ar.sceneform.rendering.Texture
@@ -224,7 +218,7 @@ class ArActivity : AppCompatActivity() {
                 // coordinate system; i.e., 540 pixels)
                 val coordSystemConvertRatio = 0.36f / 540 // we'll have to hope the relationship holds for all screen sizes
 
-                val scaledX = ((motionEvent.rawX - screenCenter.x) * coordSystemConvertRatio) * hitScaleFactor // + wind.xComp
+                val scaledX = ((motionEvent.rawX - screenCenter.x) * coordSystemConvertRatio) * hitScaleFactor + wind.xComp
 
                 val localY = projNode!!.localPosition.y
                 val tempY = ((screenCenter.y - motionEvent.rawY) * coordSystemConvertRatio) // gives -0.33156f min value

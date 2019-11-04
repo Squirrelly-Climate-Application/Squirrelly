@@ -20,7 +20,7 @@ import kotlin.math.sqrt
 
 private const val RISE_ANIM_Z_TARGET = -0.8f
 
-class Projectile(private val observer: IonThrowAnimEndListener): WorldEntity() {
+class Projectile private constructor(private val observer: IonThrowAnimEndListener) : WorldEntity() {
 
     // affects animation logic in ArActivity
     var isThrown = false

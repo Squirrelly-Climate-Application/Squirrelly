@@ -11,7 +11,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable
  * @author Ville Lohkovuori
  * */
 
-class OilMonster : Monster() {
+class OilMonster private constructor() : Monster() {
 
     override val pointsValueOnDeath = 10
 

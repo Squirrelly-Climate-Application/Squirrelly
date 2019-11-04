@@ -10,7 +10,7 @@ import android.util.Log
 private const val DEFAULT_HITPOINTS = 10
 private const val DEFAULT_DEATH_POINTS_VALUE = 5
 
-abstract class Monster: WorldEntity() {
+abstract class Monster : WorldEntity() {
 
     var isAlive: Boolean = true
         get() = this.hitPoints > 0

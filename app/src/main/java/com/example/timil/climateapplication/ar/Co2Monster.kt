@@ -9,7 +9,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable
  * @author Ville Lohkovuori
  * */
 
-class Co2Monster: Monster() {
+class Co2Monster private constructor() : Monster() {
 
     override val pointsValueOnDeath = 10
 
