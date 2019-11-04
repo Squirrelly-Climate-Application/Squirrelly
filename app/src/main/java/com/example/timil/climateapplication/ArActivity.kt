@@ -134,6 +134,7 @@ class ArActivity : AppCompatActivity() {
 
         if (monsterType == MonsterType.OIL) {
 
+            toggleHpViewVisibility(false) // hide the hp view since there is no hp to show
             enableArObjectPlacement() // the monster is spawned after choosing where to place it
         } else {
             disablePlaneDetection()
@@ -378,6 +379,8 @@ class ArActivity : AppCompatActivity() {
             monsterNode = OilMonster.create(anchorNode!!)
             Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
 
+            toggleHpViewVisibility(true) // we can now show the hp view
+
             // Disable the placement ability after one monster has been placed
             disablePlaneDetection()
             arFragment.setOnTapArPlaneListener(null)
@@ -476,6 +479,11 @@ class ArActivity : AppCompatActivity() {
             }
         }.start()
     } // startThrowTimer
+
+    private fun toggleHpViewVisibility(visible: Boolean) {
+
+        tv_hitpoints.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+    }
 
     private fun saveScoreToDb(score: Int){
         val userId = FirebaseAuth.getInstance().currentUser!!.uid
