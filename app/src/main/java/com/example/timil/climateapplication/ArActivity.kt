@@ -32,6 +32,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 private const val DEFAULT_THROWS = 5
 private const val CORRECT_ANSWER_THROWS = 10
 
+// For converting between the phone screen's regular coordinates and ARCore's coordinate system.
+// 0.36 = the experimentally defined ARCore coordinate system value at the right edge of the screen
+// on a Samsung Galaxy S7 (at a distance of half the screen from the center-point of the x axis in the regular Android
+// coordinate system; i.e., 540 pixels) ( we'll have to hope the relationship holds for all screen sizes )
+private const val COORD_SYS_CONVERT_RATIO = 0.36f / 540
+
 // for UI updates
 private enum class ViewType {
     HP,
@@ -57,9 +63,6 @@ class ArActivity : AppCompatActivity() {
         set(value) {
             field = value
             updateUI(ViewType.THROWS, value)
-            if (value == 0) {
-                endGame(false) // if the monster dies, the game ends before this call
-            }
         }
 
     private lateinit var arFragment: ArFragment
@@ -213,20 +216,16 @@ class ArActivity : AppCompatActivity() {
 
             if (upwardSwipe) {
 
-                // 0.36 = the experimentally defined ARCore coordinate system value at the right edge of the screen
-                // on a Samsung Galaxy S7 (at a distance of half the screen from the center-point of the x axis in the regular Android
-                // coordinate system; i.e., 540 pixels)
-                val coordSystemConvertRatio = 0.36f / 540 // we'll have to hope the relationship holds for all screen sizes
-
-                val scaledX = ((motionEvent.rawX - screenCenter.x) * coordSystemConvertRatio) * hitScaleFactor + wind.xComp
+                val scaledX = ((motionEvent.rawX - screenCenter.x) * COORD_SYS_CONVERT_RATIO) * hitScaleFactor + wind.xComp
 
                 val localY = projNode!!.localPosition.y
-                val tempY = ((screenCenter.y - motionEvent.rawY) * coordSystemConvertRatio) // gives -0.33156f min value
-                val scaledY = localY + (abs(localY) + tempY) * hitScaleFactor // + wind.yComp
+                val tempY = ((screenCenter.y - motionEvent.rawY) * COORD_SYS_CONVERT_RATIO)
+                val scaledY = localY + (abs(localY) + tempY) * hitScaleFactor - wind.yComp
 
+                // the target coordinate in the ARCore coordinate system
                 val target = Vector3(scaledX, scaledY, -1.0f) // sink it down a little bit, with a lower final z-value
 
-                // store the end point of the animation that is launched directly below
+                // store the end point (screen coordinate) of the animation that is launched directly below
                 actualScaledHitPoint = convertMEventCoordsToScaledScreenTargetPoint(motionEvent.rawX, motionEvent.rawY)
 
                 projNode!!.launch(target) // triggers the animation; at the end of it comes the hit check to the monster
@@ -257,6 +256,8 @@ class ArActivity : AppCompatActivity() {
             val actualHitTestResult = arFragment.arSceneView.scene.hitTest(actualHitTestMEvent)
             val actuallyHitNode = actualHitTestResult.node
 
+            numOfThrows--
+
             if (actuallyHitNode is Monster) {
 
                 monsterNode!!.damage(1)
@@ -266,11 +267,13 @@ class ArActivity : AppCompatActivity() {
                 if (!monsterNode!!.isAlive) {
 
                     endGame(true)
-                    return // so that we won't decrease the throws and 'end' the game twice (edge case)
+                    return // so that we won't 'end' the game twice (edge case)
                 }
             } // if Monster
 
-            numOfThrows-- // the game ends if it goes to zero
+            if (numOfThrows <= 0) {
+                endGame(false) // if the monster is dead, the game ends before this call
+            }
 
             projNode?.dispose() // delete the old nut
             projNode = null
@@ -316,6 +319,7 @@ class ArActivity : AppCompatActivity() {
         builder.setView(dialogView)
             .setPositiveButton(getString(R.string.txt_rewards)) { _, _ ->
                 val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
+                //TODO: we need to move to the discount screen from this button
                 startActivity(mainIntent)
                 finish()
             }
@@ -336,8 +340,8 @@ class ArActivity : AppCompatActivity() {
             // i'm sure there's a better way to do this than these idiotic casts...
             ViewType.HP -> tv_hitpoints.text = getString(R.string.txt_HP, value as Int)
             ViewType.THROWS -> tv_throws.text = getString(R.string.txt_throws, value as Int)
-            ViewType.WIND_X -> tv_wind_x.text = getString(R.string.txt_wind_x, "%.1f".format(value as Float))
-            ViewType.WIND_Y -> tv_wind_y.text = getString(R.string.txt_wind_y, "%.1f".format(value as Float))
+            ViewType.WIND_X -> tv_wind_x.text = getString(R.string.txt_wind_x, "%.2f".format(value as Float))
+            ViewType.WIND_Y -> tv_wind_y.text = getString(R.string.txt_wind_y, "%.2f".format(value as Float))
         }
     } // updateUI
 
@@ -423,19 +427,20 @@ class ArActivity : AppCompatActivity() {
             metaState)
     } // obtainMotionEvent
 
-    // maybe shorten its name, ehh
+    // we need to scale the target of the fake motion event, since it is to be xx % further than
+    // the end of the finger swipe
     private fun convertMEventCoordsToScaledScreenTargetPoint(x: Float, y: Float): Point {
 
-        // val alterXBy = wind.xComp * screenWidth / 0.55f // experimental constant; only works on the Galaxy S7!
+        val alterXBy = wind.xComp / COORD_SYS_CONVERT_RATIO
         // Log.d("HUUH", "alter x by: $alterXBy")
 
-        val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor // + alterXBy
+        val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor + alterXBy
 
-        // val alterYBy = wind.yComp * screenHeight / 3.6f
-        // Log.d("HUUH", "subtract from y: $alterYBy")
+        val alterYBy = wind.yComp / COORD_SYS_CONVERT_RATIO
+        // Log.d("HUUH", "alter y by: $alterYBy")
 
         // reverse axis (from 1920 to 0) and zero-point off-center
-        val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor // - alterYBy
+        val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor + alterYBy
         return Point(scaledX.toInt(), scaledY.toInt())
     } // convertMEventCoordsToScaledScreenTargetPoint
 

@@ -9,17 +9,17 @@ import kotlin.math.sqrt
  * @author Ville Lohkovuori
  * */
 
-// NOTE: wind is disabled for now (due to coordinate scaling issues). fix asap!
-private const val WIND_X_MIN = -0.15f // NOTE: larger values introduce inaccuracy
+private const val WIND_X_MIN = -0.15f // NOTE: larger values may introduce inaccuracy
 private const val WIND_X_MAX = 0.15f
 private const val WIND_Y_MIN = -0.2f
 private const val WIND_Y_MAX = 0.2f
 
-class Wind {
+class Wind private constructor() {
 
-    // might make these variable in the future
-    val xComp = 0.0f // Static.randomFloatBetween(WIND_X_MIN, WIND_X_MAX)
-    val yComp = 0.0f // Static.randomFloatBetween(WIND_Y_MIN, WIND_Y_MAX)
+    // might make these variable (during the game) in the future.
+    // NOTE: these are ARCore coordinate system values
+    val xComp = Static.randomFloatBetween(WIND_X_MIN, WIND_X_MAX)
+    val yComp = Static.randomFloatBetween(WIND_Y_MIN, WIND_Y_MAX)
     val force = sqrt(xComp.pow(2.0f) + yComp.pow(2.0f))
 
     // the angle (from 0 to PI) of the 'wind power vector' (relative to the x-plane).
