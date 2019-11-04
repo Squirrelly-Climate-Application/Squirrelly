@@ -23,11 +23,6 @@ enum class AIType {
     BOUNCING
 }
 
-// NOTE: ideally, these numbers should depend on the screen size, but ARCore makes that very tricky to do
-private const val X_MAX_ABS = 0.25f
-private const val Y_MAX = 0.25f
-private const val Y_MIN = 0.10f
-
 private const val ANIM_LENGTH_MAX = 4000L
 private const val ANIM_LENGTH_MIN = 1000L
 
@@ -57,6 +52,20 @@ class AI(private val node: WorldEntity) {
         private val bounceAnimTopTarget = Vector3(0f, 0.17f, -0.3f)
         private val bounceAnimUpScale = Vector3(0.9f, 1.1f, 0.9f) // stretch the drop when it floats up...
         private val bounceAnimDownScale = Vector3(1.1111111f, 0.909090909f, 1.1111111f) // ... and squeeze it when it floats back down
+
+        // boundaries for monster movement. the default values work well for the Samsung Galaxy S7
+        private var xMaxAbs = 0.25f
+        private var yMax = 0.25f
+        private var yMin= 0.10f
+
+        // the boundaries of monster movement should depend on the phone model;
+        // to accomplish this, call this function before using the AI class
+        fun setMoveBoundaryConstants(xMaxAbsBoundary: Float, yMinBoundary: Float, yMaxBoundary: Float) {
+
+            xMaxAbs = xMaxAbsBoundary
+            yMax = yMaxBoundary
+            yMin = yMinBoundary
+        }
 
         fun create(node: WorldEntity, AItype: AIType): AI {
 
@@ -232,8 +241,8 @@ class AI(private val node: WorldEntity) {
 
         val xSign = if (rGen.nextBoolean()) 1 else -1
 
-        val x = rGen.nextFloat() * X_MAX_ABS * xSign
-        val y = Y_MIN + rGen.nextFloat() * (Y_MAX - Y_MIN)
+        val x = rGen.nextFloat() * xMaxAbs* xSign
+        val y = yMin + rGen.nextFloat() * (yMax - yMin)
         return Vector3(x, y, -1.0f) // could randomize z-value as well, I guess
     }
 

@@ -111,6 +111,8 @@ class ArActivity : AppCompatActivity() {
         // it 'gets' *and* sets them
         setScreenSizeConstants()
 
+        setAIMoveBoundaryConstants(screenCenter.x) // NOTE: must be called after setScreenSizeConstants!
+
         startService(Intent(this@ArActivity, SoundService::class.java))
 
         val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
@@ -127,7 +129,7 @@ class ArActivity : AppCompatActivity() {
         }
 
         //TODO: this needs to arrive from the Bundle (etc)
-        val monsterType = MonsterType.OIL
+        val monsterType = MonsterType.PLASTIC
 
         if (monsterType == MonsterType.OIL) {
 
@@ -137,7 +139,7 @@ class ArActivity : AppCompatActivity() {
             disablePlaneDetection()
 
             // create the first nut and the monster
-            monsterNode = Co2Monster.create(arFragment.arSceneView.scene.camera)
+            monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
             Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
         }
 
@@ -483,6 +485,18 @@ class ArActivity : AppCompatActivity() {
 
         tv_hitpoints.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
+
+    private fun setAIMoveBoundaryConstants(screenCenterXValue: Int) {
+
+        val screenEdgeInArCoords = COORD_SYS_CONVERT_RATIO * screenCenterXValue // 0.36 on the Samsung Galaxy S7
+
+        // these values give good behavior (i.e., the monster models do not move off-screen)
+        val xMaxAbs = screenEdgeInArCoords * 0.7f
+        val yMin = screenEdgeInArCoords * 0.278f
+        val yMax = screenEdgeInArCoords * 0.7f
+
+        AI.setMoveBoundaryConstants(xMaxAbs, yMin, yMax)
+    } // setAIMoveBoundaryConstants
 
     private fun saveScoreToDb(score: Int){
         val userId = FirebaseAuth.getInstance().currentUser!!.uid
