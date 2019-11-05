@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.activity_ar.*
 import kotlin.math.abs
 import kotlin.math.hypot
 import android.os.CountDownTimer
+import com.example.timil.climateapplication.fragments.DiscountsFragment
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.rendering.PlaneRenderer
 import com.google.ar.sceneform.rendering.Texture
@@ -321,7 +322,7 @@ class ArActivity : AppCompatActivity() {
         builder.setView(dialogView)
             .setPositiveButton(getString(R.string.txt_rewards)) { _, _ ->
                 val mainIntent = Intent(this@ArActivity, MainActivity::class.java)
-                //TODO: we need to move to the discount screen from this button
+                mainIntent.putExtra("discountsFragment", "discountsFragment")
                 startActivity(mainIntent)
                 finish()
             }
@@ -506,22 +507,37 @@ class ArActivity : AppCompatActivity() {
             .addOnSuccessListener { document ->
                 if (document != null) {
                     var userPoints = 0
+
                     if(document.data != null){
                         if(document.data!!.getValue("points") != null){
                             userPoints = document.data!!.getValue("points").toString().toInt()
                         }
-                    }
-                    val total = userPoints+score
+                        val total = userPoints+score
+                        db.collection("users").document(userId)
+                            .update("points", total)
+                            .addOnSuccessListener {
+                                Log.d("tester", "DocumentSnapshot successfully written!")
+                            }
+                            .addOnFailureListener { e -> Log.w("tester", "Error writing document", e) }
+                    } else {
+                        val total = userPoints + score
 
-                    val userData = hashMapOf(
-                        "points" to total
-                    )
-                    db.collection("users").document(userId)
-                        .set(userData)
-                        .addOnSuccessListener {
-                            Log.d("tester", "DocumentSnapshot successfully written!")
-                        }
-                        .addOnFailureListener { e -> Log.w("tester", "Error writing document", e) }
+                        val userData = hashMapOf(
+                            "points" to total
+                        )
+                        db.collection("users").document(userId)
+                            .set(userData)
+                            .addOnSuccessListener {
+                                Log.d("tester", "DocumentSnapshot successfully written!")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(
+                                    "tester",
+                                    "Error writing document",
+                                    e
+                                )
+                            }
+                    }
                 } else {
                     Log.d("tester", "No such document")
                 }

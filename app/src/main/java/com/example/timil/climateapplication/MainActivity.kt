@@ -25,7 +25,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.ViewGroup
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
-import com.example.timil.climateapplication.ar.Static
 import com.example.timil.climateapplication.fragments.*
 import com.google.firebase.firestore.QueryDocumentSnapshot
 
@@ -68,12 +67,19 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         startFragment = StartFragment()
         scanFragment = ScanFragment()
         tabDiscountsFragment = TabLayoutFragment()
         viewDiscountFragment = ViewDiscountFragment()
 
         setupFragment(startFragment, START_FRAGMENT_TAG, true)
+
+        // intent should have extra data if the Ar game ends and the user has clicked the Discounts button
+        val intentExtra = intent.getStringExtra("discountsFragment")
+        if (intentExtra != null && intentExtra.isNotEmpty()) {
+            setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
+        }
 
         val toolBar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolBar)
