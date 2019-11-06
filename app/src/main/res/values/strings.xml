@@ -70,4 +70,7 @@
     <string name="already_registered">Already registered with this email!</string>
     <string name="google_sign_in_failed">Google sign in failed!</string>
     <string name="log_out">Are you sure you want to log out?</string>
+
+    <string name="time_left">Time left: %s</string>
+    <string name="time_is_up">Time is up!</string>
 </resources>

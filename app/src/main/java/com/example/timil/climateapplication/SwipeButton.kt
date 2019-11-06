@@ -172,8 +172,11 @@ class SwipeButton @JvmOverloads constructor(
                 center_text.bringToFront()
                 // TODO(use discount here)
             }
-            .setNegativeButton(R.string.no) { _, _ ->
-                collapseButton()
+            .setNegativeButton(R.string.no) { dialog, _ ->
+                dialog.dismiss()
             }.show()
+        builder.setOnDismissListener {
+            collapseButton()
+        }
     }
 }
