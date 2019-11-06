@@ -130,7 +130,7 @@ class ArActivity : AppCompatActivity() {
         }
 
         //TODO: this needs to arrive from the Bundle (etc)
-        val monsterType = MonsterType.PLASTIC
+        val monsterType = MonsterType.OIL
 
         if (monsterType == MonsterType.OIL) {
 
@@ -274,7 +274,7 @@ class ArActivity : AppCompatActivity() {
                 }
             } // if Monster
 
-            if (numOfThrows <= 0) {
+            if (numOfThrows <= 0) { // should only ever reach 0
                 endGame(false) // if the monster is dead, the game ends before this call
             }
 
