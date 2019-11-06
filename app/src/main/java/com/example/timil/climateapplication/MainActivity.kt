@@ -2,6 +2,7 @@ package com.example.timil.climateapplication
 
 import android.Manifest
 import android.app.Activity
+import android.app.ActivityOptions
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.firebase.ui.auth.AuthUI;
@@ -11,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.CountDownTimer
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
@@ -24,6 +26,7 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.ViewGroup
+import android.widget.TextView
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.fragments.*
 import com.google.firebase.firestore.QueryDocumentSnapshot
@@ -45,6 +48,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
     private var viewGroup: ViewGroup? = null
 
+    private val fireBaseAuth = FirebaseAuth.getInstance()
+
     companion object {
         const val RC_SIGN_IN = 42
         const val RECORD_REQUEST_CODE = 1
@@ -53,8 +58,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         const val QUIZ_FRAGMENT_TAG = "QuizFragment"
         const val TAB_DISCOUNTS_FRAGMENT_TAG = "TabDiscountsFragment"
         const val VIEW_DISCOUNT_FRAGMENT = "ViewDiscountFragment"
+        private const val wait: Long = 1000
     }
 
+    /*
     override fun onStart() {
         super.onStart()
         // Choose authentication providers
@@ -63,6 +70,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
     }
+    */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +103,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         navigationView.setNavigationItemSelectedListener(this)
 
     }
-    
+
+    /*
     override fun onResume() {
         super.onResume()
         user = FirebaseAuth.getInstance().currentUser
@@ -104,6 +113,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             startSignIn()
         }
     }
+    */
 
     private fun makeRequestCamera() {
         ActivityCompat.requestPermissions(this,
@@ -112,6 +122,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         )
     }
 
+    /*
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -129,6 +140,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             }
         }
     }
+    */
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
@@ -154,10 +166,13 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                 setupFragment(startFragment, START_FRAGMENT_TAG, false)
             }
             R.id.nav_logout -> {
+                logOut()
+                /*
                 FirebaseAuth.getInstance().signOut()
                 setupFragment(startFragment, START_FRAGMENT_TAG, false)
                 user = null
                 startSignIn()
+                */
             }
             R.id.nav_discounts -> {
                 setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
@@ -165,6 +180,28 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         }
         drawer.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun logOut() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
+        val dialogText: TextView = dialogView.findViewById(R.id.dialog_text)
+        dialogText.text = getText(R.string.log_out)
+        builder.setView(dialogView)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                fireBaseAuth.signOut()
+                val intent = Intent(this@MainActivity, SignInActivity::class.java)
+                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this@MainActivity).toBundle())
+                object : CountDownTimer(wait, wait) {
+                    override fun onTick(millisUntilFinished: Long) {
+                    }
+                    override fun onFinish() {
+                        finish()
+                    }
+                }.start()
+            }
+            .setNegativeButton(R.string.no) { _, _ ->
+            }.show()
     }
 
     override fun startQRscan() {
@@ -209,6 +246,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         setupFragment(viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT, true)
     }
 
+    /*
     private fun startSignIn() {
         startActivityForResult(
             AuthUI.getInstance()
@@ -220,6 +258,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             RC_SIGN_IN
         )
     }
+    */
 
     private fun setupFragment(fragment: Fragment, tag: String, addBackStack: Boolean) {
         if(addBackStack) {

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera.ar" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
             android:allowBackup="true"
@@ -23,6 +24,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ArActivity" />
+        <activity android:name=".SignInActivity"
+            android:windowSoftInputMode="adjustResize"/>
         <meta-data android:name="com.google.ar.core" android:value="required" />
         <service android:name=".services.SoundService">
         </service>
