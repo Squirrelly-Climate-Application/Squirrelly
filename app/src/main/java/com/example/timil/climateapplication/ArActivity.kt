@@ -18,12 +18,14 @@ import kotlinx.android.synthetic.main.activity_ar.*
 import kotlin.math.abs
 import kotlin.math.hypot
 import android.os.CountDownTimer
+import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
 import com.example.timil.climateapplication.fragments.DiscountsFragment
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.rendering.PlaneRenderer
 import com.google.ar.sceneform.rendering.Texture
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.io.Serializable
 
 /**
  * Activity that governs the AR game portion of the app.
@@ -47,7 +49,7 @@ private enum class ViewType {
     WIND_Y
 }
 
-private enum class MonsterType {
+enum class MonsterType: Serializable {
     PLASTIC,
     CO2,
     OIL
@@ -130,7 +132,8 @@ class ArActivity : AppCompatActivity() {
         }
 
         //TODO: this needs to arrive from the Bundle (etc)
-        val monsterType = MonsterType.PLASTIC
+        //val monsterType = MonsterType.PLASTIC
+        val monsterType = intent.getSerializableExtra(MONSTER_TYPE) as MonsterType
 
         if (monsterType == MonsterType.OIL) {
 

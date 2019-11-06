@@ -30,6 +30,7 @@ import android.widget.TextView
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.fragments.*
 import com.google.firebase.firestore.QueryDocumentSnapshot
+import java.io.Serializable
 
 
 class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick, DiscountsRecyclerAdapter.OnDiscountClick, NavigationView.OnNavigationItemSelectedListener {
@@ -59,6 +60,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         const val TAB_DISCOUNTS_FRAGMENT_TAG = "TabDiscountsFragment"
         const val VIEW_DISCOUNT_FRAGMENT = "ViewDiscountFragment"
         private const val wait: Long = 1000
+        const val MONSTER_TYPE = "MonsterType"
     }
 
     /*
@@ -222,10 +224,11 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         }
     }
 
-    override fun startArActivity(quizAnswerCorrect: Boolean) {
+    override fun startArActivity(quizAnswerCorrect: Boolean, monsterType: Serializable) {
 
         val mainIntent = Intent(this@MainActivity, ArActivity::class.java)
         mainIntent.putExtra(getString(R.string.quiz_answer_correct_key), quizAnswerCorrect)
+        mainIntent.putExtra(MONSTER_TYPE, monsterType)
         startActivity(mainIntent)
         finish()
 

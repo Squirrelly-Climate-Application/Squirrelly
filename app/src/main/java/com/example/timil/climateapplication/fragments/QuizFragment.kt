@@ -22,7 +22,9 @@ import kotlin.collections.ArrayList
 import android.widget.ProgressBar
 import android.support.v7.app.AlertDialog
 import android.view.Gravity
+import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
 import kotlinx.android.synthetic.main.fragment_quiz.*
+import java.io.Serializable
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 //private const val ARG_PARAM1 = "param1"
@@ -41,6 +43,8 @@ class QuizFragment : Fragment() {
     private var information = ""
     lateinit var timer: CountDownTimer
 
+    lateinit var monsterType: Serializable
+
     companion object{
         private const val gameTime: Long = 30000
         private const val interval: Long = 1000
@@ -48,7 +52,7 @@ class QuizFragment : Fragment() {
     }
 
     interface OnButtonClick {
-        fun startArActivity(quizAnswerCorrect: Boolean)
+        fun startArActivity(quizAnswerCorrect: Boolean, monsterType: Serializable)
     }
 
     override fun onAttach(activity: Activity?) {
@@ -57,6 +61,13 @@ class QuizFragment : Fragment() {
             activityCallBack = activity as OnButtonClick
         } catch (e: ClassCastException) {
             throw ClassCastException(activity.toString() + " must implement OnButtonClick interface.")
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        arguments?.getSerializable(MONSTER_TYPE)?.let {
+            monsterType = it
         }
     }
 
@@ -184,7 +195,7 @@ class QuizFragment : Fragment() {
         }
         alertDialog.show()
         alertDialog.setOnDismissListener {
-            activityCallBack!!.startArActivity(false)
+            activityCallBack!!.startArActivity(false, monsterType)
         }
     }
 }
