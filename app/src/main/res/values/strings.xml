@@ -37,4 +37,40 @@
     <string name="swipe">swipe</string>
     <string name="use_discount">Do you want to use this discount now?</string>
     <string name="discount_used">Discount used!</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="register">Register</string>
+    <string name="already_account">Already have an account?</string>
+    <string name="sign_in">Sign in</string>
+    <string name="send_verification_email">Send verification email</string>
+    <string name="create_account">Create account?</string>
+    <string name="forgot_password">Forgot password?</string>
+
+    <string name="enter_email">Enter email address!</string>
+    <string name="enter_password">Enter password!</string>
+    <string name="password_too_short">Password too short, enter minimum 6 characters!</string>
+    <string name="passwords_do_not_match">Password fields does not match!</string>
+    <string name="check_internet">Check your internet connection!</string>
+    <string name="reset_password">Send reset password email  to: %s ?</string>
+    <string name="sending_verification">Sending verification email</string>
+    <string name="verification_email">Verification email has been sent!</string>
+    <string name="already_sent">Verification email has already been sent!</string>
+    <string name="verifying_email">Verifying email</string>
+    <string name="no_registration">No registration with this email</string>
+    <string name="invalid_email_form">Invalid email form!</string>
+    <string name="reset_password_email">Reset password email has been sent!</string>
+    <string name="email_not_verified">Email not verified!</string>
+    <string name="incorrect_email_address_or_password">Incorrect email address or password!</string>
+    <string name="sending_reset_password_email">Sending reset password email</string>
+    <string name="singing_in">Signing in</string>
+    <string name="registering_user">Registering user</string>
+    <string name="registration_succeeded">Registration succeeded!</string>
+    <string name="already_registered">Already registered with this email!</string>
+    <string name="google_sign_in_failed">Google sign in failed!</string>
+    <string name="log_out">Are you sure you want to log out?</string>
+
+    <string name="time_left">Time left: %s</string>
+    <string name="time_is_up">Time is up!</string>
 </resources>

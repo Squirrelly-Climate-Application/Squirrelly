@@ -10,7 +10,9 @@ import com.example.timil.climateapplication.R
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.support.v7.app.AppCompatActivity
+import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
 import com.example.timil.climateapplication.MainActivity.Companion.QUIZ_FRAGMENT_TAG
+import com.example.timil.climateapplication.MonsterType
 
 
 class ScanFragment: Fragment(), ZXingScannerView.ResultHandler {
@@ -49,12 +51,32 @@ class ScanFragment: Fragment(), ZXingScannerView.ResultHandler {
 
     override fun handleResult(rawResult: Result) {
 
-        if (rawResult.text == "our qr text") {
-            fragmentManager!!.beginTransaction().replace(R.id.fragment_container, quizFragment, QUIZ_FRAGMENT_TAG).addToBackStack(null).commit()
-        }
-        else {
-            Toast.makeText(context, "Unidentified code, please try again", Toast.LENGTH_SHORT).show()
-            onResume()
+        when {
+            rawResult.text == "our qr text" -> {
+                fragmentManager!!.beginTransaction().replace(R.id.fragment_container, quizFragment, QUIZ_FRAGMENT_TAG).addToBackStack(null).commit()
+            }
+            rawResult.text == "OIL" -> {
+                val b = Bundle()
+                b.putSerializable(MONSTER_TYPE, MonsterType.OIL)
+                quizFragment.arguments = b
+                fragmentManager!!.beginTransaction().replace(R.id.fragment_container, quizFragment, QUIZ_FRAGMENT_TAG).addToBackStack(null).commit()
+            }
+            rawResult.text == "PLASTIC" -> {
+                val b = Bundle()
+                b.putSerializable(MONSTER_TYPE, MonsterType.PLASTIC)
+                quizFragment.arguments = b
+                fragmentManager!!.beginTransaction().replace(R.id.fragment_container, quizFragment, QUIZ_FRAGMENT_TAG).addToBackStack(null).commit()
+            }
+            rawResult.text == "CO2" -> {
+                val b = Bundle()
+                b.putSerializable(MONSTER_TYPE, MonsterType.CO2)
+                quizFragment.arguments = b
+                fragmentManager!!.beginTransaction().replace(R.id.fragment_container, quizFragment, QUIZ_FRAGMENT_TAG).addToBackStack(null).commit()
+            }
+            else -> {
+                Toast.makeText(context, "Unidentified code, please try again", Toast.LENGTH_SHORT).show()
+                onResume()
+            }
         }
 
     }

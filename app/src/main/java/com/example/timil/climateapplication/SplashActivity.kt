@@ -7,6 +7,7 @@ import android.os.CountDownTimer
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import com.example.timil.climateapplication.ar.Static
+import com.google.firebase.auth.FirebaseAuth
 
 class SplashActivity : AppCompatActivity() {
 
@@ -20,8 +21,19 @@ class SplashActivity : AppCompatActivity() {
         if (!isFinishing) {
 
             if (!paused) {
-                val mainIntent = Intent(this@SplashActivity, MainActivity::class.java)
-                startActivity(mainIntent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
+                val user = FirebaseAuth.getInstance().currentUser
+                if (user != null) {
+                    if (user.isEmailVerified) {
+                        val intent = Intent(this@SplashActivity, MainActivity::class.java)
+                        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
+                    } else {
+                        val intent = Intent(this@SplashActivity, SignInActivity::class.java)
+                        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
+                    }
+                } else {
+                    val intent = Intent(this@SplashActivity, SignInActivity::class.java)
+                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this@SplashActivity).toBundle())
+                }
 
                 object : CountDownTimer(wait, wait) {
                     override fun onTick(millisUntilFinished: Long) {

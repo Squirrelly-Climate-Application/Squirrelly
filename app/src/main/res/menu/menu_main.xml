@@ -20,7 +20,7 @@
     <item android:title="@string/menu">
         <menu>
             <item android:id="@+id/nav_home"
-                android:icon="@mipmap/ic_launcher"
+                android:icon="@drawable/squirrelly_icon"
                 android:title="@string/home" />
 
             <item android:id="@+id/nav_discounts"
