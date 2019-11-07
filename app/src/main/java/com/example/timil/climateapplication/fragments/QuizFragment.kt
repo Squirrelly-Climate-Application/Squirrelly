@@ -26,6 +26,8 @@ import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
 import kotlinx.android.synthetic.main.fragment_quiz.*
 import java.io.Serializable
 
+
+
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 //private const val ARG_PARAM1 = "param1"
 //private const val ARG_PARAM2 = "param2"
@@ -40,10 +42,12 @@ class QuizFragment : Fragment() {
     private var activityCallBack: OnButtonClick? = null
     private var savedQuestionData = false
 
+    private lateinit var options: ArrayList<*>
     private var information = ""
-    lateinit var timer: CountDownTimer
+    private var rightAnswer = ""
 
-    lateinit var monsterType: Serializable
+    private lateinit var timer: CountDownTimer
+    private lateinit var monsterType: Serializable
 
     companion object{
         private const val gameTime: Long = 30000
@@ -52,7 +56,7 @@ class QuizFragment : Fragment() {
     }
 
     interface OnButtonClick {
-        fun startArActivity(quizAnswerCorrect: Boolean, monsterType: Serializable)
+        fun startArActivity(quizAnswerCorrect: Boolean?, monsterType: Serializable)
     }
 
     override fun onAttach(activity: Activity?) {
@@ -139,34 +143,95 @@ class QuizFragment : Fragment() {
     // generate buttons based on how many possible options are in the question
     private fun generateAnswerButtons(question: QueryDocumentSnapshot){
 
-        val options = question.data.getValue("options") as ArrayList<*>
-        val rightAnswer = question.data.getValue("answer") as String
+        options = question.data.getValue("options") as ArrayList<*>
+        rightAnswer = question.data.getValue("answer") as String
         information = question.data.getValue("information") as String
+
+        options.shuffle()
 
         val layout = root!!.findViewById(R.id.btnsLinearLayout) as LinearLayout
         layout.orientation = LinearLayout.VERTICAL
         layout.gravity = Gravity.CENTER
 
-        for (i in 0 until options.size) {
-            val btnAnswer = Button(context)
+        if (options.size > 5) {
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(10, 10, 10, 10)
+            params.weight = 1f
+            for (i in 0 until options.size) {
+                if (i % 2 == 1) {
+                    val parent = getLinearLayoutParent()
+                    params.width = parent.width/2
+                    parent.addView(getButton(i-1, params))
+                    parent.addView(getButton(i, params))
+                    layout.addView(parent)
+                    checkHeights(layout, (i-1)/2, params)
+                }
+                else if (i == options.size-1) {
+                    val parent = getLinearLayoutParent()
+                    params.width = parent.width/2
+                    parent.addView(getButton(i, params))
+                    layout.addView(parent)
+                }
+            }
+        } else {
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             params.setMargins(10, 10, 10, 10)
-            btnAnswer.layoutParams = params
-            btnAnswer.background.setColorFilter(ContextCompat.getColor(context!!, R.color.colorAccent), PorterDuff.Mode.MULTIPLY)
-            btnAnswer.setTextColor(ContextCompat.getColor(context!!, R.color.colorWhite))
-            btnAnswer.textSize = 16F
-
-            btnAnswer.text = options[i].toString()
-            btnAnswer.id = options.indexOf(options[i])
-            btnAnswer.setOnClickListener {
-                timer.cancel()
-                showDialog(btnAnswer.text == rightAnswer)
+            for (i in 0 until options.size) {
+                val btnAnswer = getButton(i, params)
+                layout.addView(btnAnswer)
             }
-            layout.addView(btnAnswer)
         }
+    }
+
+    private fun checkHeights(layout: LinearLayout, i: Int, params: LinearLayout.LayoutParams) {
+        val parent = layout.getChildAt(i) as LinearLayout
+
+        parent.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            val child1 = parent.getChildAt(0)
+            val child2 = parent.getChildAt(1)
+            if (child1.height > child2.height) {
+                params.height = child1.height
+                child2.layoutParams = params
+            }
+            else if (child1.height < child2.height) {
+                params.height = child2.height
+                child1.layoutParams = params
+            }
+        }
+    }
+
+    private fun getLinearLayoutParent(): LinearLayout {
+        val parent = LinearLayout(context)
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        parent.layoutParams = layoutParams
+        parent.orientation = LinearLayout.HORIZONTAL
+        parent.weightSum = 2f
+        parent.gravity = Gravity.CENTER
+        return parent
+    }
+
+    private fun getButton(i: Int, params: LinearLayout.LayoutParams): Button {
+        val btnAnswer = Button(context)
+        btnAnswer.layoutParams = params
+        btnAnswer.background.setColorFilter(ContextCompat.getColor(context!!, R.color.colorAccent), PorterDuff.Mode.MULTIPLY)
+        btnAnswer.setTextColor(ContextCompat.getColor(context!!, R.color.colorWhite))
+        btnAnswer.textSize = 16F
+        btnAnswer.text = options[i].toString()
+        btnAnswer.id = options.indexOf(options[i])
+        btnAnswer.setOnClickListener {
+            timer.cancel()
+            showDialog(btnAnswer.text == rightAnswer)
+        }
+        return btnAnswer
     }
 
     private fun startTimer() {
@@ -185,7 +250,9 @@ class QuizFragment : Fragment() {
     private fun showDialog(correct: Boolean?) {
         val alertDialog = AlertDialog.Builder(context!!).create()
         when (correct) {
-            null -> { alertDialog.setTitle(context!!.applicationContext.getString(R.string.time_is_up)) }
+            null -> {
+                alertDialog.setTitle(context!!.applicationContext.getString(R.string.time_is_up))
+            }
             true -> { alertDialog.setTitle("Right answer!") }
             false -> { alertDialog!!.setTitle("Wrong answer.") }
         }
@@ -195,7 +262,7 @@ class QuizFragment : Fragment() {
         }
         alertDialog.show()
         alertDialog.setOnDismissListener {
-            activityCallBack!!.startArActivity(false, monsterType)
+            activityCallBack!!.startArActivity(correct, monsterType)
         }
     }
 }

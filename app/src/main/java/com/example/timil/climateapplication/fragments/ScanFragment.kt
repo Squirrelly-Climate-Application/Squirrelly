@@ -52,9 +52,6 @@ class ScanFragment: Fragment(), ZXingScannerView.ResultHandler {
     override fun handleResult(rawResult: Result) {
 
         when {
-            rawResult.text == "our qr text" -> {
-                fragmentManager!!.beginTransaction().replace(R.id.fragment_container, quizFragment, QUIZ_FRAGMENT_TAG).addToBackStack(null).commit()
-            }
             rawResult.text == "OIL" -> {
                 val b = Bundle()
                 b.putSerializable(MONSTER_TYPE, MonsterType.OIL)
