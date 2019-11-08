@@ -73,4 +73,6 @@
 
     <string name="time_left">Time left: %s</string>
     <string name="time_is_up">Time is up!</string>
+    <string name="scanning">Scanning…</string>
+    <string name="until_next_time">"%s until next time available"</string>
 </resources>

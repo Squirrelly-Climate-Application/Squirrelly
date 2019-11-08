@@ -40,7 +40,7 @@
 
     <!-- TODO: Here is the discount swipe button -->
     <com.example.timil.climateapplication.SwipeButton
-        android:id="@+id/swipe_btn"
+        android:id="@+id/btnUseDiscountSwipe"
         android:layout_width="match_parent"
         android:layout_marginStart="50dp"
         android:layout_marginEnd="50dp"

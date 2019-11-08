@@ -12,6 +12,10 @@ import kotlinx.android.synthetic.main.custom_swipe_button_layout.view.*
 import android.view.LayoutInflater
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_view_discount.view.*
+import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.widget.Toast
+
 
 class SwipeButton @JvmOverloads constructor(
     context: Context,
@@ -28,6 +32,8 @@ class SwipeButton @JvmOverloads constructor(
     private var enabledDrawable: Drawable? = null
     private var viewGroup: ViewGroup? = null
 
+    private var onDiscountUseListener: OnDiscountUseListener? = null
+
     init {
         LayoutInflater.from(context).inflate(R.layout.custom_swipe_button_layout, this, true)
         attrs?.let {
@@ -39,9 +45,13 @@ class SwipeButton @JvmOverloads constructor(
         setButtonTouchListener()
     }
 
+    fun setOnCountReachedListener(listener: OnDiscountUseListener) {
+        onDiscountUseListener = listener
+    }
+
     private fun setButtonTouchListener() {
         sliding_button.setOnTouchListener { _, event ->
-            val maxSwipe = swipe_btn.width - sliding_button.width.toFloat()
+            val maxSwipe = btnUseDiscountSwipe.width - sliding_button.width.toFloat()
             val x = event.rawX
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -102,7 +112,6 @@ class SwipeButton @JvmOverloads constructor(
                 sliding_button.setImageDrawable(enabledDrawable)
             }
         })
-
         animatorSet.playTogether(positionAnimator, widthAnimator)
         animatorSet.start()
         showDialog()
@@ -164,19 +173,22 @@ class SwipeButton @JvmOverloads constructor(
         val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
         val dialogText: TextView = dialogView.findViewById(R.id.dialog_text)
         dialogText.text = context.applicationContext.getText(R.string.use_discount)
+        builder.setOnDismissListener {
+            collapseButton()
+        }
         builder.setView(dialogView)
-            .setPositiveButton(R.string.yes) { _, _ ->
-                center_text.text = context.applicationContext.getText(R.string.discount_used)
-                center_text.setTextColor(resources.getColor(R.color.colorPrimaryDark))
-                center_text.alpha = 1f
-                center_text.bringToFront()
-                // TODO(use discount here)
+            .setPositiveButton(R.string.yes) { dialog, _ ->
+                if (onDiscountUseListener!!.onDiscountUse()) {
+                    center_text.text = context.applicationContext.getText(R.string.discount_used)
+                    center_text.setTextColor(context.applicationContext.getColor(R.color.colorPrimaryDark))
+                    center_text.alpha = 1f
+                    center_text.bringToFront()
+                } else {
+                    dialog.dismiss()
+                }
             }
             .setNegativeButton(R.string.no) { dialog, _ ->
                 dialog.dismiss()
             }.show()
-        builder.setOnDismissListener {
-            collapseButton()
-        }
     }
 }

@@ -10,7 +10,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import com.example.timil.climateapplication.OnDiscountUseListener
 import com.example.timil.climateapplication.R
+import com.example.timil.climateapplication.SwipeButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,6 +29,7 @@ class ViewDiscountFragment : Fragment() {
     private var discountInformationTv: TextView? = null
     private var discountPointsTv: TextView? = null
     private var btnUseDiscount: Button? = null
+    private lateinit var btnUseDiscountSwipe: SwipeButton
 
     private var userPoints: Int? = 0
     private var discountPoints: Int? = 0
@@ -47,6 +50,7 @@ class ViewDiscountFragment : Fragment() {
         discountInformationTv = root!!.findViewById(R.id.tvViewDiscountInfo)
         discountPointsTv = root!!.findViewById(R.id.tvViewDiscountPoints)
         btnUseDiscount = root!!.findViewById(R.id.btnUseDiscount)
+        btnUseDiscountSwipe = root!!.findViewById(R.id.btnUseDiscountSwipe)
 
         val bundle = arguments
         try {
@@ -56,7 +60,7 @@ class ViewDiscountFragment : Fragment() {
             discountCompanyTv!!.text = bundle.getString("discountCompany")
             discountInformationTv!!.text = bundle.getString("discountInformation")
             discountPointsTv!!.text = discountPoints.toString()
-
+            /*
             btnUseDiscount!!.setOnClickListener {
                 if( userPoints!! >=  discountPoints!!){
                     updateUserDataToDb(bundle)
@@ -64,6 +68,20 @@ class ViewDiscountFragment : Fragment() {
                     Toast.makeText(context, "Not enough points to activate the discount!", Toast.LENGTH_LONG).show()
                 }
             }
+            */
+            btnUseDiscountSwipe.setOnCountReachedListener(object : OnDiscountUseListener {
+
+                override fun onDiscountUse(): Boolean {
+                    return if( userPoints!! >=  discountPoints!!){
+                        updateUserDataToDb(bundle)
+                        true
+                    } else {
+                        Toast.makeText(context, "Not enough points to activate the discount!", Toast.LENGTH_LONG).show()
+                        false
+                    }
+                }
+            })
+
         } catch (err: Exception) {
             Log.d("TEST", "No bundle data")
         }
