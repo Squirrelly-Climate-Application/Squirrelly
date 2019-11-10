@@ -75,4 +75,6 @@
     <string name="time_is_up">Time is up!</string>
     <string name="scanning">Scanning…</string>
     <string name="until_next_time">"%s until next time available"</string>
+    <string name="daily_tip">DAILY TIP</string>
+    <string name="loading_daily_tip">Loading daily tip...</string>
 </resources>

@@ -14,5 +14,33 @@
             android:textAllCaps="true"
             android:textAlignment="center"/>
 
+    <LinearLayout
+        android:id="@+id/linearDailyTips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="8dp"
+        android:elevation="8dp"
+        android:background="@color/cardview_light_background">
+
+        <TextView
+            android:id="@+id/tvDailyTip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:text="@string/daily_tip"
+            android:gravity="center_vertical"
+            android:layout_margin="8dp"/>
+
+        <TextView
+            android:id="@+id/tvDailyTipInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/loading_daily_tip"
+            android:backgroundTint="@color/fui_transparent"/>
+
+    </LinearLayout>
 
 </LinearLayout>
