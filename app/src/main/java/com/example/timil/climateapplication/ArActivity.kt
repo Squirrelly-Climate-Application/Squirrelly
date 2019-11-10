@@ -62,10 +62,16 @@ private const val THROW_TIME_LIMIT = 1200L // how long you have to throw the nut
 
 class ArActivity : AppCompatActivity() {
 
-    var numOfThrows = DEFAULT_THROWS
+    private var numOfThrows = DEFAULT_THROWS
         set(value) {
             field = value
             updateUI(ViewType.THROWS, value)
+        }
+
+    private val totalMonsterHp: Int
+        get() {
+
+            return monsterNodes.map { it?.hitPoints ?: 0 }.reduce { acc, it -> acc + it }
         }
 
     private lateinit var arFragment: ArFragment
@@ -74,11 +80,7 @@ class ArActivity : AppCompatActivity() {
     // for tracking gesture (swipe) hits to the thrown projectile (acorn)
     private var hitProj = false
     private var projNode: Projectile? = null
-    private var monsterNode: Monster? = null
-        set (value) {
-            field = value
-            updateUI(ViewType.HP, monsterNode?.hitPoints ?: 0)
-        }
+    private val monsterNodes = arrayOfNulls<Monster>(5) // bad form, but I need the easy index access
 
     private val wind = Wind.create()
 
@@ -141,9 +143,15 @@ class ArActivity : AppCompatActivity() {
             disablePlaneDetection()
 
             // create the first nut and the monster
-            monsterNode = PlasticMonster.create(arFragment.arSceneView.scene.camera)
+            monsterNodes[0] = when (monsterType) {
+
+                MonsterType.PLASTIC ->  PlasticMonster.create(arFragment.arSceneView.scene.camera)
+                MonsterType.CO2 -> Co2Monster.create(arFragment.arSceneView.scene.camera)
+                else -> Co2Monster.create(arFragment.arSceneView.scene.camera) // it's required and can't be null... should never be reached
+            }
+            updateUI(ViewType.HP, monsterNodes[0]!!.hitPoints)
             Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
-        }
+        } // if-else
 
         btn_pause.setOnClickListener {
 
@@ -250,6 +258,7 @@ class ArActivity : AppCompatActivity() {
             // Log.d("HUUH", "localPos after rise: $localPosition")
         }
 
+        // TODO: un-spaghettify the game end logic
         override fun onDropAnimEnd() {
 
             // these shenanigans are needed because the hit detection should only happen once the
@@ -264,19 +273,29 @@ class ArActivity : AppCompatActivity() {
 
             if (actuallyHitNode is Monster) {
 
-                monsterNode!!.damage(1)
-                updateUI(ViewType.HP, monsterNode!!.hitPoints)
+                actuallyHitNode.damage(1)
+
+                // non-optimal, but ehh, there's very few monsters
+                updateUI(ViewType.HP, totalMonsterHp)
                 Log.d("HUUH", "hit monster!")
 
-                if (!monsterNode!!.isAlive) {
+                if (!actuallyHitNode.isAlive) {
 
-                    endGame(true)
-                    return // so that we won't 'end' the game twice (edge case)
+                    if (actuallyHitNode is OilMonster && actuallyHitNode.isInitialMonster) {
+
+                        spawnSmallOilMonsters(actuallyHitNode.localPosition)
+                    }
+
+                    if (allMonstersDead()) {
+
+                        endGame(true)
+                        return // so that we won't 'end' the game twice if this was the last throw
+                    }
                 }
             } // if Monster
 
             if (numOfThrows <= 0) { // should only ever reach 0
-                endGame(false) // if the monster is dead, the game ends before this call
+                endGame(false) // if the monsters are all dead, the game ends before this call
             }
 
             projNode?.dispose() // delete the old nut
@@ -291,7 +310,9 @@ class ArActivity : AppCompatActivity() {
 
         gamePaused = true
         projNode?.pauseAnimations()
-        monsterNode?.pauseAI()
+        monsterNodes.forEach {
+            it?.pauseAI()
+        }
         btn_pause.text = getString(R.string.txt_resume)
         stopService(Intent(this@ArActivity, SoundService::class.java))
     }
@@ -300,22 +321,34 @@ class ArActivity : AppCompatActivity() {
 
         gamePaused = false
         projNode?.resumeAnimations()
-        monsterNode?.resumeAI()
+        monsterNodes.forEach {
+            it?.resumeAI()
+        }
         btn_pause.text = getString(R.string.txt_pause)
         startService(Intent(this@ArActivity, SoundService::class.java))
     }
 
-    private fun endGame(monsterDead: Boolean) {
+    private fun endGame(allMonstersDead: Boolean) {
 
         var score = numOfThrows
-        score += if (monsterDead) monsterNode!!.pointsValueOnDeath else monsterNode!!.maxHitPoints - monsterNode!!.hitPoints
+
+        monsterNodes.forEach {
+
+            if (it != null) {
+                score += if (!it.isAlive) {
+                    it.pointsValueOnDeath
+                } else {
+                    it.maxHitPoints - it.hitPoints
+                }
+            }
+        }
 
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_end_game, viewGroup)
 
         // can't 'see' the views without this trick
         dialogView.findViewById<TextView>(R.id.tv_end_score).text = getString(R.string.txt_score, score)
-        dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (monsterDead) getString(R.string.txt_victory) else getString(R.string.txt_loss)
+        dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (allMonstersDead) getString(R.string.txt_victory) else getString(R.string.txt_loss)
 
         // save the points in the database
         saveScoreToDb(score)
@@ -378,7 +411,10 @@ class ArActivity : AppCompatActivity() {
             anchorNode = AnchorNode(anchor)
             anchorNode?.setParent(arFragment.arSceneView.scene)
 
-            monsterNode = OilMonster.create(anchorNode!!)
+            monsterNodes[0] = OilMonster.create(anchorNode!!)
+
+            // technically a false value, but it's easiest to deal with multiple monsters in this way
+            updateUI(ViewType.HP, 5)
             Projectile.create(arFragment.arSceneView.scene.camera, onThrowAnimEndCallbackHolder)
 
             toggleHpViewVisibility(true) // we can now show the hp view
@@ -482,6 +518,31 @@ class ArActivity : AppCompatActivity() {
             }
         }.start()
     } // startThrowTimer
+
+    private fun allMonstersDead(): Boolean {
+
+        monsterNodes.forEach {
+
+            if (it != null) {
+                if (it.isAlive) {
+                    return false
+                }
+            }
+        }
+        return true
+    } // allMonstersDead
+
+    private fun spawnSmallOilMonsters(localPos: Vector3) {
+
+        Log.d("HUUH", "original localPos: $localPos")
+
+        monsterNodes[1] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
+        monsterNodes[2] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
+        monsterNodes[3] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
+        monsterNodes[4] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
+
+        updateUI(ViewType.HP, totalMonsterHp)
+    } // spawnSmallOilMonsters
 
     private fun toggleHpViewVisibility(visible: Boolean) {
 

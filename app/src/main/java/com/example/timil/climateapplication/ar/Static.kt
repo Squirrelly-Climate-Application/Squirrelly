@@ -69,7 +69,7 @@ object Static {
 
                     isShadowReceiver = false
                     isShadowCaster = false
-                    collisionShape = Sphere(0.19f, Vector3(0f, 0.30f, 0f))
+                    collisionShape = Sphere(0.35f, Vector3(0f, 0.30f, 0f))
                 }
             } // thenAccept
     } // load3dModelResources
