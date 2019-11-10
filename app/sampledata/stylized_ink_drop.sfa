@@ -37,7 +37,7 @@
     file: 'sampledata/stylized_ink_drop.obj',
     name: 'stylized_ink_drop',
     recenter: 'root',
-    scale: 0.05,
+    scale: 0.10,
   },
   version: '0.54:2',
 }

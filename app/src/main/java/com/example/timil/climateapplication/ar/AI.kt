@@ -44,19 +44,19 @@ class AI(private val node: WorldEntity) {
     private var sphereCollisionShapeScaleAnim: ObjectAnimator? = null
     private var spinAnim: ObjectAnimator? = null
 
+    private val bounceAnimLowTarget = node.localPosition
+    private val bounceAnimTopTarget = Vector3(node.localPosition.x, node.localPosition.y+0.17f, node.localPosition.z)
+    private val bounceAnimUpScale = Vector3(node.localScale.x * 0.9f, node.localScale.y * 1.1f, node.localScale.z * 0.9f) // stretch the drop when it floats up...
+    private val bounceAnimDownScale = Vector3(node.localScale.x * 1.1111111f, node.localScale.y * 0.909090909f, node.localScale.z *1.1111111f) // ... and squeeze it when it floats back down
+
     companion object {
 
         private val rGen = Random(System.currentTimeMillis())
 
-        private val bounceAnimLowTarget = Vector3(0f, 0f, -0.3f)
-        private val bounceAnimTopTarget = Vector3(0f, 0.17f, -0.3f)
-        private val bounceAnimUpScale = Vector3(0.9f, 1.1f, 0.9f) // stretch the drop when it floats up...
-        private val bounceAnimDownScale = Vector3(1.1111111f, 0.909090909f, 1.1111111f) // ... and squeeze it when it floats back down
-
         // boundaries for monster movement. the default values work well for the Samsung Galaxy S7
         private var xMaxAbs = 0.25f
         private var yMax = 0.25f
-        private var yMin= 0.10f
+        private var yMin = 0.10f
 
         // the boundaries of monster movement should depend on the phone model;
         // to accomplish this, call this function before using the AI class
@@ -68,6 +68,8 @@ class AI(private val node: WorldEntity) {
         }
 
         fun create(node: WorldEntity, AItype: AIType): AI {
+
+            Log.d("HUUH", "monster node localPos when creating AI: " + node.localPosition)
 
             return when (AItype) {
 
