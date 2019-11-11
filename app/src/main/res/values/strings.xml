@@ -76,5 +76,11 @@
     <string name="scanning">Scanning…</string>
     <string name="until_next_time">"%s until next time available"</string>
     <string name="daily_tip">DAILY TIP</string>
-    <string name="loading_daily_tip">Loading daily tip...</string>
+    <string name="loading_daily_tip">Loading daily tip…</string>
+
+    <string name="settings">Settings</string>
+    <string name="sounds">Sounds</string>
+    <string name="vibration">Vibration</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 </resources>

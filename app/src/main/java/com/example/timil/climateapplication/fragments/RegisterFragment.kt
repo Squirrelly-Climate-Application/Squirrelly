@@ -21,6 +21,8 @@ import android.widget.Toast
 import com.example.timil.climateapplication.AppStatus
 import com.example.timil.climateapplication.MainActivity
 import com.example.timil.climateapplication.R
+import com.example.timil.climateapplication.Vibrator
+import com.example.timil.climateapplication.Vibrator.Companion.VIBRATION_TIME_SHORT
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -218,6 +220,9 @@ class RegisterFragment: Fragment() {
     }
 
     private fun shakeButton() {
+        if (AppStatus().vibrationOn(context!!)) {
+            Vibrator().vibrate(activity!!, VIBRATION_TIME_SHORT)
+        }
         val shake: Animation = AnimationUtils.loadAnimation(activity!!.applicationContext,
             R.anim.shake
         )

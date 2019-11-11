@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     // private lateinit var arFragment: CustomArFragment
     private lateinit var tabDiscountsFragment: TabLayoutFragment
     private lateinit var viewDiscountFragment: ViewDiscountFragment
+    private lateinit var settingsFragment: SettingsFragment
 
     private lateinit var drawer: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
@@ -59,6 +60,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         const val QUIZ_FRAGMENT_TAG = "QuizFragment"
         const val TAB_DISCOUNTS_FRAGMENT_TAG = "TabDiscountsFragment"
         const val VIEW_DISCOUNT_FRAGMENT = "ViewDiscountFragment"
+        const val SETTINGS_FRAGMENT_TAG = "SettingsFragment"
         private const val wait: Long = 1000
         const val MONSTER_TYPE = "MonsterType"
     }
@@ -82,6 +84,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         scanFragment = ScanFragment()
         tabDiscountsFragment = TabLayoutFragment()
         viewDiscountFragment = ViewDiscountFragment()
+        settingsFragment = SettingsFragment()
 
         setupFragment(startFragment, START_FRAGMENT_TAG, true)
 
@@ -167,17 +170,14 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             R.id.nav_home -> {
                 setupFragment(startFragment, START_FRAGMENT_TAG, false)
             }
-            R.id.nav_logout -> {
-                logOut()
-                /*
-                FirebaseAuth.getInstance().signOut()
-                setupFragment(startFragment, START_FRAGMENT_TAG, false)
-                user = null
-                startSignIn()
-                */
-            }
             R.id.nav_discounts -> {
                 setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
+            }
+            R.id.nav_settings -> {
+                setupFragment(settingsFragment, SETTINGS_FRAGMENT_TAG, false)
+            }
+            R.id.nav_logout -> {
+                logOut()
             }
         }
         drawer.closeDrawer(GravityCompat.START)
@@ -290,7 +290,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                 val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
                 builder.setView(dialogView)
                     .setPositiveButton(R.string.yes) { _, _ ->
-                        if (findFragment(START_FRAGMENT_TAG) || findFragment(TAB_DISCOUNTS_FRAGMENT_TAG)){
+                        if (findFragment(START_FRAGMENT_TAG)
+                            || findFragment(TAB_DISCOUNTS_FRAGMENT_TAG)
+                            || findFragment(SETTINGS_FRAGMENT_TAG)){
                             finish()
                         }
                         else {

@@ -118,7 +118,7 @@ class ArActivity : AppCompatActivity() {
 
         setAIMoveBoundaryConstants(screenCenter.x) // NOTE: must be called after setScreenSizeConstants!
 
-        startService(Intent(this@ArActivity, SoundService::class.java))
+        if (AppStatus().soundsOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
 
         val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
         numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
@@ -162,7 +162,7 @@ class ArActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         supportActionBar?.hide()
-        startService(Intent(this@ArActivity, SoundService::class.java))
+        if (AppStatus().soundsOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
     }
 
     override fun onStop() {
@@ -325,7 +325,7 @@ class ArActivity : AppCompatActivity() {
             it?.resumeAI()
         }
         btn_pause.text = getString(R.string.txt_pause)
-        startService(Intent(this@ArActivity, SoundService::class.java))
+        if (AppStatus().soundsOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
     }
 
     private fun endGame(allMonstersDead: Boolean) {

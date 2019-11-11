@@ -20,6 +20,7 @@ import android.widget.*
 import com.example.timil.climateapplication.AppStatus
 import com.example.timil.climateapplication.MainActivity
 import com.example.timil.climateapplication.R
+import com.example.timil.climateapplication.Vibrator
 import com.google.firebase.auth.*
 import kotlinx.android.synthetic.main.fragment_signin.*
 import kotlinx.android.synthetic.main.fragment_signin.edit_text_email
@@ -236,6 +237,9 @@ class SignInFragment: Fragment() {
     }
 
     private fun shakeButton(button: Button) {
+        if (AppStatus().vibrationOn(context!!)) {
+            Vibrator().vibrate(activity!!, Vibrator.VIBRATION_TIME_SHORT)
+        }
         val shake: Animation = AnimationUtils.loadAnimation(activity!!.applicationContext,
             R.anim.shake
         )
