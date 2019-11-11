@@ -14,6 +14,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import com.example.timil.climateapplication.AppStatus
 import com.example.timil.climateapplication.MainActivity
@@ -53,6 +55,7 @@ class SignInFragment: Fragment() {
                 signIn("${edit_text_email.text}", "${edit_text_password.text}")
             } else {
                 Toast.makeText(context!!, context!!.applicationContext.getText(R.string.check_internet), Toast.LENGTH_SHORT).show()
+                shakeButton(button_sign_in)
             }
         }
 
@@ -71,6 +74,7 @@ class SignInFragment: Fragment() {
                 }
             } else {
                 Toast.makeText(context!!, context!!.applicationContext.getText(R.string.check_internet), Toast.LENGTH_SHORT).show()
+                shakeButton(button_send_verification_email)
             }
         }
 
@@ -103,6 +107,7 @@ class SignInFragment: Fragment() {
 
     private fun signIn(email: String, password: String) {
         if (!validateForm(email, password)) {
+            shakeButton(button_sign_in)
             return
         }
         showLoadingDialog(context!!.applicationContext.getText(R.string.singing_in).toString())
@@ -160,6 +165,7 @@ class SignInFragment: Fragment() {
                     Toast.makeText(context!!, context!!.applicationContext.getText(R.string.already_sent), Toast.LENGTH_SHORT).show()
                     button_send_verification_email.isEnabled = true
                     button_send_verification_email.alpha = 1f
+                    shakeButton(button_send_verification_email)
                 }
             }
     }
@@ -229,4 +235,10 @@ class SignInFragment: Fragment() {
             }.show()
     }
 
+    private fun shakeButton(button: Button) {
+        val shake: Animation = AnimationUtils.loadAnimation(activity!!.applicationContext,
+            R.anim.shake
+        )
+        button.startAnimation(shake)
+    }
 }

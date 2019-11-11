@@ -16,6 +16,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import java.util.*
 import kotlin.collections.ArrayList
+import android.text.format.DateUtils
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 //private const val ARG_PARAM1 = "param1"
@@ -29,6 +35,10 @@ class StartFragment : Fragment() {
 
     private var root: View? = null
     private var activityCallBack: OnGameStart? = null
+
+    private val fireBaseDatabase = FirebaseDatabase.getInstance()
+    private val fireBaseAuth = FirebaseAuth.getInstance()
+    private var uid = ""
 
     interface OnGameStart {
         fun startQRscan()
@@ -55,15 +65,15 @@ class StartFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
+        uid = fireBaseAuth.currentUser!!.uid
         val btnStart = root!!.findViewById<Button>(R.id.btnStart)
         btnStart.setOnClickListener {
             activityCallBack!!.startQRscan()
         }
-        getDailyTips()
+        getInitialTimeFromDatabase()
     }
 
-    private fun getDailyTips(){
+    private fun getDailyTips(position: Int){
         val dailyTips = ArrayList<QueryDocumentSnapshot>()
 
         val db = FirebaseFirestore.getInstance()
@@ -72,25 +82,82 @@ class StartFragment : Fragment() {
                 for (document in task.result!!) {
                     dailyTips.add(document)
                 }
-
-                val randomNumber = generateRandomNumber(dailyTips)
-
                 val tvDaily = root!!.findViewById<TextView>(R.id.tvDailyTipInfo)
-                tvDaily.text = dailyTips[randomNumber].data.getValue("information").toString()
-
-
+                if (dailyTips.size > position) {
+                    tvDaily.text = dailyTips[position].data.getValue("information").toString()
+                    saveDailyTipPositionToDatabase(position)
+                } else {
+                    saveDailyTipPositionToDatabase(0)
+                    tvDaily.text = dailyTips[0].data.getValue("information").toString()
+                }
             } else {
                 Log.w("Error", "Error getting questions.", task.exception)
             }
         }
     }
 
-    private fun generateRandomNumber(dailyTips: ArrayList<*>): Int {
-        val random = Random()
-        val low = 0
-        val high = dailyTips.size
+    private fun saveCurrentStartTimeToDatabase() {
+        val ref = fireBaseDatabase.getReference("/users/$uid/daily tip/used")
+        ref.setValue(Date().time)
+            .addOnSuccessListener {
+                Log.d("TAG", "Successfully uploaded to the database")
+            }
+            .addOnFailureListener {
+                Log.d("TAG", "${it.message}")
+            }
+    }
 
-        return random.nextInt(high - low) + low
+    private fun getInitialTimeFromDatabase() {
+        val ref = fireBaseDatabase.getReference("/users/$uid/daily tip/used")
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val initial = if (dataSnapshot.value != null) {
+                    dataSnapshot.value!! as Long
+                } else { 0 }
+                when {
+                    initial == 0L -> {
+                        saveDailyTipPositionToDatabase(0)
+                        getDailyTips(0)
+                    }
+                    DateUtils.isToday(initial) -> {
+                        getDailyTipPositionFromDatabase(0)
+                    }
+                    else -> {
+                        getDailyTipPositionFromDatabase(1)
+                    }
+                }
+                saveCurrentStartTimeToDatabase()
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d("TAG", "${databaseError.message}")
+            }
+        })
+    }
+
+    private fun saveDailyTipPositionToDatabase(position: Int) {
+        val ref = fireBaseDatabase.getReference("/users/$uid/daily tip/position")
+        ref.setValue(position)
+            .addOnSuccessListener {
+                Log.d("TAG", "Successfully uploaded to the database")
+            }
+            .addOnFailureListener {
+                Log.d("TAG", "${it.message}")
+            }
+    }
+
+    private fun getDailyTipPositionFromDatabase(nextTip: Int) {
+        val ref = fireBaseDatabase.getReference("/users/$uid/daily tip/position")
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val position = dataSnapshot.value.toString().toInt()
+                getDailyTips(position + nextTip)
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+
+            }
+        })
     }
 
 }

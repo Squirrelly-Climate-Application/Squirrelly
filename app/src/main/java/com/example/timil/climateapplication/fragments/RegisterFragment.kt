@@ -13,6 +13,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -118,6 +120,7 @@ class RegisterFragment: Fragment() {
                 createAccount(edit_text_email.text.toString(), edit_text_password.text.toString(), edit_text_confirm_password.text.toString())
             } else {
                 Toast.makeText(context!!, context!!.applicationContext.getText(R.string.check_internet), Toast.LENGTH_SHORT).show()
+                shakeButton()
             }
         }
 
@@ -145,6 +148,7 @@ class RegisterFragment: Fragment() {
 
     private fun createAccount(email: String, password: String, confirmPassword: String) {
         if (!validateForm(email, password, confirmPassword)) {
+            shakeButton()
             return
         }
         showLoadingDialog(context!!.applicationContext.getText(R.string.registering_user).toString())
@@ -211,6 +215,13 @@ class RegisterFragment: Fragment() {
         builder.setCancelable(false)
         dialog = builder.create()
         dialog!!.show()
+    }
+
+    private fun shakeButton() {
+        val shake: Animation = AnimationUtils.loadAnimation(activity!!.applicationContext,
+            R.anim.shake
+        )
+        button_register.startAnimation(shake)
     }
 
 }
