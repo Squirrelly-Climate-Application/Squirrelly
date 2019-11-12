@@ -2,13 +2,13 @@ package com.example.timil.climateapplication.fragments
 
 
 import android.app.Activity
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 
 import com.example.timil.climateapplication.R
@@ -17,11 +17,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 import java.util.*
 import kotlin.collections.ArrayList
 import android.text.format.DateUtils
+import com.example.timil.climateapplication.CustomButton
+import com.example.timil.climateapplication.OnStartGameListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.fragment_start.*
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 //private const val ARG_PARAM1 = "param1"
@@ -39,6 +42,8 @@ class StartFragment : Fragment() {
     private val fireBaseDatabase = FirebaseDatabase.getInstance()
     private val fireBaseAuth = FirebaseAuth.getInstance()
     private var uid = ""
+
+    private lateinit var buttonStart: CustomButton
 
     interface OnGameStart {
         fun startQRscan()
@@ -66,10 +71,33 @@ class StartFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         uid = fireBaseAuth.currentUser!!.uid
+        /*
         val btnStart = root!!.findViewById<Button>(R.id.btnStart)
         btnStart.setOnClickListener {
             activityCallBack!!.startQRscan()
         }
+        */
+
+        squirrelly_view.setBackgroundResource(R.drawable.squirrelly_talk)
+        squirrelly_view.post {
+            val squirrelAnimation = squirrelly_view.background as AnimationDrawable
+            squirrelAnimation.isOneShot = true
+            squirrelAnimation.start()
+        }
+        squirrelly_view.setOnClickListener {
+            squirrelly_view.setBackgroundResource(R.drawable.squirrelly_shake_head)
+            val squirrelAnimation = squirrelly_view.background as AnimationDrawable
+            squirrelAnimation.stop()
+            squirrelAnimation.isOneShot = true
+            squirrelAnimation.start()
+        }
+
+        buttonStart = root!!.findViewById(R.id.custom_button_frame)
+        buttonStart.setOnStartGameListener(object : OnStartGameListener {
+            override fun onStartGame() {
+                activityCallBack!!.startQRscan()
+            }
+        })
         getInitialTimeFromDatabase()
     }
 
@@ -87,8 +115,8 @@ class StartFragment : Fragment() {
                     tvDaily.text = dailyTips[position].data.getValue("information").toString()
                     saveDailyTipPositionToDatabase(position)
                 } else {
-                    saveDailyTipPositionToDatabase(0)
                     tvDaily.text = dailyTips[0].data.getValue("information").toString()
+                    saveDailyTipPositionToDatabase(0)
                 }
             } else {
                 Log.w("Error", "Error getting questions.", task.exception)

@@ -69,7 +69,7 @@ class ViewDiscountFragment : Fragment() {
                 }
             }
             */
-            btnUseDiscountSwipe.setOnCountReachedListener(object : OnDiscountUseListener {
+            btnUseDiscountSwipe.setOnDiscountUseListener(object : OnDiscountUseListener {
 
                 override fun onDiscountUse(): Boolean {
                     return if( userPoints!! >=  discountPoints!!){

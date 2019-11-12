@@ -45,7 +45,7 @@ class SwipeButton @JvmOverloads constructor(
         setButtonTouchListener()
     }
 
-    fun setOnCountReachedListener(listener: OnDiscountUseListener) {
+    fun setOnDiscountUseListener(listener: OnDiscountUseListener) {
         onDiscountUseListener = listener
     }
 
