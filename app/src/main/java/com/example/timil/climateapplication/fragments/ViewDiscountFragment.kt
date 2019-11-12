@@ -3,6 +3,7 @@ package com.example.timil.climateapplication.fragments
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.transition.TransitionInflater
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +29,7 @@ class ViewDiscountFragment : Fragment() {
     private var discountCompanyTv: TextView? = null
     private var discountInformationTv: TextView? = null
     private var discountPointsTv: TextView? = null
+    private var expiringDateTv: TextView? = null
     private var btnUseDiscount: Button? = null
     private lateinit var btnUseDiscountSwipe: SwipeButton
 
@@ -49,6 +51,7 @@ class ViewDiscountFragment : Fragment() {
         discountCompanyTv = root!!.findViewById(R.id.tvViewDiscountTitle)
         discountInformationTv = root!!.findViewById(R.id.tvViewDiscountInfo)
         discountPointsTv = root!!.findViewById(R.id.tvViewDiscountPoints)
+        expiringDateTv = root!!.findViewById(R.id.tvViewExpiringDate)
         btnUseDiscount = root!!.findViewById(R.id.btnUseDiscount)
         btnUseDiscountSwipe = root!!.findViewById(R.id.btnUseDiscountSwipe)
 
@@ -60,6 +63,9 @@ class ViewDiscountFragment : Fragment() {
             discountCompanyTv!!.text = bundle.getString("discountCompany")
             discountInformationTv!!.text = bundle.getString("discountInformation")
             discountPointsTv!!.text = discountPoints.toString()
+            expiringDateTv!!.text = bundle.getString("expiringDate")
+
+            root!!.transitionName = bundle.getString("Shared element")!!
             /*
             btnUseDiscount!!.setOnClickListener {
                 if( userPoints!! >=  discountPoints!!){
@@ -128,6 +134,14 @@ class ViewDiscountFragment : Fragment() {
             .addOnFailureListener { exception ->
                 Log.d("tester", "get failed with ", exception)
             }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        sharedElementEnterTransition = TransitionInflater
+            .from(context).inflateTransition(
+                android.R.transition.move
+            )
+        super.onCreate(savedInstanceState)
     }
 
 }

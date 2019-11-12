@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import com.example.timil.climateapplication.R
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.LinearLayoutManager
+import android.text.format.DateUtils
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import android.util.Log
 import android.widget.ProgressBar
@@ -16,6 +17,7 @@ import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
+import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -111,7 +113,11 @@ class DiscountsFragment : Fragment() {
                         if (task.isSuccessful) {
                             val discounts = ArrayList<QueryDocumentSnapshot>()
                             for (discountDocument in task.result!!) {
-                                discounts.add(discountDocument)
+                                val expiringDate = DateFormat.getDateInstance().parse(discountDocument.data.getValue("expiring date").toString()).time
+                                if (Date().time < expiringDate || DateUtils.isToday(expiringDate)) {
+                                    discounts.add(discountDocument)
+                                }
+                                //discounts.add(discountDocument)
                             }
 
                             // if user has already used some of the discounts -> do not show it on the list

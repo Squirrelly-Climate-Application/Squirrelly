@@ -2,6 +2,7 @@ package com.example.timil.climateapplication.adapters
 
 import android.app.Activity
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +22,7 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     private var proceedToViewFragment: Boolean? = null
 
     interface OnDiscountClick {
-        fun showDiscount(document: QueryDocumentSnapshot, userPoints: Int)
+        fun showDiscount(view: View, document: QueryDocumentSnapshot, userPoints: Int)
     }
 
     init {
@@ -49,9 +50,12 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         discountViewHolder.discountTitle.text = discountsList!![i].data.getValue("company").toString()
         discountViewHolder.discountInfo.text = discountsList!![i].data.getValue("information").toString()
         discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue("points_needed").toString())
+        discountViewHolder.expiringDate.text = discountsList!![i].data.getValue("expiring date").toString()
+        discountViewHolder.view.transitionName = discountsList!![i].id
+        Log.d("tää", "discountsList!![i].id = ${discountsList!![i].id}")
         if (proceedToViewFragment!!) {
             discountViewHolder.itemRoot.setOnClickListener {
-                mCallback!!.showDiscount(discountsList!![i], userPoints!!)
+                mCallback!!.showDiscount(discountViewHolder.view, discountsList!![i], userPoints!!)
             }
         }
     }
@@ -64,6 +68,7 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         var discountTitle: TextView = itemRoot.findViewById(R.id.tvDiscountTitle)
         var discountInfo: TextView = itemRoot.findViewById(R.id.tvDiscountInfo)
         var discountPoints: TextView = itemRoot.findViewById(R.id.tvDiscountPoints)
+        var expiringDate: TextView = itemRoot.findViewById(R.id.tvExpiringDate)
         var view: View = itemRoot
     }
 

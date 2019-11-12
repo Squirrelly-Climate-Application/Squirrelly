@@ -4,10 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toTopOf="parent">
+    android:layout_margin="8dp"
+    android:elevation="8dp"
+    android:background="@color/cardview_light_background">
 
     <TextView
         android:id="@+id/tvViewDiscountTitle"
@@ -32,13 +33,19 @@
         android:layout_margin="8dp"
         android:backgroundTint="@color/fui_transparent"/>
 
+    <TextView
+        android:id="@+id/tvViewExpiringDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:backgroundTint="@color/fui_transparent"/>
+
     <Button
         android:id="@+id/btnUseDiscount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="USE DISCOUNT"/>
 
-    <!-- TODO: Here is the discount swipe button -->
     <com.example.timil.climateapplication.SwipeButton
         android:id="@+id/btnUseDiscountSwipe"
         android:layout_width="match_parent"

@@ -25,6 +25,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
@@ -238,15 +239,23 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     }
 
     // called when opening a discount for more information
-    override fun showDiscount(document: QueryDocumentSnapshot, userPoints: Int) {
+    override fun showDiscount(view: View, document: QueryDocumentSnapshot, userPoints: Int) {
         val bundle = Bundle()
+        bundle.putString("Shared element", view.transitionName)
+
         bundle.putString("discountId", document.id)
         bundle.putString("discountCompany", document.data["company"].toString())
         bundle.putString("discountInformation", document.data["information"].toString())
         bundle.putInt("discountPoints", document.data["points_needed"].toString().toInt())
         bundle.putInt("userPoints", userPoints)
+        bundle.putString("expiringDate", document.data["expiring date"].toString())
         viewDiscountFragment.arguments = bundle
-        setupFragment(viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT, true)
+        //setupFragment(viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT, true)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT)
+            .addSharedElement(view, view.transitionName)
+            .addToBackStack( "tag" )
+            .commit()
     }
 
     /*
