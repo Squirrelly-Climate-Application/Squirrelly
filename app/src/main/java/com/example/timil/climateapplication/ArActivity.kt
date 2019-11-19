@@ -26,6 +26,18 @@ import com.google.ar.sceneform.rendering.Texture
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.Serializable
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+import android.view.ViewGroup
+import android.support.v4.app.SupportActivity
+import android.support.v4.app.SupportActivity.ExtraData
+import android.support.v4.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.os.Debug
+import android.support.constraint.ConstraintLayout
+import android.widget.ImageView
+import kotlin.math.PI
+
 
 /**
  * Activity that governs the AR game portion of the app.
@@ -42,11 +54,10 @@ private const val CORRECT_ANSWER_THROWS = 10
 private const val COORD_SYS_CONVERT_RATIO = 0.36f / 540
 
 // for UI updates
+// (it's a little bit decimated since I removed the wind values from it... maybe refactor)
 private enum class ViewType {
     HP,
-    THROWS,
-    WIND_X,
-    WIND_Y
+    THROWS
 }
 
 enum class MonsterType: Serializable {
@@ -70,7 +81,6 @@ class ArActivity : AppCompatActivity() {
 
     private val totalMonsterHp: Int
         get() {
-
             return monsterNodes.map { it?.hitPoints ?: 0 }.reduce { acc, it -> acc + it }
         }
 
@@ -123,9 +133,7 @@ class ArActivity : AppCompatActivity() {
         val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
         numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
 
-        // to properly update the UI, we need to do these assignments once it has been initialized
-        updateUI(ViewType.WIND_X, wind.xComp)
-        updateUI(ViewType.WIND_Y, wind.yComp)
+        adjustWindArrowIndicator(this.wind, iv_arrow)
 
         arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
         arFragment.arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
@@ -377,8 +385,6 @@ class ArActivity : AppCompatActivity() {
             // i'm sure there's a better way to do this than these idiotic casts...
             ViewType.HP -> tv_hitpoints.text = getString(R.string.txt_HP, value as Int)
             ViewType.THROWS -> tv_throws.text = getString(R.string.txt_throws, value as Int)
-            ViewType.WIND_X -> tv_wind_x.text = getString(R.string.txt_wind_x, "%.2f".format(value as Float))
-            ViewType.WIND_Y -> tv_wind_y.text = getString(R.string.txt_wind_y, "%.2f".format(value as Float))
         }
     } // updateUI
 
@@ -534,7 +540,7 @@ class ArActivity : AppCompatActivity() {
 
     private fun spawnSmallOilMonsters(localPos: Vector3) {
 
-        Log.d("HUUH", "original localPos: $localPos")
+        // Log.d("HUUH", "original localPos: $localPos")
 
         monsterNodes[1] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
         monsterNodes[2] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
@@ -608,5 +614,26 @@ class ArActivity : AppCompatActivity() {
                 Log.d("tester", "get failed with ", exception)
             }
     } // saveScoreToDb
+
+    // correctly orient and scale the wind arrow indicator (to show the wind force & direction)
+    private fun adjustWindArrowIndicator(wind: Wind, icon: ImageView) {
+
+        icon.rotation = -wind.degreeAngle // for some reason, clockwise == positive direction here
+
+        val scaleXyBy = (1 + wind.force / 25).toFloat() // value range: 1-2
+        // icon.scaleX = scaleXyBy // these seem to f things up... disabling for now
+        // icon.scaleY = scaleXyBy
+
+        val newX = (icon.layoutParams.width * scaleXyBy).toInt()
+        val newY = (icon.layoutParams.height * scaleXyBy).toInt()
+        icon.layoutParams.width = newX
+        icon.layoutParams.height = newY
+        icon.requestLayout()
+
+        //TODO: ideally, the arrow's width would stay the same and only the length would change
+        // according to the force attribute (atm we scale the entire arrow)
+
+        tv_force.text = wind.force.toString()
+    } // adjustWindArrowIndicator
 
 } // ArActivity
