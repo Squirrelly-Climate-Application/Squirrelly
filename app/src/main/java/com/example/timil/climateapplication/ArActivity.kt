@@ -618,7 +618,8 @@ class ArActivity : AppCompatActivity() {
     // correctly orient and scale the wind arrow indicator (to show the wind force & direction)
     private fun adjustWindArrowIndicator(wind: Wind, icon: ImageView) {
 
-        icon.rotation = -wind.degreeAngle // for some reason, clockwise == positive direction here
+        //icon.rotation = -wind.degreeAngle // for some reason, clockwise == positive direction here
+        icon.animate().rotation(-wind.degreeAngle).start()
 
         val scaleXyBy = (1 + wind.force / 25).toFloat() // value range: 1-2
         // icon.scaleX = scaleXyBy // these seem to f things up... disabling for now

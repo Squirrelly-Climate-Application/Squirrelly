@@ -8,6 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.timil.climateapplication.R
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
 import com.google.firebase.firestore.QueryDocumentSnapshot
 
 
@@ -47,12 +51,11 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     }
 
     override fun onBindViewHolder(discountViewHolder: DiscountViewHolder, i: Int) {
-        discountViewHolder.discountTitle.text = discountsList!![i].data.getValue("company").toString()
-        discountViewHolder.discountInfo.text = discountsList!![i].data.getValue("information").toString()
-        discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue("points_needed").toString())
-        discountViewHolder.expiringDate.text = discountsList!![i].data.getValue("expiring date").toString()
+        discountViewHolder.discountTitle.text = discountsList!![i].data.getValue(DISCOUNT_COMPANY_KEY).toString()
+        discountViewHolder.discountInfo.text = discountsList!![i].data.getValue(DISCOUNT_INFORMATION_KEY).toString()
+        discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue(DISCOUNT_POINTS_KEY).toString())
+        discountViewHolder.expiringDate.text = discountsList!![i].data.getValue(EXPIRING_DATE_KEY).toString()
         discountViewHolder.view.transitionName = discountsList!![i].id
-        Log.d("tää", "discountsList!![i].id = ${discountsList!![i].id}")
         if (proceedToViewFragment!!) {
             discountViewHolder.itemRoot.setOnClickListener {
                 mCallback!!.showDiscount(discountViewHolder.view, discountsList!![i], userPoints!!)

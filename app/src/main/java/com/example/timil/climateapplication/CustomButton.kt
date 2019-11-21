@@ -47,6 +47,7 @@ class CustomButton @JvmOverloads constructor(
     }
 
     private fun moveButton() {
+        /*
         val linearDailyTips = this.rootView.findViewById<LinearLayout>(R.id.linearDailyTips)
         linearDailyTips.visibility = LinearLayout.GONE
 
@@ -66,10 +67,10 @@ class CustomButton @JvmOverloads constructor(
 
         val centerX = custom_button_frame.width / 2.0f
         val centerY = custom_button_frame.height / 2.0f
-        val rotation3dAnimator = Rotate3dAnimation(0f, 360f, centerX, centerY, -500.0f, true)
+        val rotation3dAnimator = Rotate3dAnimation(0f, 0f, centerX, centerY, -500.0f, true, true, true)
         rotation3dAnimator.fillAfter = true
         rotation3dAnimator.interpolator = AccelerateInterpolator()
-        rotation3dAnimator.duration = 2000
+        rotation3dAnimator.duration = 1000
 
         this.startAnimation(rotation3dAnimator)
 
@@ -80,13 +81,13 @@ class CustomButton @JvmOverloads constructor(
             context!!.applicationContext.getColor(android.R.color.transparent),
             context!!.applicationContext.getColor(android.R.color.transparent)
         )
-        colourAnimator.duration = 2000
+        colourAnimator.duration = 1000
 
         val animatorSet = AnimatorSet()
         animatorSet.playTogether(circleAnimator)
         setAnimatorListener(animatorSet)
         animatorSet.start()
-
+        */
     }
 
     private fun setAnimatorListener(animatorSet: AnimatorSet) {

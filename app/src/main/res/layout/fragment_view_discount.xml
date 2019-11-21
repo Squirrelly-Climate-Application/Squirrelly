@@ -4,47 +4,57 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_margin="8dp"
-    android:elevation="8dp"
-    android:background="@color/cardview_light_background">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvViewDiscountTitle"
+    <LinearLayout
+        android:id="@+id/linearLayoutCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="16sp"
-        android:gravity="center_vertical"
-        android:layout_margin="8dp"/>
-
-    <TextView
-        android:id="@+id/tvViewDiscountInfo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_margin="8dp"
-        android:backgroundTint="@color/fui_transparent"/>
+        android:elevation="8dp"
+        android:background="@color/cardview_light_background">
 
-    <TextView
-        android:id="@+id/tvViewDiscountPoints"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:backgroundTint="@color/fui_transparent"/>
+        <TextView
+            android:id="@+id/tvViewDiscountTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:gravity="center_vertical"
+            android:layout_margin="8dp"/>
 
-    <TextView
-        android:id="@+id/tvViewExpiringDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:backgroundTint="@color/fui_transparent"/>
+        <TextView
+            android:id="@+id/tvViewDiscountInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/fui_transparent"/>
 
-    <Button
+        <TextView
+            android:id="@+id/tvViewDiscountPoints"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/fui_transparent"/>
+
+        <TextView
+            android:id="@+id/tvViewExpiringDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/fui_transparent"/>
+
+    </LinearLayout>
+
+
+
+    <!--Button
         android:id="@+id/btnUseDiscount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="USE DISCOUNT"/>
+        android:text="USE DISCOUNT"/-->
 
     <com.example.timil.climateapplication.SwipeButton
         android:id="@+id/btnUseDiscountSwipe"

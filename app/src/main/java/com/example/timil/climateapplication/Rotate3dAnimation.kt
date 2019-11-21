@@ -11,6 +11,8 @@ class Rotate3dAnimation (
     private val mCenterX: Float,
     private val mCenterY: Float,
     private val mDepthZ: Float,
+    private val rotateX: Boolean,
+    private val rotateY: Boolean,
     private val mReverse: Boolean
 ) : Animation() {
     private var mCamera: Camera? = null
@@ -36,7 +38,12 @@ class Rotate3dAnimation (
         } else {
             camera.translate(0.0f, 0.0f, mDepthZ * (1.0f - interpolatedTime))
         }
-        camera.rotateY(degrees)
+        if (rotateX) {
+            camera.rotateX(degrees)
+        }
+        if (rotateY) {
+            camera.rotateY(degrees)
+        }
         camera.getMatrix(matrix)
         camera.restore()
 

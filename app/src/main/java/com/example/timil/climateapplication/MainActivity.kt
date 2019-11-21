@@ -30,6 +30,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.fragments.*
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.SHARED_ELEMENT_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.USER_POINTS_KEY
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import java.io.Serializable
 
@@ -241,20 +247,19 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     // called when opening a discount for more information
     override fun showDiscount(view: View, document: QueryDocumentSnapshot, userPoints: Int) {
         val bundle = Bundle()
-        bundle.putString("Shared element", view.transitionName)
+        bundle.putString(SHARED_ELEMENT_KEY, view.transitionName)
 
-        bundle.putString("discountId", document.id)
-        bundle.putString("discountCompany", document.data["company"].toString())
-        bundle.putString("discountInformation", document.data["information"].toString())
-        bundle.putInt("discountPoints", document.data["points_needed"].toString().toInt())
-        bundle.putInt("userPoints", userPoints)
-        bundle.putString("expiringDate", document.data["expiring date"].toString())
+        bundle.putString(DISCOUNT_COMPANY_KEY, document.data[DISCOUNT_COMPANY_KEY].toString())
+        bundle.putString(DISCOUNT_INFORMATION_KEY, document.data[DISCOUNT_INFORMATION_KEY].toString())
+        bundle.putInt(DISCOUNT_POINTS_KEY, document.data[DISCOUNT_POINTS_KEY].toString().toInt())
+        bundle.putInt(USER_POINTS_KEY, userPoints)
+        bundle.putString(EXPIRING_DATE_KEY, document.data[EXPIRING_DATE_KEY].toString())
         viewDiscountFragment.arguments = bundle
         //setupFragment(viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT, true)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT)
             .addSharedElement(view, view.transitionName)
-            .addToBackStack( "tag" )
+            .addToBackStack(null)
             .commit()
     }
 

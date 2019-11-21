@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 class SplashActivity : AppCompatActivity() {
 
     private var paused = false
-    private val wait: Long = 1000
+    private val wait: Long = 1500
     private val delay: Long = 3000
 
     private var mDelayHandler: Handler? = null

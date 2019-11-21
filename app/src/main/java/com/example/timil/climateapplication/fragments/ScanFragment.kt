@@ -147,7 +147,7 @@ class ScanFragment: Fragment(), ZXingScannerView.ResultHandler {
         secondsLeft -= TimeUnit.HOURS.toSeconds(hoursLeft)
         minutesLeft = TimeUnit.SECONDS.toMinutes(secondsLeft)
         secondsLeft -= TimeUnit.MINUTES.toSeconds(minutesLeft)
-        return Date().time - initial <= TimeUnit.MINUTES.toMillis(expiringTime) //temporarily return false here to skip expiring time
+        return false//Date().time - initial <= TimeUnit.MINUTES.toMillis(expiringTime) //temporarily return false here to skip expiring time
     }
 
     private fun showLoadingDialog(message: String) {

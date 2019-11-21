@@ -9,11 +9,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.example.timil.climateapplication.OnDiscountUseListener
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.SwipeButton
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.SHARED_ELEMENT_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.USER_POINTS_KEY
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,13 +32,14 @@ import java.util.*
  */
 class ViewDiscountFragment : Fragment() {
 
-    private var root: View? = null
-    private var discountCompanyTv: TextView? = null
-    private var discountInformationTv: TextView? = null
-    private var discountPointsTv: TextView? = null
-    private var expiringDateTv: TextView? = null
-    private var btnUseDiscount: Button? = null
+    private lateinit var root: View
+    private lateinit var discountCompanyTv: TextView
+    private lateinit var discountInformationTv: TextView
+    private lateinit var discountPointsTv: TextView
+    private lateinit var expiringDateTv: TextView
+    //private var btnUseDiscount: Button? = null
     private lateinit var btnUseDiscountSwipe: SwipeButton
+    private lateinit var linearLayoutCardView: LinearLayout
 
     private var userPoints: Int? = 0
     private var discountPoints: Int? = 0
@@ -48,24 +56,25 @@ class ViewDiscountFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        discountCompanyTv = root!!.findViewById(R.id.tvViewDiscountTitle)
-        discountInformationTv = root!!.findViewById(R.id.tvViewDiscountInfo)
-        discountPointsTv = root!!.findViewById(R.id.tvViewDiscountPoints)
-        expiringDateTv = root!!.findViewById(R.id.tvViewExpiringDate)
-        btnUseDiscount = root!!.findViewById(R.id.btnUseDiscount)
-        btnUseDiscountSwipe = root!!.findViewById(R.id.btnUseDiscountSwipe)
+        discountCompanyTv = root.findViewById(R.id.tvViewDiscountTitle)
+        discountInformationTv = root.findViewById(R.id.tvViewDiscountInfo)
+        discountPointsTv = root.findViewById(R.id.tvViewDiscountPoints)
+        expiringDateTv = root.findViewById(R.id.tvViewExpiringDate)
+        //btnUseDiscount = root!!.findViewById(R.id.btnUseDiscount)
+        btnUseDiscountSwipe = root.findViewById(R.id.btnUseDiscountSwipe)
+        linearLayoutCardView = root.findViewById(R.id.linearLayoutCardView)
 
         val bundle = arguments
         try {
-            discountPoints = bundle!!.getInt("discountPoints")
-            userPoints = bundle.getInt("userPoints")
+            discountPoints = bundle!!.getInt(DISCOUNT_POINTS_KEY)
+            userPoints = bundle.getInt(USER_POINTS_KEY)
 
-            discountCompanyTv!!.text = bundle.getString("discountCompany")
-            discountInformationTv!!.text = bundle.getString("discountInformation")
-            discountPointsTv!!.text = discountPoints.toString()
-            expiringDateTv!!.text = bundle.getString("expiringDate")
+            discountCompanyTv.text = bundle.getString(DISCOUNT_COMPANY_KEY)
+            discountInformationTv.text = bundle.getString(DISCOUNT_INFORMATION_KEY)
+            discountPointsTv.text = discountPoints.toString()
+            expiringDateTv.text = bundle.getString(EXPIRING_DATE_KEY)
 
-            root!!.transitionName = bundle.getString("Shared element")!!
+            linearLayoutCardView.transitionName = bundle.getString(SHARED_ELEMENT_KEY)!!
             /*
             btnUseDiscount!!.setOnClickListener {
                 if( userPoints!! >=  discountPoints!!){

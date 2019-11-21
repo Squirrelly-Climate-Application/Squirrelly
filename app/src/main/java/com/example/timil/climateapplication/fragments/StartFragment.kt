@@ -17,6 +17,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 import java.util.*
 import kotlin.collections.ArrayList
 import android.text.format.DateUtils
+import android.widget.Button
 import com.example.timil.climateapplication.CustomButton
 import com.example.timil.climateapplication.OnStartGameListener
 import com.google.firebase.auth.FirebaseAuth
@@ -43,7 +44,7 @@ class StartFragment : Fragment() {
     private val fireBaseAuth = FirebaseAuth.getInstance()
     private var uid = ""
 
-    private lateinit var buttonStart: CustomButton
+    private lateinit var buttonStart: Button
 
     interface OnGameStart {
         fun startQRscan()
@@ -71,19 +72,8 @@ class StartFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         uid = fireBaseAuth.currentUser!!.uid
-        /*
-        val btnStart = root!!.findViewById<Button>(R.id.btnStart)
-        btnStart.setOnClickListener {
-            activityCallBack!!.startQRscan()
-        }
-        */
 
-        squirrelly_view.setBackgroundResource(R.drawable.squirrelly_talk)
-        squirrelly_view.post {
-            val squirrelAnimation = squirrelly_view.background as AnimationDrawable
-            squirrelAnimation.isOneShot = true
-            squirrelAnimation.start()
-        }
+
         squirrelly_view.setOnClickListener {
             squirrelly_view.setBackgroundResource(R.drawable.squirrelly_shake_head)
             val squirrelAnimation = squirrelly_view.background as AnimationDrawable
@@ -92,12 +82,17 @@ class StartFragment : Fragment() {
             squirrelAnimation.start()
         }
 
-        buttonStart = root!!.findViewById(R.id.custom_button_frame)
+        buttonStart = root!!.findViewById(R.id.button_start)
+        buttonStart.isEnabled = false
+        buttonStart.setOnClickListener {
+            activityCallBack!!.startQRscan()
+        }
+        /* buttonStart = root!!.findViewById(R.id.custom_button_frame)
         buttonStart.setOnStartGameListener(object : OnStartGameListener {
             override fun onStartGame() {
                 activityCallBack!!.startQRscan()
             }
-        })
+        })*/
         getInitialTimeFromDatabase()
     }
 
@@ -111,6 +106,13 @@ class StartFragment : Fragment() {
                     dailyTips.add(document)
                 }
                 val tvDaily = root!!.findViewById<TextView>(R.id.tvDailyTipInfo)
+                tvDaily.background = context!!.applicationContext.getDrawable(R.drawable.speech_bubble)
+                squirrelly_view.setBackgroundResource(R.drawable.squirrelly_talk)
+                squirrelly_view.post {
+                    val squirrelAnimation = squirrelly_view.background as AnimationDrawable
+                    squirrelAnimation.isOneShot = true
+                    squirrelAnimation.start()
+                }
                 if (dailyTips.size > position) {
                     tvDaily.text = dailyTips[position].data.getValue("information").toString()
                     saveDailyTipPositionToDatabase(position)
@@ -118,6 +120,7 @@ class StartFragment : Fragment() {
                     tvDaily.text = dailyTips[0].data.getValue("information").toString()
                     saveDailyTipPositionToDatabase(0)
                 }
+                buttonStart.isEnabled = true
             } else {
                 Log.w("Error", "Error getting questions.", task.exception)
             }
