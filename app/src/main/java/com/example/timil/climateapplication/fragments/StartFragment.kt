@@ -19,6 +19,8 @@ import kotlin.collections.ArrayList
 import android.text.format.DateUtils
 import android.widget.Button
 import com.example.timil.climateapplication.CustomButton
+import com.example.timil.climateapplication.MainActivity
+import com.example.timil.climateapplication.MainActivity.Companion.START_FRAGMENT_TAG
 import com.example.timil.climateapplication.OnStartGameListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -83,7 +85,6 @@ class StartFragment : Fragment() {
         }
 
         buttonStart = root!!.findViewById(R.id.button_start)
-        buttonStart.isEnabled = false
         buttonStart.setOnClickListener {
             activityCallBack!!.startQRscan()
         }
@@ -105,22 +106,24 @@ class StartFragment : Fragment() {
                 for (document in task.result!!) {
                     dailyTips.add(document)
                 }
-                val tvDaily = root!!.findViewById<TextView>(R.id.tvDailyTipInfo)
-                tvDaily.background = context!!.applicationContext.getDrawable(R.drawable.speech_bubble)
-                squirrelly_view.setBackgroundResource(R.drawable.squirrelly_talk)
-                squirrelly_view.post {
-                    val squirrelAnimation = squirrelly_view.background as AnimationDrawable
-                    squirrelAnimation.isOneShot = true
-                    squirrelAnimation.start()
+                if (fragmentManager!!.findFragmentByTag(START_FRAGMENT_TAG) != null
+                    && fragmentManager!!.findFragmentByTag(START_FRAGMENT_TAG)!!.isVisible) {
+                    val tvDaily = root!!.findViewById<TextView>(R.id.tvDailyTipInfo)
+                    tvDaily.background = context!!.applicationContext.getDrawable(R.drawable.speech_bubble)
+                    squirrelly_view.setBackgroundResource(R.drawable.squirrelly_talk)
+                    squirrelly_view.post {
+                        val squirrelAnimation = squirrelly_view.background as AnimationDrawable
+                        squirrelAnimation.isOneShot = true
+                        squirrelAnimation.start()
+                    }
+                    if (dailyTips.size > position) {
+                        tvDaily.text = dailyTips[position].data.getValue("information").toString()
+                        saveDailyTipPositionToDatabase(position)
+                    } else {
+                        tvDaily.text = dailyTips[0].data.getValue("information").toString()
+                        saveDailyTipPositionToDatabase(0)
+                    }
                 }
-                if (dailyTips.size > position) {
-                    tvDaily.text = dailyTips[position].data.getValue("information").toString()
-                    saveDailyTipPositionToDatabase(position)
-                } else {
-                    tvDaily.text = dailyTips[0].data.getValue("information").toString()
-                    saveDailyTipPositionToDatabase(0)
-                }
-                buttonStart.isEnabled = true
             } else {
                 Log.w("Error", "Error getting questions.", task.exception)
             }

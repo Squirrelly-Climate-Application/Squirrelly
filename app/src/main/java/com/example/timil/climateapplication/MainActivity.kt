@@ -254,6 +254,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         bundle.putInt(DISCOUNT_POINTS_KEY, document.data[DISCOUNT_POINTS_KEY].toString().toInt())
         bundle.putInt(USER_POINTS_KEY, userPoints)
         bundle.putString(EXPIRING_DATE_KEY, document.data[EXPIRING_DATE_KEY].toString())
+
+        bundle.putString("discountId", document.id)
+
         viewDiscountFragment.arguments = bundle
         //setupFragment(viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT, true)
         supportFragmentManager.beginTransaction()
