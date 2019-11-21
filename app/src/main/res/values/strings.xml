@@ -11,9 +11,14 @@
     <string name="navigation_drawer_close">Close Drawer</string>
     <string name="squirrelly">Squirrelly</string>
     <string name="discounts">Discounts</string>
+    <string name="discount_map">Discount Map</string>
     <string name="menu">Menu</string>
     <string name="user_points">My points: %1$s</string>
     <string name="discount_cost">Cost: %1$s points</string>
+
+    <string name="txt_points">%1$d points</string>
+    <string name="txt_discount_percent">for -%1$d %%</string>
+    <string name="txt_expires">Expires: %1$s</string>
 
     <string name="txt_pause">Pause</string>
     <string name="txt_resume">Resume</string>

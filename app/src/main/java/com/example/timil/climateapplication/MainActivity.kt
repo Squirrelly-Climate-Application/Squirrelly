@@ -47,10 +47,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
     private lateinit var startFragment: StartFragment
     private lateinit var scanFragment: ScanFragment
-    // private lateinit var arFragment: CustomArFragment
     private lateinit var tabDiscountsFragment: TabLayoutFragment
     private lateinit var viewDiscountFragment: ViewDiscountFragment
     private lateinit var settingsFragment: SettingsFragment
+    private lateinit var googleMapFragment: GoogleMapFragment
 
     private lateinit var drawer: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         const val START_FRAGMENT_TAG = "StartFragment"
         const val SCAN_FRAGMENT_TAG = "ScanFragment"
         const val QUIZ_FRAGMENT_TAG = "QuizFragment"
+        const val GOOGLEMAP_FRAGMENT_TAG = "GoogleMapFragment"
         const val TAB_DISCOUNTS_FRAGMENT_TAG = "TabDiscountsFragment"
         const val VIEW_DISCOUNT_FRAGMENT = "ViewDiscountFragment"
         const val SETTINGS_FRAGMENT_TAG = "SettingsFragment"
@@ -92,6 +93,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         tabDiscountsFragment = TabLayoutFragment()
         viewDiscountFragment = ViewDiscountFragment()
         settingsFragment = SettingsFragment()
+        googleMapFragment = GoogleMapFragment()
 
         setupFragment(startFragment, START_FRAGMENT_TAG, true)
 
@@ -179,6 +181,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             }
             R.id.nav_discounts -> {
                 setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
+            }
+            R.id.nav_discounts_map -> {
+                setupFragment(googleMapFragment, GOOGLEMAP_FRAGMENT_TAG, false)
             }
             R.id.nav_settings -> {
                 setupFragment(settingsFragment, SETTINGS_FRAGMENT_TAG, false)
