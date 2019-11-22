@@ -621,9 +621,7 @@ class ArActivity : AppCompatActivity() {
         //icon.rotation = -wind.degreeAngle // for some reason, clockwise == positive direction here
         icon.animate().rotation(-wind.degreeAngle).start()
 
-        val scaleXyBy = (1 + wind.force / 25).toFloat() // value range: 1-2
-        // icon.scaleX = scaleXyBy // these seem to f things up... disabling for now
-        // icon.scaleY = scaleXyBy
+        val scaleXyBy = (1 + wind.force / 25) // value range: 1-2
         val newX = (icon.layoutParams.width * scaleXyBy).toInt()
         val newY = (icon.layoutParams.height * scaleXyBy).toInt()
         icon.layoutParams.width = newX
@@ -633,11 +631,7 @@ class ArActivity : AppCompatActivity() {
         //TODO: ideally, the arrow's width would stay the same and only the length would change
         // according to the force attribute (atm we scale the entire arrow)
 
-        // NOTE: even though the top app bar (with the battery power % etc) is disabled in the ar view,
-        // it still causes clipping issues with the arrow view! there should always be a top margin
-        // of about 24dp for all views placed near the top of the screen.
-
-        tv_force.text = wind.force.toString()
+        tv_force.text = wind.force.toInt().toString()
     } // adjustWindArrowIndicator
 
 } // ArActivity

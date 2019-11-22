@@ -23,7 +23,7 @@ class Wind private constructor() {
         }
 
     val yComp = Static.randomFloatBetween(WIND_Y_MIN, WIND_Y_MAX)
-    val force = (sqrt(xComp.pow(2.0f) + yComp.pow(2.0f)) * 100).toInt() // max 25; looks better in the UI
+    val force = (sqrt(xComp.pow(2.0f) + yComp.pow(2.0f)) * 100) // max 25; looks better in the UI
 
     // the angle (from 0 to 2 PI) of the 'wind power vector' (relative to the x-plane).
     // to be used in positioning the wind indicator (arrow).
