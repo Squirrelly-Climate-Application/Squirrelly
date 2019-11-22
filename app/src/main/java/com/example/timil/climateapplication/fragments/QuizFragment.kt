@@ -257,7 +257,7 @@ class QuizFragment : Fragment() {
             false -> { alertDialog!!.setTitle("Wrong answer.") }
         }
         alertDialog.setMessage(information)
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OKAY") { dialog, _ ->
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OKAY") { dialog, _ ->
             dialog.dismiss()
         }
         alertDialog.show()
