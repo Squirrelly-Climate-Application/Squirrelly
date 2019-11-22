@@ -34,6 +34,8 @@ class SwipeButton @JvmOverloads constructor(
 
     private var onDiscountUseListener: OnDiscountUseListener? = null
 
+    private var discountUsed = false
+
     init {
         LayoutInflater.from(context).inflate(R.layout.custom_swipe_button_layout, this, true)
         attrs?.let {
@@ -174,15 +176,17 @@ class SwipeButton @JvmOverloads constructor(
         val dialogText: TextView = dialogView.findViewById(R.id.dialog_text)
         dialogText.text = context.applicationContext.getText(R.string.use_discount)
         builder.setOnDismissListener {
-            collapseButton()
+            if (!discountUsed) {
+                collapseButton()
+            }
         }
         builder.setView(dialogView)
             .setPositiveButton(R.string.yes) { dialog, _ ->
                 if (onDiscountUseListener!!.onDiscountUse()) {
                     center_text.text = context.applicationContext.getText(R.string.discount_used)
-                    center_text.setTextColor(context.applicationContext.getColor(R.color.colorPrimaryDark))
                     center_text.alpha = 1f
                     center_text.bringToFront()
+                    discountUsed = true
                 } else {
                     dialog.dismiss()
                 }
