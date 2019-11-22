@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -124,7 +125,8 @@ class DiscountsFragment : Fragment() {
                         if (task.isSuccessful) {
                             val discounts = ArrayList<QueryDocumentSnapshot>()
                             for (discountDocument in task.result!!) {
-                                val expiringDate = DateFormat.getDateInstance().parse(discountDocument.data.getValue(EXPIRING_DATE_KEY).toString()).time
+                                val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
+                                val expiringDate = simpleDateFormat.parse(discountDocument.data.getValue(EXPIRING_DATE_KEY).toString()).time
                                 if (Date().time < expiringDate || DateUtils.isToday(expiringDate)) {
                                     discounts.add(discountDocument)
                                 }
