@@ -40,7 +40,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 import java.io.Serializable
 
 
-class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick, DiscountsRecyclerAdapter.OnDiscountClick, NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragment.OnButtonClick, DiscountsRecyclerAdapter.OnDiscountClick, NavigationView.OnNavigationItemSelectedListener, GoogleMapFragment.OnLongClick {
 
     private var providers: List<AuthUI.IdpConfig>? = null
     private var user: FirebaseUser? = null
@@ -252,19 +252,45 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
     // called when opening a discount for more information
     override fun showDiscount(view: View, document: QueryDocumentSnapshot, userPoints: Int) {
+
         val bundle = Bundle()
         bundle.putString(SHARED_ELEMENT_KEY, view.transitionName)
-
         bundle.putString(DISCOUNT_COMPANY_KEY, document.data[DISCOUNT_COMPANY_KEY].toString())
         bundle.putString(DISCOUNT_INFORMATION_KEY, document.data[DISCOUNT_INFORMATION_KEY].toString())
         bundle.putInt(DISCOUNT_POINTS_KEY, document.data[DISCOUNT_POINTS_KEY].toString().toInt())
         bundle.putInt(USER_POINTS_KEY, userPoints)
         bundle.putString(EXPIRING_DATE_KEY, document.data[EXPIRING_DATE_KEY].toString())
-
         bundle.putString("discountId", document.id)
 
         viewDiscountFragment.arguments = bundle
         //setupFragment(viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT, true)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT)
+            .addSharedElement(view, view.transitionName)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    override fun showMapDiscount(discount: Discount, userPoints: Int, view: View) {
+
+        // navigation drawer highlighted item doesn't update without this
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+        navigationView.setCheckedItem(R.id.nav_discounts)
+
+        setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
+
+        view.transitionName = discount.id
+
+        val bundle = Bundle()
+        bundle.putString(SHARED_ELEMENT_KEY, view.transitionName)
+        bundle.putString(DISCOUNT_COMPANY_KEY, discount.companyName)
+        bundle.putString(DISCOUNT_INFORMATION_KEY, discount.information)
+        bundle.putInt(DISCOUNT_POINTS_KEY, discount.pointsNeeded)
+        bundle.putInt(USER_POINTS_KEY, userPoints)
+        bundle.putString(EXPIRING_DATE_KEY, discount.expiringDate)
+        bundle.putString("discountId", discount.id)
+
+        viewDiscountFragment.arguments = bundle
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT)
             .addSharedElement(view, view.transitionName)

@@ -1,9 +1,13 @@
 package com.example.timil.climateapplication.fragments
 
+import android.app.Activity
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
+import android.text.format.DateUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +22,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QueryDocumentSnapshot
 import java.util.*
 
 /**
@@ -64,40 +71,35 @@ class GoogleMapFragment :
     private lateinit var googleMap: GoogleMap
     private lateinit var mView: View
     private lateinit var params: CoordinatorLayout.LayoutParams
+    private var activityCallBack: OnLongClick? = null
 
-    //TODO: fetch the real data from the database
-    private val mockupDiscounts = listOf(
-        Discount(
-            "Kissantappajat Oy",
-            "Murhakuja 13",
-            "totally legal",
-            400,
-            30,
-            "31.12.2019",
-            LatLng(60.176961, 24.926007),
-            "sdfsfda"
-        ),
-        Discount(
-            "Oy Infect Ab",
-            "Tippurikatu 69",
-            "tautisen hyvä mesta",
-            200,
-            20,
-            "31.12.2100",
-            LatLng(60.1595731,24.9464303),
-            "sdfsdfa"
-        ),
-        Discount(
-            "Savupiippu Oy",
-            "Savusumunkatu 01",
-            "vain parasta saastetta",
-            1000,
-            5,
-            "31.12.2100",
-            LatLng(60.1837555,24.9699441),
-            "sdgdsfg"
-        )
-    )
+    private lateinit var discountsList: MutableList<Discount>
+    private var userPoints = 0
+
+    interface OnLongClick {
+        fun showMapDiscount(discount: Discount, userPoints: Int, view: View)
+    }
+
+    companion object {
+        const val DISCOUNT_COMPANY_KEY = "company"
+        const val DISCOUNT_COMPANY_ADDRESS_KEY = "companyAddress"
+        const val DISCOUNT_INFORMATION_KEY = "information"
+        const val DISCOUNT_POINTS_KEY = "points_needed"
+        const val DISCOUNT_PERCENT_KEY = "discount_percent"
+        const val DISCOUNT_EXPIRING_DATE_KEY = "expiring date"
+        const val DISCOUNT_LATITUDE_KEY = "latitude"
+        const val DISCOUNT_LONGITUDE_KEY = "longitude"
+        const val DISCOUNT_COMPANY_LOGO_KEY = "companyLogo"
+    }
+
+    override fun onAttach(activity: Activity?) {
+        super.onAttach(activity)
+        try {
+            activityCallBack = activity as OnLongClick
+        } catch (e: ClassCastException) {
+            throw ClassCastException(activity.toString() + " must implement OnLongClick interface.")
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -110,7 +112,15 @@ class GoogleMapFragment :
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.googlemap_support_fragment) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
+
         return mView
+    }
+
+    override fun onResume() {
+        super.onResume()
+        
+        discountsList = ArrayList()
+        getDiscountsData()
     }
 
     override fun onDestroy() {
@@ -132,8 +142,82 @@ class GoogleMapFragment :
             moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL)) // zoom in a little bit
             moveCamera(CameraUpdateFactory.newLatLng(HELSINKI_CITY_CENTER))
         }
-        placeDiscountsOnMap(mockupDiscounts)
     } // onMapReady
+
+    //TODO: Should make a class to store all the DB methods in one place
+    private fun getDiscountsData(){
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users").document(userId).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val document = task.result
+                if (document != null) {
+                    var usedDiscountsArrayList: ArrayList<Map<String, Date>>? = null
+                    if (document.get("used_discounts") != null) {
+                        usedDiscountsArrayList = document.get("used_discounts") as ArrayList<Map<String, Date>>
+                    }
+
+                    if(document.get("points") != null) {
+                        userPoints = (document.get("points") as Long).toInt()
+                    }
+
+                    db.collection("discounts").get().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val discounts = ArrayList<QueryDocumentSnapshot>()
+                            for (discountDocument in task.result!!) {
+                                val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
+                                val expiringDate = simpleDateFormat.parse(discountDocument.data.getValue(
+                                    DiscountsFragment.EXPIRING_DATE_KEY
+                                ).toString()).time
+                                if (Date().time < expiringDate || DateUtils.isToday(expiringDate)) {
+                                    discounts.add(discountDocument)
+                                }
+                            }
+
+                            // if user has already used some of the discounts -> do not show it on the list
+                            if (usedDiscountsArrayList != null) {
+                                if (usedDiscountsArrayList.size > 0) {
+                                    for (usedDiscount in usedDiscountsArrayList) {
+                                        for (discount in discounts) {
+                                            if (usedDiscount["id"].toString() == discount.id) {
+                                                discounts.remove(discount)
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            for (discount in discounts) {
+                                discountsList.add(
+                                    Discount(
+                                        discount.id,
+                                        discount.get(DISCOUNT_COMPANY_KEY).toString(),
+                                        discount.get(DISCOUNT_COMPANY_ADDRESS_KEY).toString(),
+                                        discount.get(DISCOUNT_INFORMATION_KEY).toString(),
+                                        (discount.get(DISCOUNT_POINTS_KEY) as Long).toInt(),
+                                        (discount.get(DISCOUNT_PERCENT_KEY) as Long).toInt(),
+                                        discount.get(DISCOUNT_EXPIRING_DATE_KEY).toString(),
+                                        LatLng(discount.get(DISCOUNT_LATITUDE_KEY) as Double, discount.get(DISCOUNT_LONGITUDE_KEY) as Double),
+                                        discount.get(DISCOUNT_COMPANY_LOGO_KEY).toString()
+                                    )
+                                )
+                            }
+
+                            placeDiscountsOnMap(discountsList)
+
+                        } else {
+                            Log.w("Error", "Error getting discounts.", task.exception)
+                        }
+                    }
+                }
+
+            } else {
+                Log.w("Error", "Error getting discounts.", task.exception)
+            }
+        }
+    }
 
     private fun placeDiscountsOnMap(list: List<Discount>) {
 
@@ -172,7 +256,8 @@ class GoogleMapFragment :
 
     override fun onInfoWindowLongClick(marker: Marker?) {
 
-        //TODO: go to the discounts view and view the discount that was in the window
+        activityCallBack!!.showMapDiscount(discountsList[marker?.tag as Int], userPoints, mView)
+
     }
 
     // we need this to show more info than the company name and address
@@ -197,7 +282,7 @@ class GoogleMapFragment :
 
         private fun render(markerIndex: Int, infoView: View) {
 
-            val discount = mockupDiscounts[markerIndex]
+            val discount = discountsList[markerIndex]
             infoView.apply {
 
                 alpha = 0.5f // doesn't seem to have any effect (nor does setting it in the xml)

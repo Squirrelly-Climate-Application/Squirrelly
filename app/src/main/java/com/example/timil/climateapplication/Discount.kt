@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng
 
 data class Discount(
 
+    val id: String,
     val companyName: String,
     val companyAddress: String,
     val information: String,
