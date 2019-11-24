@@ -314,7 +314,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                     .setPositiveButton(R.string.yes) { _, _ ->
                         if (findFragment(START_FRAGMENT_TAG)
                             || findFragment(TAB_DISCOUNTS_FRAGMENT_TAG)
-                            || findFragment(SETTINGS_FRAGMENT_TAG)){
+                            || findFragment(SETTINGS_FRAGMENT_TAG)
+                            || findFragment(GOOGLEMAP_FRAGMENT_TAG)){
                             finish()
                         }
                         else {

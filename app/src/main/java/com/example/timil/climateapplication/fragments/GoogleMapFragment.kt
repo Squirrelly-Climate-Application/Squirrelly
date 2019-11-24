@@ -1,8 +1,9 @@
 package com.example.timil.climateapplication.fragments
 
 import android.os.Bundle
+import android.support.design.widget.AppBarLayout
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,6 +62,8 @@ class GoogleMapFragment :
     GoogleMap.OnInfoWindowLongClickListener
 {
     private lateinit var googleMap: GoogleMap
+    private lateinit var mView: View
+    private lateinit var params: CoordinatorLayout.LayoutParams
 
     //TODO: fetch the real data from the database
     private val mockupDiscounts = listOf(
@@ -99,11 +102,21 @@ class GoogleMapFragment :
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val view = inflater.inflate(R.layout.fragment_googlemap, container, false)
+        mView = inflater.inflate(R.layout.fragment_googlemap, container, false)
+
+        params = container!!.layoutParams as CoordinatorLayout.LayoutParams
+        params.behavior = null
+        mView.requestLayout()
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.googlemap_support_fragment) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
-        return view
+        return mView
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        params.behavior = AppBarLayout.ScrollingViewBehavior()
+        mView.requestLayout()
     }
 
     // called when mapFragment.getMapAsync() returns in onCreateView()
