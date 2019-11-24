@@ -236,10 +236,11 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         }
     }
 
-    override fun startArActivity(quizAnswerCorrect: Boolean?, monsterType: Serializable) {
+    override fun startArActivity(quizPoints: Int, monsterType: Serializable) {
 
         val mainIntent = Intent(this@MainActivity, ArActivity::class.java)
-        mainIntent.putExtra(getString(R.string.quiz_answer_correct_key), quizAnswerCorrect)
+        //mainIntent.putExtra(getString(R.string.quiz_answer_correct_key), quizAnswerCorrect)
+        mainIntent.putExtra(getString(R.string.quiz_answer_correct_key), quizPoints)
         mainIntent.putExtra(MONSTER_TYPE, monsterType)
         startActivity(mainIntent)
         finish()

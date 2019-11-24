@@ -130,8 +130,9 @@ class ArActivity : AppCompatActivity() {
 
         if (AppStatus().soundsOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
 
-        val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
-        numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
+        //val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
+        //numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
+        numOfThrows = intent?.extras?.getInt(getString(R.string.quiz_answer_correct_key))!!
 
         adjustWindArrowIndicator(this.wind, iv_arrow)
 

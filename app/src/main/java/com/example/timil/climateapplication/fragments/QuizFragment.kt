@@ -56,7 +56,7 @@ class QuizFragment : Fragment() {
     }
 
     interface OnButtonClick {
-        fun startArActivity(quizAnswerCorrect: Boolean?, monsterType: Serializable)
+        fun startArActivity(quizPoints: Int, monsterType: Serializable)
     }
 
     override fun onAttach(activity: Activity?) {
@@ -103,7 +103,11 @@ class QuizFragment : Fragment() {
                         questionsList.add(document)
                     }
 
-                    val questionNumber = generateRandomNumber(questionsList)
+                    var questionNumber = generateRandomNumber(questionsList)
+                    while (previousQuestions.contains(questionNumber)) {
+                        questionNumber = generateRandomNumber(questionsList)
+                    }
+                    previousQuestions.add(questionNumber)
 
                     val txtQuestion = root!!.findViewById<TextView>(R.id.txtQuestion)
                     txtQuestion.text = questionsList[questionNumber].data.getValue("question").toString()
@@ -149,9 +153,9 @@ class QuizFragment : Fragment() {
 
         options.shuffle()
 
-        val layout = root!!.findViewById(R.id.btnsLinearLayout) as LinearLayout
-        layout.orientation = LinearLayout.VERTICAL
-        layout.gravity = Gravity.CENTER
+        btnsLinearLayout = root!!.findViewById(R.id.btnsLinearLayout) as LinearLayout
+        btnsLinearLayout.orientation = LinearLayout.VERTICAL
+        btnsLinearLayout.gravity = Gravity.CENTER
 
         if (options.size > 5) {
             val params = LinearLayout.LayoutParams(
@@ -166,14 +170,14 @@ class QuizFragment : Fragment() {
                     params.width = parent.width/2
                     parent.addView(getButton(i-1, params))
                     parent.addView(getButton(i, params))
-                    layout.addView(parent)
-                    checkHeights(layout, (i-1)/2, params)
+                    btnsLinearLayout.addView(parent)
+                    checkHeights(btnsLinearLayout, (i-1)/2, params)
                 }
                 else if (i == options.size-1) {
                     val parent = getLinearLayoutParent()
                     params.width = parent.width/2
                     parent.addView(getButton(i, params))
-                    layout.addView(parent)
+                    btnsLinearLayout.addView(parent)
                 }
             }
         } else {
@@ -184,7 +188,7 @@ class QuizFragment : Fragment() {
             params.setMargins(10, 10, 10, 10)
             for (i in 0 until options.size) {
                 val btnAnswer = getButton(i, params)
-                layout.addView(btnAnswer)
+                btnsLinearLayout.addView(btnAnswer)
             }
         }
     }
@@ -249,11 +253,15 @@ class QuizFragment : Fragment() {
 
     private fun showDialog(correct: Boolean?) {
         val alertDialog = AlertDialog.Builder(context!!).create()
+        btnsLinearLayout.removeAllViews()
         when (correct) {
             null -> {
                 alertDialog.setTitle(context!!.applicationContext.getString(R.string.time_is_up))
             }
-            true -> { alertDialog.setTitle("Right answer!") }
+            true -> {
+                alertDialog.setTitle("Right answer!")
+                points += 2
+            }
             false -> { alertDialog!!.setTitle("Wrong answer.") }
         }
         alertDialog.setMessage(information)
@@ -262,7 +270,25 @@ class QuizFragment : Fragment() {
         }
         alertDialog.show()
         alertDialog.setOnDismissListener {
-            activityCallBack!!.startArActivity(correct, monsterType)
+            when (continueQuiz) {
+                null -> {
+                    continueQuiz = true
+                    savedQuestionData = false
+                    onResume()
+                }
+                true -> {
+                    continueQuiz = false
+                    savedQuestionData = false
+                    onResume()
+                }
+                false -> { activityCallBack!!.startArActivity(points, monsterType) }
+            }
+            //activityCallBack!!.startArActivity(correct, monsterType)
         }
     }
+
+    private var points: Int = 4
+    private var continueQuiz: Boolean? = null
+    private var previousQuestions = arrayListOf<Int>()
+    private lateinit var btnsLinearLayout: LinearLayout
 }
