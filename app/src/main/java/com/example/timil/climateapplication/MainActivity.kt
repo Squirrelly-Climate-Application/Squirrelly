@@ -55,6 +55,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
     private lateinit var drawer: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
 
+    private lateinit var navigationView: NavigationView
+
     private var viewGroup: ViewGroup? = null
 
     private val fireBaseAuth = FirebaseAuth.getInstance()
@@ -95,6 +97,9 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         settingsFragment = SettingsFragment()
         googleMapFragment = GoogleMapFragment()
 
+        navigationView = findViewById(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
+
         setupFragment(startFragment, START_FRAGMENT_TAG, true)
 
         // intent should have extra data if the Ar game ends and the user has clicked the Discounts button
@@ -112,9 +117,6 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         drawer.addDrawerListener(toggle)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
-
-        val navigationView: NavigationView = findViewById(R.id.nav_view)
-        navigationView.setNavigationItemSelectedListener(this)
 
     }
 
@@ -323,6 +325,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                 .replace(R.id.fragment_container, fragment, tag)
                 .commit()
         }
+        navigationView.menu.findItem(R.id.nav_home).isChecked = tag == START_FRAGMENT_TAG
     }
 
     private fun findFragment(tag: String): Boolean = (supportFragmentManager.findFragmentByTag(tag) != null
@@ -334,15 +337,20 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             drawer.isDrawerOpen(GravityCompat.START) -> drawer.closeDrawer(GravityCompat.START)
             findFragment(SCAN_FRAGMENT_TAG) -> super.onBackPressed()
             findFragment(VIEW_DISCOUNT_FRAGMENT) -> super.onBackPressed()
+            ( findFragment(TAB_DISCOUNTS_FRAGMENT_TAG)
+                    || findFragment(SETTINGS_FRAGMENT_TAG)
+                    || findFragment(GOOGLEMAP_FRAGMENT_TAG)) -> {
+                navigationView.menu.findItem(R.id.nav_discounts).isChecked = false
+                navigationView.menu.findItem(R.id.nav_discounts_map).isChecked = false
+                navigationView.menu.findItem(R.id.nav_settings).isChecked = false
+                setupFragment(startFragment, START_FRAGMENT_TAG, false)
+            }
             else -> {
                 val builder = AlertDialog.Builder(this)
                 val dialogView = layoutInflater.inflate(R.layout.dialog_close_app, viewGroup)
                 builder.setView(dialogView)
                     .setPositiveButton(R.string.yes) { _, _ ->
-                        if (findFragment(START_FRAGMENT_TAG)
-                            || findFragment(TAB_DISCOUNTS_FRAGMENT_TAG)
-                            || findFragment(SETTINGS_FRAGMENT_TAG)
-                            || findFragment(GOOGLEMAP_FRAGMENT_TAG)){
+                        if (findFragment(START_FRAGMENT_TAG)){
                             finish()
                         }
                         else {

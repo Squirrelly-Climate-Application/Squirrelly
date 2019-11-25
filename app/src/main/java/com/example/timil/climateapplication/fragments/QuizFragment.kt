@@ -1,6 +1,7 @@
 package com.example.timil.climateapplication.fragments
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -49,6 +50,11 @@ class QuizFragment : Fragment() {
     private lateinit var timer: CountDownTimer
     private lateinit var monsterType: Serializable
 
+    private var points: Int = 4
+    private var continueQuiz: Boolean? = null
+    private var previousQuestions = arrayListOf<Int>()
+    private lateinit var buttonsLinearLayout: LinearLayout
+
     companion object{
         private const val gameTime: Long = 30000
         private const val interval: Long = 1000
@@ -59,9 +65,10 @@ class QuizFragment : Fragment() {
         fun startArActivity(quizPoints: Int, monsterType: Serializable)
     }
 
-    override fun onAttach(activity: Activity?) {
-        super.onAttach(activity)
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
         try {
+            val activity = context as Activity
             activityCallBack = activity as OnButtonClick
         } catch (e: ClassCastException) {
             throw ClassCastException(activity.toString() + " must implement OnButtonClick interface.")
@@ -153,9 +160,9 @@ class QuizFragment : Fragment() {
 
         options.shuffle()
 
-        btnsLinearLayout = root!!.findViewById(R.id.btnsLinearLayout) as LinearLayout
-        btnsLinearLayout.orientation = LinearLayout.VERTICAL
-        btnsLinearLayout.gravity = Gravity.CENTER
+        buttonsLinearLayout = root!!.findViewById(R.id.btnsLinearLayout) as LinearLayout
+        buttonsLinearLayout.orientation = LinearLayout.VERTICAL
+        buttonsLinearLayout.gravity = Gravity.CENTER
 
         if (options.size > 5) {
             val params = LinearLayout.LayoutParams(
@@ -170,14 +177,14 @@ class QuizFragment : Fragment() {
                     params.width = parent.width/2
                     parent.addView(getButton(i-1, params))
                     parent.addView(getButton(i, params))
-                    btnsLinearLayout.addView(parent)
-                    checkHeights(btnsLinearLayout, (i-1)/2, params)
+                    buttonsLinearLayout.addView(parent)
+                    checkHeights(buttonsLinearLayout, (i-1)/2, params)
                 }
                 else if (i == options.size-1) {
                     val parent = getLinearLayoutParent()
                     params.width = parent.width/2
                     parent.addView(getButton(i, params))
-                    btnsLinearLayout.addView(parent)
+                    buttonsLinearLayout.addView(parent)
                 }
             }
         } else {
@@ -188,7 +195,7 @@ class QuizFragment : Fragment() {
             params.setMargins(10, 10, 10, 10)
             for (i in 0 until options.size) {
                 val btnAnswer = getButton(i, params)
-                btnsLinearLayout.addView(btnAnswer)
+                buttonsLinearLayout.addView(btnAnswer)
             }
         }
     }
@@ -253,7 +260,7 @@ class QuizFragment : Fragment() {
 
     private fun showDialog(correct: Boolean?) {
         val alertDialog = AlertDialog.Builder(context!!).create()
-        btnsLinearLayout.removeAllViews()
+        buttonsLinearLayout.removeAllViews()
         when (correct) {
             null -> {
                 alertDialog.setTitle(context!!.applicationContext.getString(R.string.time_is_up))
@@ -286,9 +293,4 @@ class QuizFragment : Fragment() {
             //activityCallBack!!.startArActivity(correct, monsterType)
         }
     }
-
-    private var points: Int = 4
-    private var continueQuiz: Boolean? = null
-    private var previousQuestions = arrayListOf<Int>()
-    private lateinit var btnsLinearLayout: LinearLayout
 }

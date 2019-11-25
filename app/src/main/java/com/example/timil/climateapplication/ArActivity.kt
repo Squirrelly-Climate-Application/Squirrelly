@@ -283,6 +283,9 @@ class ArActivity : AppCompatActivity() {
             if (actuallyHitNode is Monster) {
 
                 actuallyHitNode.damage(1)
+                if (AppStatus().vibrationOn(this@ArActivity)) {
+                    Vibrator().vibrate(this@ArActivity, Vibrator.VIBRATION_TIME_REGULAR)
+                }
 
                 // non-optimal, but ehh, there's very few monsters
                 updateUI(ViewType.HP, totalMonsterHp)

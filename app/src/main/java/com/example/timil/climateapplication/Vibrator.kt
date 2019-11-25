@@ -9,8 +9,8 @@ class Vibrator {
 
     companion object {
         const val VIBRATION_TIME_SHORT: Long = 100
-        const val VIBRATION_TIME_REGULAR: Long = 500
-        const val VIBRATION_TIME_LONG: Long = 1000
+        const val VIBRATION_TIME_REGULAR: Long = 300
+        const val VIBRATION_TIME_LONG: Long = 700
     }
 
     fun vibrate(activity: Activity, time: Long) {
