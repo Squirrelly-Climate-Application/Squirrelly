@@ -21,6 +21,7 @@ import com.example.timil.climateapplication.AppStatus
 import com.example.timil.climateapplication.MainActivity
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.Vibrator
+import com.example.timil.climateapplication.services.SoundService
 import com.google.firebase.auth.*
 import kotlinx.android.synthetic.main.fragment_signin.*
 import kotlinx.android.synthetic.main.fragment_signin.edit_text_email
@@ -237,6 +238,9 @@ class SignInFragment: Fragment() {
     }
 
     private fun shakeButton(button: Button) {
+        if (AppStatus().soundsOn(context!!)) {
+            SoundService().soundEffect(context!!, SoundService.SOUND_EFFECT_INVALID)
+        }
         if (AppStatus().vibrationOn(context!!)) {
             Vibrator().vibrate(activity!!, Vibrator.VIBRATION_TIME_SHORT)
         }

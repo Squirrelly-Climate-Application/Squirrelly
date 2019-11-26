@@ -23,7 +23,11 @@ import kotlin.collections.ArrayList
 import android.widget.ProgressBar
 import android.support.v7.app.AlertDialog
 import android.view.Gravity
+import com.example.timil.climateapplication.AppStatus
 import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
+import com.example.timil.climateapplication.services.SoundService
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_CORRECT
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_INCORRECT
 import kotlinx.android.synthetic.main.fragment_quiz.*
 import java.io.Serializable
 
@@ -264,12 +268,23 @@ class QuizFragment : Fragment() {
         when (correct) {
             null -> {
                 alertDialog.setTitle(context!!.applicationContext.getString(R.string.time_is_up))
+                if (AppStatus().soundsOn(context!!)) {
+                    SoundService().soundEffect(context!!, SOUND_EFFECT_INCORRECT)
+                }
             }
             true -> {
                 alertDialog.setTitle("Right answer!")
                 points += 2
+                if (AppStatus().soundsOn(context!!)) {
+                    SoundService().soundEffect(context!!, SOUND_EFFECT_CORRECT)
+                }
             }
-            false -> { alertDialog!!.setTitle("Wrong answer.") }
+            false -> {
+                alertDialog!!.setTitle("Wrong answer.")
+                if (AppStatus().soundsOn(context!!)) {
+                    SoundService().soundEffect(context!!, SOUND_EFFECT_INCORRECT)
+                }
+            }
         }
         alertDialog.setMessage(information)
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OKAY") { dialog, _ ->

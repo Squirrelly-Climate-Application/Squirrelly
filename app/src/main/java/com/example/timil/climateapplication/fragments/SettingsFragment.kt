@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.example.timil.climateapplication.AppStatus
+import com.example.timil.climateapplication.AppStatus.Companion.MUSIC_STATUS_TAG
 import com.example.timil.climateapplication.AppStatus.Companion.SOUNDS_STATUS_TAG
 import com.example.timil.climateapplication.AppStatus.Companion.VIBRATION_STATUS_TAG
 import com.example.timil.climateapplication.Vibrator
@@ -29,8 +30,10 @@ class SettingsFragment: Fragment() {
         settings = PreferenceManager.getDefaultSharedPreferences(context)
         editor = settings.edit()
         val vibrationStatus = AppStatus().vibrationOn(context!!)
+        val musicStatus = AppStatus().musicOn(context!!)
         val soundsStatus = AppStatus().soundsOn(context!!)
         if (vibrationStatus) { vibration.isChecked = true }
+        if (musicStatus) { music.isChecked = true }
         if (soundsStatus) { sounds.isChecked = true }
 
         vibration.setOnCheckedChangeListener { _, isChecked ->
@@ -40,6 +43,14 @@ class SettingsFragment: Fragment() {
             }
             else {
                 editor.putBoolean(VIBRATION_STATUS_TAG, false).apply()
+            }
+        }
+        music.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                editor.putBoolean(MUSIC_STATUS_TAG, true).apply()
+            }
+            else {
+                editor.putBoolean(MUSIC_STATUS_TAG, false).apply()
             }
         }
         sounds.setOnCheckedChangeListener { _, isChecked ->

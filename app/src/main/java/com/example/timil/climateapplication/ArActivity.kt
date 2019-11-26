@@ -19,24 +19,20 @@ import kotlin.math.abs
 import kotlin.math.hypot
 import android.os.CountDownTimer
 import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
-import com.example.timil.climateapplication.fragments.DiscountsFragment
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.rendering.PlaneRenderer
 import com.google.ar.sceneform.rendering.Texture
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.Serializable
-import android.opengl.ETC1.getHeight
-import android.opengl.ETC1.getWidth
 import android.view.ViewGroup
-import android.support.v4.app.SupportActivity
-import android.support.v4.app.SupportActivity.ExtraData
-import android.support.v4.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.os.Debug
-import android.support.constraint.ConstraintLayout
 import android.widget.ImageView
-import kotlin.math.PI
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_CO2
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_OIL
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_PLASTIC
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_LOSE
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_THROW
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_WIN
 
 
 /**
@@ -115,6 +111,8 @@ class ArActivity : AppCompatActivity() {
     private var throwTimerExpired = false
     private var gamePaused = false
 
+    private lateinit var monsterType: MonsterType
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // hide the top UI bar (that shows battery level etc)
@@ -128,7 +126,7 @@ class ArActivity : AppCompatActivity() {
 
         setAIMoveBoundaryConstants(screenCenter.x) // NOTE: must be called after setScreenSizeConstants!
 
-        if (AppStatus().soundsOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
+        if (AppStatus().musicOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
 
         //val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
         //numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
@@ -142,7 +140,7 @@ class ArActivity : AppCompatActivity() {
             onPeekTouchDetect(hitTestResult, motionEvent)
         }
 
-        val monsterType = intent.getSerializableExtra(MONSTER_TYPE) as MonsterType
+        monsterType = intent.getSerializableExtra(MONSTER_TYPE) as MonsterType
 
         if (monsterType == MonsterType.OIL) {
 
@@ -171,7 +169,7 @@ class ArActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         supportActionBar?.hide()
-        if (AppStatus().soundsOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
+        if (AppStatus().musicOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
     }
 
     override fun onStop() {
@@ -251,6 +249,9 @@ class ArActivity : AppCompatActivity() {
 
                 projNode!!.launch(target) // triggers the animation; at the end of it comes the hit check to the monster
 
+                if (AppStatus().soundsOn(this@ArActivity)) {
+                    SoundService().soundEffect(this@ArActivity, SOUND_EFFECT_THROW)
+                }
                 startDistanceY = 0f
                 startDistanceX = 0f
             } // if upwardSwipe
@@ -285,6 +286,13 @@ class ArActivity : AppCompatActivity() {
                 actuallyHitNode.damage(1)
                 if (AppStatus().vibrationOn(this@ArActivity)) {
                     Vibrator().vibrate(this@ArActivity, Vibrator.VIBRATION_TIME_REGULAR)
+                }
+                if (AppStatus().soundsOn(this@ArActivity)) {
+                    when (monsterType) {
+                        MonsterType.PLASTIC -> SoundService().soundEffect(this@ArActivity, SOUND_EFFECT_HIT_PLASTIC)
+                        MonsterType.CO2 -> SoundService().soundEffect(this@ArActivity, SOUND_EFFECT_HIT_CO2)
+                        MonsterType.OIL -> SoundService().soundEffect(this@ArActivity, SOUND_EFFECT_HIT_OIL)
+                    }
                 }
 
                 // non-optimal, but ehh, there's very few monsters
@@ -337,7 +345,7 @@ class ArActivity : AppCompatActivity() {
             it?.resumeAI()
         }
         btn_pause.text = getString(R.string.txt_pause)
-        if (AppStatus().soundsOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
+        if (AppStatus().musicOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
     }
 
     private fun endGame(allMonstersDead: Boolean) {
@@ -379,6 +387,14 @@ class ArActivity : AppCompatActivity() {
             }
             .setCancelable(false)
             .show()
+        
+        if (AppStatus().soundsOn(this@ArActivity)) {
+            if (allMonstersDead) {
+                SoundService().soundEffect(this@ArActivity, SOUND_EFFECT_WIN)
+            } else {
+                SoundService().soundEffect(this@ArActivity, SOUND_EFFECT_LOSE)
+            }
+        }
 
         Log.d("HUUH", "final points: $score")
     } // endGame

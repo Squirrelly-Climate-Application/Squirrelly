@@ -32,11 +32,11 @@
             android:textSize="24sp"/>
 
         <Switch
-            android:id="@+id/sounds"
+            android:id="@+id/vibration"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
-            android:text="@string/sounds"
+            android:text="@string/vibration"
             android:textSize="18sp"
             android:textOn="@string/on"
             android:textOff="@string/off"
@@ -44,10 +44,22 @@
             tools:checked="true"/>
 
         <Switch
-            android:id="@+id/vibration"
+            android:id="@+id/music"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="@string/vibration"
+            android:layout_marginBottom="30dp"
+            android:text="@string/music"
+            android:textSize="18sp"
+            android:textOn="@string/on"
+            android:textOff="@string/off"
+            android:showText="true"
+            tools:checked="true"/>
+
+        <Switch
+            android:id="@+id/sounds"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="@string/sounds"
             android:textSize="18sp"
             android:textOn="@string/on"
             android:textOff="@string/off"

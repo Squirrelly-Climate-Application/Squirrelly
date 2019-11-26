@@ -23,6 +23,8 @@ import com.example.timil.climateapplication.MainActivity
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.Vibrator
 import com.example.timil.climateapplication.Vibrator.Companion.VIBRATION_TIME_SHORT
+import com.example.timil.climateapplication.services.SoundService
+import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_INVALID
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -220,6 +222,9 @@ class RegisterFragment: Fragment() {
     }
 
     private fun shakeButton() {
+        if (AppStatus().soundsOn(context!!)) {
+            SoundService().soundEffect(context!!, SOUND_EFFECT_INVALID)
+        }
         if (AppStatus().vibrationOn(context!!)) {
             Vibrator().vibrate(activity!!, VIBRATION_TIME_SHORT)
         }

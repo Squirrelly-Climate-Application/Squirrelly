@@ -14,6 +14,7 @@ class AppStatus {
 
     companion object {
         const val VIBRATION_STATUS_TAG = "vibration"
+        const val MUSIC_STATUS_TAG = "music"
         const val SOUNDS_STATUS_TAG = "sounds"
     }
 
@@ -35,6 +36,11 @@ class AppStatus {
     fun vibrationOn(context: Context): Boolean {
         settings = PreferenceManager.getDefaultSharedPreferences(context)
         return settings.getBoolean(VIBRATION_STATUS_TAG, true)
+    }
+
+    fun musicOn(context: Context): Boolean {
+        settings = PreferenceManager.getDefaultSharedPreferences(context)
+        return settings.getBoolean(MUSIC_STATUS_TAG, true)
     }
 
     fun soundsOn(context: Context): Boolean {
