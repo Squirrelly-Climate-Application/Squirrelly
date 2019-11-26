@@ -658,7 +658,6 @@ class ArActivity : AppCompatActivity() {
     private fun adjustWindArrowIndicator() {
         wind = Wind.create()
         //icon.rotation = -wind.degreeAngle // for some reason, clockwise == positive direction here
-        iv_arrow.animate().rotation(-wind.degreeAngle).start()
 
         val scaleXyBy = (1 + wind.force / 25) // value range: 1-2
         val newX = (initialArrowLayoutWidth * scaleXyBy).toInt()
@@ -666,6 +665,8 @@ class ArActivity : AppCompatActivity() {
         iv_arrow.layoutParams.width = newX
         iv_arrow.layoutParams.height = newY
         iv_arrow.requestLayout()
+
+        iv_arrow.animate().rotation(-wind.degreeAngle).start()
 
         //TODO: ideally, the arrow's width would stay the same and only the length would change
         // according to the force attribute (atm we scale the entire arrow)
