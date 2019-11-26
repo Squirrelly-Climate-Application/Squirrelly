@@ -2,6 +2,7 @@ package com.example.timil.climateapplication
 
 import android.content.Intent
 import android.graphics.Point
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.app.AlertDialog
@@ -27,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.io.Serializable
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_CO2
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_OIL
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_PLASTIC
@@ -88,7 +90,7 @@ class ArActivity : AppCompatActivity() {
     private var projNode: Projectile? = null
     private val monsterNodes = arrayOfNulls<Monster>(5) // bad form, but I need the easy index access
 
-    private val wind = Wind.create()
+    private lateinit var wind: Wind
 
     // we need this because the nuts hit a bit further than the end of the finger swipe
     private var actualScaledHitPoint: Point? = null
@@ -113,6 +115,9 @@ class ArActivity : AppCompatActivity() {
 
     private lateinit var monsterType: MonsterType
 
+    private var initialArrowLayoutWidth = 0
+    private var initialArrowLayoutHeight = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // hide the top UI bar (that shows battery level etc)
@@ -120,6 +125,9 @@ class ArActivity : AppCompatActivity() {
         this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         setContentView(R.layout.activity_ar)
+
+        initialArrowLayoutWidth = iv_arrow.layoutParams.width
+        initialArrowLayoutHeight = iv_arrow.layoutParams.height
 
         // it 'gets' *and* sets them
         setScreenSizeConstants()
@@ -132,7 +140,7 @@ class ArActivity : AppCompatActivity() {
         //numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
         numOfThrows = intent?.extras?.getInt(getString(R.string.quiz_answer_correct_key))!!
 
-        adjustWindArrowIndicator(this.wind, iv_arrow)
+        adjustWindArrowIndicator()
 
         arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment
         arFragment.arSceneView.scene.addOnPeekTouchListener { hitTestResult, motionEvent ->
@@ -282,8 +290,17 @@ class ArActivity : AppCompatActivity() {
             numOfThrows--
 
             if (actuallyHitNode is Monster) {
-
                 actuallyHitNode.damage(1)
+
+                val toast = Toast.makeText(this@ArActivity, "HIT!", Toast.LENGTH_SHORT)
+                toast.view.findViewById<TextView>(android.R.id.message).typeface = Typeface.create(Typeface.SERIF ,Typeface.BOLD_ITALIC)
+                toast.view.setBackgroundColor(applicationContext.getColor(R.color.fui_transparent))
+                toast.view.findViewById<TextView>(android.R.id.message).setTextColor(applicationContext.getColor(R.color.colorAccent))
+                toast.view.findViewById<TextView>(android.R.id.message).textSize = 48f
+                toast.view.findViewById<TextView>(android.R.id.message).fontFeatureSettings
+                toast.setGravity(Gravity.START or Gravity.TOP, actualHitTestMEvent.x.toInt()-150, actualHitTestMEvent.y.toInt()-150)
+                toast.show()
+
                 if (AppStatus().vibrationOn(this@ArActivity)) {
                     Vibrator().vibrate(this@ArActivity, Vibrator.VIBRATION_TIME_REGULAR)
                 }
@@ -317,6 +334,8 @@ class ArActivity : AppCompatActivity() {
             if (numOfThrows <= 0) { // should only ever reach 0
                 endGame(false) // if the monsters are all dead, the game ends before this call
             }
+
+            adjustWindArrowIndicator()
 
             projNode?.dispose() // delete the old nut
             projNode = null
@@ -387,7 +406,7 @@ class ArActivity : AppCompatActivity() {
             }
             .setCancelable(false)
             .show()
-        
+
         if (AppStatus().soundsOn(this@ArActivity)) {
             if (allMonstersDead) {
                 SoundService().soundEffect(this@ArActivity, SOUND_EFFECT_WIN)
@@ -636,22 +655,22 @@ class ArActivity : AppCompatActivity() {
     } // saveScoreToDb
 
     // correctly orient and scale the wind arrow indicator (to show the wind force & direction)
-    private fun adjustWindArrowIndicator(wind: Wind, icon: ImageView) {
-
+    private fun adjustWindArrowIndicator() {
+        wind = Wind.create()
         //icon.rotation = -wind.degreeAngle // for some reason, clockwise == positive direction here
-        icon.animate().rotation(-wind.degreeAngle).start()
+        iv_arrow.animate().rotation(-wind.degreeAngle).start()
 
         val scaleXyBy = (1 + wind.force / 25) // value range: 1-2
-        val newX = (icon.layoutParams.width * scaleXyBy).toInt()
-        val newY = (icon.layoutParams.height * scaleXyBy).toInt()
-        icon.layoutParams.width = newX
-        icon.layoutParams.height = newY
-        icon.requestLayout()
+        val newX = (initialArrowLayoutWidth * scaleXyBy).toInt()
+        val newY = (initialArrowLayoutHeight * scaleXyBy).toInt()
+        iv_arrow.layoutParams.width = newX
+        iv_arrow.layoutParams.height = newY
+        iv_arrow.requestLayout()
 
         //TODO: ideally, the arrow's width would stay the same and only the length would change
         // according to the force attribute (atm we scale the entire arrow)
 
-        tv_force.text = wind.force.toInt().toString()
+        tv_force.text = getString(R.string.meters_per_second, wind.force.toInt())
     } // adjustWindArrowIndicator
 
 } // ArActivity

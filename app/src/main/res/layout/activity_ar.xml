@@ -76,7 +76,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/ar_fragment">
 
-        <com.example.timil.climateapplication.EqualWidthHeightTextView
+        <!--com.example.timil.climateapplication.EqualWidthHeightTextView
             android:id="@+id/tv_force"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -88,7 +88,25 @@
             android:padding="1dp"
             android:textAlignment="center"
             android:textColor="@android:color/black"
-            android:textSize="15sp" />
+            android:textSize="15sp" /-->
+
+        <TextView
+            android:id="@+id/tv_force"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/fui_transparent"
+            android:elevation="10dp"
+            android:gravity="center"
+            android:shadowColor="@color/colorPrimaryDark"
+            android:shadowDx="4"
+            android:shadowDy="4"
+            android:shadowRadius="4"
+            android:fontFamily="sans-serif-condense"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/iv_arrow"
