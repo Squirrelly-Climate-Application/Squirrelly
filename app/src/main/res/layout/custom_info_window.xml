@@ -67,6 +67,7 @@
         android:background="@drawable/bg_info_window_tv"
         android:textSize="14sp"
         android:padding="8dp"
+        android:maxWidth="220dp"
         android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
