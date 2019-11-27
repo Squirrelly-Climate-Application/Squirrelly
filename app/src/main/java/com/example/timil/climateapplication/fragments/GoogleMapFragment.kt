@@ -18,10 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
@@ -34,6 +31,7 @@ import java.util.*
 
 private const val DEFAULT_ZOOM_LEVEL = 13.0f
 private val HELSINKI_CITY_CENTER = LatLng(60.1742309, 24.9342355)
+private val MAP_BOUNDS = LatLngBounds(LatLng(60.1609117,24.8002801), LatLng(60.2618835,25.1415221))
 //TODO: make latLongBounds to limit the map bounds to existing discount locations
 
 private enum class MarkerColor(val value: Float) {
@@ -138,7 +136,8 @@ class GoogleMapFragment :
             setInfoWindowAdapter(CustomInfoWindowAdapter())
             setOnInfoWindowClickListener(this@GoogleMapFragment)
             setOnInfoWindowLongClickListener(this@GoogleMapFragment)
-
+            
+            googleMap.setLatLngBoundsForCameraTarget(MAP_BOUNDS) // restrict the camera to the capital area
             moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL)) // zoom in a little bit
             moveCamera(CameraUpdateFactory.newLatLng(HELSINKI_CITY_CENTER))
         }
