@@ -43,7 +43,6 @@ import com.example.timil.climateapplication.services.SoundService.Companion.SOUN
  * */
 
 private const val DEFAULT_THROWS = 5
-private const val CORRECT_ANSWER_THROWS = 10
 
 // For converting between the phone screen's regular coordinates and ARCore's coordinate system.
 // 0.36 = the experimentally defined ARCore coordinate system value at the right edge of the screen
@@ -136,8 +135,6 @@ class ArActivity : AppCompatActivity() {
 
         if (AppStatus().musicOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
 
-        //val quizAnswerCorrect = intent?.extras?.getBoolean(getString(R.string.quiz_answer_correct_key)) ?: false
-        //numOfThrows = if (quizAnswerCorrect) CORRECT_ANSWER_THROWS else DEFAULT_THROWS
         numOfThrows = intent?.extras?.getInt(getString(R.string.quiz_answer_correct_key))!!
 
         adjustWindArrowIndicator()
@@ -292,14 +289,7 @@ class ArActivity : AppCompatActivity() {
             if (actuallyHitNode is Monster) {
                 actuallyHitNode.damage(1)
 
-                val toast = Toast.makeText(this@ArActivity, "HIT!", Toast.LENGTH_SHORT)
-                toast.view.findViewById<TextView>(android.R.id.message).typeface = Typeface.create(Typeface.SERIF ,Typeface.BOLD_ITALIC)
-                toast.view.setBackgroundColor(applicationContext.getColor(R.color.fui_transparent))
-                toast.view.findViewById<TextView>(android.R.id.message).setTextColor(applicationContext.getColor(R.color.colorAccent))
-                toast.view.findViewById<TextView>(android.R.id.message).textSize = 48f
-                toast.view.findViewById<TextView>(android.R.id.message).fontFeatureSettings
-                toast.setGravity(Gravity.START or Gravity.TOP, actualHitTestMEvent.x.toInt()-150, actualHitTestMEvent.y.toInt()-150)
-                toast.show()
+                showHitToast(actualHitTestMEvent)
 
                 if (AppStatus().vibrationOn(this@ArActivity)) {
                     Vibrator().vibrate(this@ArActivity, Vibrator.VIBRATION_TIME_REGULAR)
@@ -344,6 +334,22 @@ class ArActivity : AppCompatActivity() {
             setUIPower(0)
         } // onDropAnimEnd
     } // onThrowAnimEndCallbackHolder
+
+    private fun showHitToast(motionEvent: MotionEvent) {
+
+        val toast = Toast.makeText(this@ArActivity, "HIT!", Toast.LENGTH_SHORT)
+        toast.view.setBackgroundColor(applicationContext.getColor(R.color.fui_transparent))
+        val msgTV = toast.view.findViewById<TextView>(android.R.id.message)
+        msgTV.apply {
+
+            typeface = Typeface.create(Typeface.SERIF ,Typeface.BOLD_ITALIC)
+            setTextColor(applicationContext.getColor(R.color.colorAccent))
+            textSize = 48f
+            fontFeatureSettings
+        }
+        toast.setGravity(Gravity.START or Gravity.TOP, motionEvent.x.toInt()-150, motionEvent.y.toInt()-150)
+        toast.show()
+    } // showHitToast
 
     private fun pauseGame() {
 
