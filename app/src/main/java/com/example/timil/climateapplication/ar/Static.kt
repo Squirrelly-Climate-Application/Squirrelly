@@ -15,9 +15,12 @@ import kotlin.random.Random
  * @author Ville Lohkovuori
 **/
 
+// the pattern is inverted here, because this object is in fact *not* storing the built renderables,
+// but rather setting them in the WorldEntity classes. it doesn't really matter though, as they're
+// only loaded once, which is the main goal here.
 object Static {
 
-    private val rGen = Random(System.currentTimeMillis())
+    val rGen = Random(System.currentTimeMillis())
 
     fun load3dModelResources(context: Context) {
 
@@ -87,6 +90,13 @@ object Static {
     fun randomFloatBetween(min: Float, max: Float): Float {
 
         return min + rGen.nextFloat() * (max - min)
+    }
+
+    fun signedRandomFloatBetween(minAbs: Float, maxAbs: Float): Float {
+
+        val sign = if (rGen.nextBoolean()) 1 else -1
+        val absRnd = randomFloatBetween(minAbs, maxAbs)
+        return absRnd * sign
     }
 
 } // Static

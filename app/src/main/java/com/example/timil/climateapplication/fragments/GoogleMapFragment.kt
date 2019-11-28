@@ -136,7 +136,7 @@ class GoogleMapFragment :
             setInfoWindowAdapter(CustomInfoWindowAdapter())
             setOnInfoWindowClickListener(this@GoogleMapFragment)
             setOnInfoWindowLongClickListener(this@GoogleMapFragment)
-            
+
             googleMap.setLatLngBoundsForCameraTarget(MAP_BOUNDS) // restrict the camera to the capital area
             moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL)) // zoom in a little bit
             moveCamera(CameraUpdateFactory.newLatLng(HELSINKI_CITY_CENTER))

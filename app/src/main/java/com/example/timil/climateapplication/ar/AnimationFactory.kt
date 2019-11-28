@@ -7,12 +7,14 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
 import android.util.Log
+import android.view.animation.BounceInterpolator
 import android.view.animation.LinearInterpolator
 import com.google.ar.sceneform.collision.Box
 import com.google.ar.sceneform.collision.Sphere
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.QuaternionEvaluator
 import com.google.ar.sceneform.math.Vector3Evaluator
+import com.google.ar.sceneform.rendering.Light
 
 /**
  * For creating animators (that animate ar objects).
@@ -27,7 +29,7 @@ object AnimationFactory {
         dura: Long,
         from: Vector3? = Vector3(0f, 0f, 0f),
         to: Vector3? = Vector3(0f, 0f, 0f),
-        endListener: AnimatorListenerAdapter? = null): ObjectAnimator {
+        endListener: AnimatorListenerAdapter): ObjectAnimator {
 
         return ObjectAnimator().apply {
 
@@ -41,6 +43,26 @@ object AnimationFactory {
             addListener(endListener)
         } // apply
     } // linearMoveAnim
+
+    // it's a bit untidy, but passing null to addListener leads to a NullPointerException when you
+    // start the animation, so we need a separate function in case there is no listener
+    fun linearMoveAnimNoEndListener(
+        node: Node?,
+        dura: Long,
+        from: Vector3? = Vector3(0f, 0f, 0f),
+        to: Vector3? = Vector3(0f, 0f, 0f)): ObjectAnimator {
+
+        return ObjectAnimator().apply {
+
+            target = node
+            propertyName = "localPosition"
+            duration = dura
+            interpolator = LinearInterpolator() // default, but let's have it for clarity's sake
+            setAutoCancel(false)
+            setObjectValues(from, to)
+            setEvaluator(Vector3Evaluator())
+        } // apply
+    } // linearMoveAnimNoEndListener
 
     // for making objects spin
     //TODO: adjust the speed according to the launch speed, maybe?
@@ -120,5 +142,21 @@ object AnimationFactory {
             setEvaluator(FloatEvaluator())
         }
     } // sphereCollisionShapeScaleAnim
+
+    // increases and then decreases the light intensity, giving the impression of a flash
+    fun lightOnOffAnimation(light: Light, dura: Long, endListener: AnimatorListenerAdapter? = null): ObjectAnimator {
+        return ObjectAnimator().apply {
+
+            target = light
+            propertyName = "intensity"
+            duration = dura / 2
+            interpolator = BounceInterpolator()
+            setAutoCancel(false)
+            setObjectValues(0)
+            setObjectValues(light.intensity)
+            setEvaluator(FloatEvaluator())
+            addListener(endListener)
+        } // apply
+    } // lightOnOffAnimation
 
 } // AnimationFactory
