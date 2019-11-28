@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
+import com.example.timil.climateapplication.DbManager
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -35,6 +36,7 @@ class DiscountsFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
 
     private var userPoints: Int? = 0
+    private val dbManager = DbManager()
 
     companion object {
         const val DISCOUNT_POINTS_KEY = "points_needed"
@@ -59,108 +61,20 @@ class DiscountsFragment : Fragment() {
 
         progressBar = root.findViewById(R.id.progressBarDiscounts)
         progressBar.visibility = View.VISIBLE
-        val userId = FirebaseAuth.getInstance().currentUser!!.uid
-        getUserData(userId)
-        getDiscountsData(userId)
+
+        dbManager.getUserData(userPoints!!) {
+            userPoints = it
+
+            val tvUserPoints = root.findViewById<TextView>(R.id.tvMyPoints)
+            tvUserPoints.text = resources.getString(R.string.user_points, userPoints.toString())
+            tvUserPoints.visibility = View.VISIBLE
+        }
+        dbManager.getDiscountsData {
+
+            progressBar.visibility = View.GONE
+            adapter.setDiscounts(it, userPoints!!, true)
+        }
 
         return root
     }
-
-    override fun onResume() {
-        super.onResume()
-
-
-    }
-
-    private fun getUserData(userId: String){
-        val db = FirebaseFirestore.getInstance()
-        val docRef = db.collection("users").document(userId)
-        docRef.get()
-            .addOnSuccessListener { document ->
-
-                if (document != null) {
-                    // in case the user is new and doesn't have any data in Firebase yet -> give data to avoid null exceptions
-                    if(document.data == null){
-                        val userData = hashMapOf(
-                            "points" to userPoints
-                        )
-                        db.collection("users").document(userId)
-                            .set(userData)
-                            .addOnSuccessListener {
-                                Log.d("tester", "DocumentSnapshot successfully written!")
-                            }
-                            .addOnFailureListener { e -> Log.w("tester", "Error writing document", e) }
-                    }
-                    else {
-                        userPoints = document.data!!.getValue(USER_POINTS_KEY).toString().toInt()
-                    }
-
-                    val tvUserPoints = root.findViewById<TextView>(R.id.tvMyPoints)
-                    tvUserPoints.text = resources.getString(R.string.user_points, userPoints.toString())
-                    tvUserPoints.visibility = View.VISIBLE
-
-                } else {
-                    Log.d("tester", "No such document")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("tester", "get failed with ", exception)
-            }
-
-    }
-
-    private fun getDiscountsData(userId: String){
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("users").document(userId).get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val document = task.result
-                if (document != null) {
-                    var usedDiscountsArrayList: ArrayList<Map<String, Date>>? = null
-                    if (document.get("used_discounts") != null) {
-                        usedDiscountsArrayList = document.get("used_discounts") as ArrayList<Map<String, Date>>
-                    }
-
-                    db.collection("discounts").get().addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val discounts = ArrayList<QueryDocumentSnapshot>()
-                            for (discountDocument in task.result!!) {
-                                val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
-                                val expiringDate = simpleDateFormat.parse(discountDocument.data.getValue(EXPIRING_DATE_KEY).toString()).time
-                                if (Date().time < expiringDate || DateUtils.isToday(expiringDate)) {
-                                    discounts.add(discountDocument)
-                                }
-                                //discounts.add(discountDocument)
-                            }
-
-                            // if user has already used some of the discounts -> do not show it on the list
-                            if (usedDiscountsArrayList != null) {
-                                if (usedDiscountsArrayList.size > 0) {
-                                    for (usedDiscount in usedDiscountsArrayList) {
-                                        for (discount in discounts) {
-                                            if (usedDiscount["id"].toString() == discount.id) {
-                                                discounts.remove(discount)
-                                                break
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            progressBar.visibility = View.GONE
-
-                            adapter.setDiscounts(discounts, userPoints!!, true)
-
-                        } else {
-                            Log.w("Error", "Error getting discounts.", task.exception)
-                        }
-                    }
-                }
-
-            } else {
-                Log.w("Error", "Error getting discounts.", task.exception)
-            }
-        }
-    }
-
 }
