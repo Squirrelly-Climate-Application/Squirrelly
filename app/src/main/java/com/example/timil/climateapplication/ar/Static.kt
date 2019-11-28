@@ -20,7 +20,7 @@ import kotlin.random.Random
 // only loaded once, which is the main goal here.
 object Static {
 
-    val rGen = Random(System.currentTimeMillis())
+    private val rGen = Random(System.currentTimeMillis())
 
     fun load3dModelResources(context: Context) {
 
@@ -86,6 +86,26 @@ object Static {
 
         return Quaternion.axisAngle(Vector3(rndX, rndY, rndZ), baseAngle)
     }
+
+    fun randomScale(minScaleFactor: Float, maxScaleFactor: Float): Vector3 {
+
+        val randX = randomFloatBetween(minScaleFactor, maxScaleFactor)
+        val randY = randomFloatBetween(minScaleFactor, maxScaleFactor)
+        val randZ = randomFloatBetween(minScaleFactor, maxScaleFactor)
+        return Vector3(randX, randY, randZ)
+    }
+
+    fun uniformlyRandomizedPosition(localPos: Vector3, rFactor: Float): Vector3 {
+
+        // there's probably a prettier way to do this, but frankly I just don't care
+        var sign = if (rGen.nextBoolean()) 1 else -1
+        val newX = localPos.x + rFactor * sign
+        sign = if (rGen.nextBoolean()) 1 else -1
+        val newY = localPos.y + rFactor * sign
+        sign = if (rGen.nextBoolean()) 1 else -1
+        val newZ = localPos.z + rFactor * sign
+        return Vector3(newX, newY, newZ)
+    } // uniformlyRandomizedPosition
 
     fun randomFloatBetween(min: Float, max: Float): Float {
 

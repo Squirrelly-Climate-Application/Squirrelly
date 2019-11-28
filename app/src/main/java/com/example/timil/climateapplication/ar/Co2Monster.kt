@@ -8,6 +8,7 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Color
 import com.google.ar.sceneform.rendering.Light
 import com.google.ar.sceneform.rendering.ModelRenderable
+import kotlin.random.Random
 
 /**
  * A type of monster that looks like a morphing cloud.
@@ -25,7 +26,7 @@ class Co2Monster private constructor() : Monster() {
             field = value
             Log.d("HUUH", "hp: $hitPoints")
             checkForDeath()
-            playHitAnim()
+            playHitAnim() // putting this here is a bit risky in case we'd later add DOT effects, etc
         }
 
     companion object {
@@ -33,7 +34,7 @@ class Co2Monster private constructor() : Monster() {
         // used for the light effect when the nuts hit the monster
         private val whiteLight = Light.builder(Light.Type.POINT)
             .setColor(Color(1f, 1f, 1f))
-            .setIntensity(100000f)
+            .setIntensity(0f)
             .setFalloffRadius(200f)
             .setShadowCastingEnabled(false)
             .build()
@@ -51,26 +52,27 @@ class Co2Monster private constructor() : Monster() {
             }.also {
                 // the AI must be created here in order for node.renderable not to be null
                 it.monsterAI = AI.create(it, AIType.MORPHING)
-                // it.monsterAI.execute()
+                it.monsterAI.execute()
             }
         } // create
     } // companion object
 
+    //TODO: simplify it somehow... maybe move some of the logic to another class?
     private fun playHitAnim() {
 
         // move the cloud fast a little bit, so it looks like it has been 'pushed' by the projectile
         val moveX = Static.signedRandomFloatBetween(0.05f, 0.07f) // i.e., either -0.08 to -0.05 OR 0.05 to 0.08
         val moveY = Static.signedRandomFloatBetween(0.05f, 0.07f)
         val dura = Static.randomFloatBetween(300f, 500f).toLong()
-        val moveAnim = AnimationFactory.linearMoveAnimNoEndListener(this, dura, localPosition, Vector3(localPosition.x + moveX, localPosition.y + moveY, localPosition.z))
-        moveAnim.start()
+        val shakeAnim = AnimationFactory.linearMoveAnimNoEndListener(this, dura, localPosition, Vector3(localPosition.x + moveX, localPosition.y + moveY, localPosition.z))
+        shakeAnim.start()
 
         // make a light effect at the hit location
         val lightNode = EffectEntity()
         lightNode.setParent(this) // what else could it even be?
         lightNode.light = whiteLight
-        lightNode.localPosition = Vector3(0f, 0f, 0.2f) // move the light towards the player, out of the cloud, so it can be seen
-        val endListener = object : AnimatorListenerAdapter() {
+        lightNode.localPosition = Vector3(0f, 0f, 0.28f) // move the light towards the player, out of the cloud, so it can be seen
+        val lightEndListener = object : AnimatorListenerAdapter() {
 
             override fun onAnimationEnd(animation: Animator?) {
 
@@ -78,10 +80,37 @@ class Co2Monster private constructor() : Monster() {
                 animation?.removeAllListeners()
             }
         }
-        val onOffAnim = AnimationFactory.lightOnOffAnimation(lightNode.light!!, 500L, endListener)
+        val onOffAnim = AnimationFactory.lightOnOffAnimation(lightNode.light!!, 500L, 100000f, lightEndListener)
         onOffAnim.start()
 
-        //TODO: make small cloud objects spawn from the hit location, drift around and disappear (needs a new class)
+        // these should be spawned on a different thread to prevent choppiness, but it's too much work for too little gain
+        val numOfClouds = Random.nextInt(1, 3) // inclusive at both ends
+        for (i in 0..numOfClouds) {
+
+            val cloud = EffectEntity()
+            cloud.localPosition = localPosition //TODO: move it to the hit position somehow
+            cloud.renderable = monsterRenderable
+            cloud.localScale = localScale.scaled(Static.randomFloatBetween(0.1f, 0.2f))
+            cloud.setParent(this)
+
+            val animDura = Static.randomFloatBetween(1000f, 1800f).toLong()
+
+            val endListener = object : AnimatorListenerAdapter() {
+
+                override fun onAnimationEnd(animation: Animator?) {
+
+                    cloud.dispose()
+                    animation?.removeAllListeners()
+                }
+            } // endListener
+
+            val moveAnim = AnimationFactory.linearMoveAnim(cloud, animDura, cloud.localPosition, Static.uniformlyRandomizedPosition(cloud.localPosition, 0.2f), endListener)
+            val spinAnim = AnimationFactory.spinAnim(cloud, animDura, Static.randomizedQuaternion())
+            val scaleAnim = AnimationFactory.scaleAnim(cloud, animDura, Static.randomScale(1.2f, 1.8f))
+            moveAnim.start()
+            spinAnim.start()
+            scaleAnim.start()
+        } // for
     } // playHitAnim
 
 } // Co2Monster

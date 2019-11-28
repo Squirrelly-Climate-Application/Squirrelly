@@ -537,6 +537,7 @@ class ArActivity : AppCompatActivity() {
 
     private fun setScreenSizeConstants() {
 
+        //TODO: appears to give faulty values (always 1080x1920); investigate !!
         val display = windowManager.defaultDisplay
         val size = Point()
         display.getSize(size)

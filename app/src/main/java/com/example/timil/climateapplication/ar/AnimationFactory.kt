@@ -144,7 +144,7 @@ object AnimationFactory {
     } // sphereCollisionShapeScaleAnim
 
     // increases and then decreases the light intensity, giving the impression of a flash
-    fun lightOnOffAnimation(light: Light, dura: Long, endListener: AnimatorListenerAdapter? = null): ObjectAnimator {
+    fun lightOnOffAnimation(light: Light, dura: Long, peakIntensity: Float, endListener: AnimatorListenerAdapter): ObjectAnimator {
         return ObjectAnimator().apply {
 
             target = light
@@ -152,8 +152,8 @@ object AnimationFactory {
             duration = dura / 2
             interpolator = BounceInterpolator()
             setAutoCancel(false)
-            setObjectValues(0)
-            setObjectValues(light.intensity)
+            setObjectValues(peakIntensity) // this seems to work, but may need adjustment
+            // setObjectValues(light.intensity)
             setEvaluator(FloatEvaluator())
             addListener(endListener)
         } // apply

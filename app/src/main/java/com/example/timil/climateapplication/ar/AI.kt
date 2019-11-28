@@ -112,7 +112,7 @@ class AI(private val node: WorldEntity) {
                             }
                         }) // moveAnim
 
-                    val newScale = randomScale()
+                    val newScale = Static.randomScale(0.8f, 1.3f)
                     scaleAnim = AnimationFactory.scaleAnim(node, duration, newScale)
 
                     val newRadius = maxOf(newScale.x, newScale.y, newScale.z) / 2 / RADIUS_HIT_SCALE_FACTOR
@@ -165,7 +165,7 @@ class AI(private val node: WorldEntity) {
                 moveAnim?.duration = dura
                 moveAnim?.setObjectValues(node.localPosition, randomTarget())
 
-                val newScale = randomScale()
+                val newScale = Static.randomScale(0.8f, 1.3f)
 
                 scaleAnim?.duration = dura
                 scaleAnim?.setObjectValues(node.localScale, newScale)
@@ -246,14 +246,6 @@ class AI(private val node: WorldEntity) {
         val x = rGen.nextFloat() * xMaxAbs* xSign
         val y = yMin + rGen.nextFloat() * (yMax - yMin)
         return Vector3(x, y, -1.0f) // could randomize z-value as well, I guess
-    }
-
-    private fun randomScale(): Vector3 {
-
-        val randX = Static.randomFloatBetween(0.7f, 1.3f)
-        val randY = Static.randomFloatBetween(0.7f, 1.3f)
-        val randZ = Static.randomFloatBetween(0.7f, 1.3f)
-        return Vector3(randX, randY, randZ)
     }
 
 } // AI

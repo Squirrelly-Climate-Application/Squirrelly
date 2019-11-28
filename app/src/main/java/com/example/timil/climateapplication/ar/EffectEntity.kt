@@ -5,6 +5,7 @@ package com.example.timil.climateapplication.ar
  * as flashing lights or small clouds that gradually disappear.
  * */
 
+//TODO: move some of the animation logic of the small clouds to a subclass of this class, perhaps
 class EffectEntity : WorldEntity() {
 
     override fun dispose() {

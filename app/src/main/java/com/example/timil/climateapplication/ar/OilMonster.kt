@@ -70,7 +70,7 @@ class OilMonster private constructor() : Monster() {
     } // companion object
 
     // for making smaller OilMonsters
-    fun scaleSize(scaleFactor: Float) {
+    private fun scaleSize(scaleFactor: Float) {
 
         localScale = localScale.scaled(scaleFactor)
         // TODO: disabling this for now; figure out the correct scaling!
