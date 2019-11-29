@@ -408,6 +408,12 @@ class ArActivity : AppCompatActivity() {
         dialogView.findViewById<TextView>(R.id.tv_end_score).text = getString(R.string.txt_score, score)
         dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (allMonstersDead) getString(R.string.txt_victory) else getString(R.string.txt_loss)
 
+        if (allMonstersDead) {
+            dialogView.findViewById<ImageView>(R.id.squirrelly_image_left).background = getDrawable(R.drawable.squirrelly_squirrel_14)
+            dialogView.findViewById<ImageView>(R.id.squirrelly_image_right).background = getDrawable(R.drawable.squirrelly_squirrel_14)
+        }
+
+
         // save the points in the database
         saveScoreToDb(score)
 
@@ -738,8 +744,6 @@ class ArActivity : AppCompatActivity() {
             PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putBoolean(GUIDELINES_STATUS_TAG, !isChecked).apply()
         }
-
-
     }
 
 } // ArActivity

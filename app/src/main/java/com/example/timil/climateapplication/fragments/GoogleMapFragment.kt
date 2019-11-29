@@ -143,6 +143,8 @@ class GoogleMapFragment :
         }
     } // onMapReady
 
+
+
     //TODO: Should make a class to store all the DB methods in one place
     private fun getDiscountsData(){
         val userId = FirebaseAuth.getInstance().currentUser!!.uid
@@ -223,7 +225,8 @@ class GoogleMapFragment :
         list.forEach {
 
             val marker = googleMap.addMarker(markerOptionsFrom(it))
-            marker.setInfoWindowAnchor(0f, -0.4f)
+            marker.setInfoWindowAnchor(0.5f, 0.5f)
+            marker.setAnchor(0.5f,-2f)
             marker.tag = list.indexOf(it) // we need to 'remember' the marker to show the info window correctly
         }
     } // placeDiscountsOnMap
@@ -284,7 +287,6 @@ class GoogleMapFragment :
             val discount = discountsList[markerIndex]
             infoView.apply {
 
-                alpha = 0.5f // doesn't seem to have any effect (nor does setting it in the xml)
                 findViewById<TextView>(R.id.tv_company).text = discount.companyName
                 findViewById<TextView>(R.id.tv_address).text = discount.companyAddress
                 findViewById<TextView>(R.id.tv_points).text = getString(R.string.txt_points, discount.pointsNeeded)
