@@ -30,6 +30,7 @@ import java.util.*
  * */
 
 private const val DEFAULT_ZOOM_LEVEL = 13.0f
+private const val MIN_ZOOM_LEVEL = 11.0f // i.e., the furthest you can zoom out
 private val HELSINKI_CITY_CENTER = LatLng(60.1742309, 24.9342355)
 private val MAP_BOUNDS = LatLngBounds(LatLng(60.1609117,24.8002801), LatLng(60.2618835,25.1415221))
 //TODO: make latLongBounds to limit the map bounds to existing discount locations
@@ -137,8 +138,9 @@ class GoogleMapFragment :
             setOnInfoWindowClickListener(this@GoogleMapFragment)
             setOnInfoWindowLongClickListener(this@GoogleMapFragment)
 
-            googleMap.setLatLngBoundsForCameraTarget(MAP_BOUNDS) // restrict the camera to the capital area
+            setLatLngBoundsForCameraTarget(MAP_BOUNDS) // restrict the camera to the capital area
             moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL)) // zoom in a little bit
+            setMinZoomPreference(MIN_ZOOM_LEVEL) // restrict how far you can zoom out
             moveCamera(CameraUpdateFactory.newLatLng(HELSINKI_CITY_CENTER))
         }
     } // onMapReady
