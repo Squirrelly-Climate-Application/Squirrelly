@@ -61,7 +61,7 @@ class Co2Monster private constructor() : Monster() {
     private fun playHitAnim() {
 
         // move the cloud fast a little bit, so it looks like it has been 'pushed' by the projectile
-        val moveX = Static.signedRandomFloatBetween(0.05f, 0.07f) // i.e., either -0.08 to -0.05 OR 0.05 to 0.08
+        val moveX = Static.signedRandomFloatBetween(0.05f, 0.07f) // i.e., either -0.07 to -0.05 OR 0.05 to 0.07
         val moveY = Static.signedRandomFloatBetween(0.05f, 0.07f)
         val dura = Static.randomFloatBetween(300f, 500f).toLong()
         val shakeAnim = AnimationFactory.linearMoveAnimNoEndListener(this, dura, localPosition, Vector3(localPosition.x + moveX, localPosition.y + moveY, localPosition.z))
@@ -88,7 +88,7 @@ class Co2Monster private constructor() : Monster() {
         for (i in 0..numOfClouds) {
 
             val cloud = EffectEntity()
-            cloud.localPosition = localPosition //TODO: move it to the hit position somehow
+            cloud.localPosition = localPosition //TODO: move it to the hit position somehow (low priority)
             cloud.renderable = monsterRenderable
             cloud.localScale = localScale.scaled(Static.randomFloatBetween(0.1f, 0.2f))
             cloud.setParent(this)

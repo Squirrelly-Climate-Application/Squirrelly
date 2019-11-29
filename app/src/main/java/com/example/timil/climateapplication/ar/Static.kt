@@ -59,7 +59,8 @@ object Static {
 
                     isShadowReceiver = false
                     isShadowCaster = false
-                    collisionShape = Sphere(0.14f, Vector3(0f, 0.25f, 0f))
+                    collisionShape = Sphere(0.17f, Vector3(0f, 0.25f, 0f))
+                    // Sphere(0.14f, Vector3(0f, 0.25f, 0f))
                 }
             } // thenAccept
 

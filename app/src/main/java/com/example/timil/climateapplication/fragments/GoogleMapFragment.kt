@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.example.timil.climateapplication.Discount
 import com.example.timil.climateapplication.R
+import com.example.timil.climateapplication.ar.WorldEntity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -33,7 +34,6 @@ private const val DEFAULT_ZOOM_LEVEL = 13.0f
 private const val MIN_ZOOM_LEVEL = 11.0f // i.e., the furthest you can zoom out
 private val HELSINKI_CITY_CENTER = LatLng(60.1742309, 24.9342355)
 private val MAP_BOUNDS = LatLngBounds(LatLng(60.1609117,24.8002801), LatLng(60.2618835,25.1415221))
-//TODO: make latLongBounds to limit the map bounds to existing discount locations
 
 private enum class MarkerColor(val value: Float) {
 
@@ -65,7 +65,8 @@ class GoogleMapFragment :
     Fragment(),
     OnMapReadyCallback,
     GoogleMap.OnInfoWindowClickListener,
-    GoogleMap.OnInfoWindowLongClickListener
+    GoogleMap.OnInfoWindowLongClickListener,
+    GoogleMap.OnMarkerClickListener
 {
     private lateinit var googleMap: GoogleMap
     private lateinit var mView: View
@@ -80,6 +81,7 @@ class GoogleMapFragment :
     }
 
     companion object {
+
         const val DISCOUNT_COMPANY_KEY = "company"
         const val DISCOUNT_COMPANY_ADDRESS_KEY = "companyAddress"
         const val DISCOUNT_INFORMATION_KEY = "information"
@@ -89,7 +91,7 @@ class GoogleMapFragment :
         const val DISCOUNT_LATITUDE_KEY = "latitude"
         const val DISCOUNT_LONGITUDE_KEY = "longitude"
         const val DISCOUNT_COMPANY_LOGO_KEY = "companyLogo"
-    }
+    } // companion object
 
     override fun onAttach(activity: Activity?) {
         super.onAttach(activity)
@@ -113,7 +115,7 @@ class GoogleMapFragment :
         mapFragment?.getMapAsync(this)
 
         return mView
-    }
+    } // onCreateView
 
     override fun onResume() {
         super.onResume()
@@ -142,6 +144,7 @@ class GoogleMapFragment :
             moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL)) // zoom in a little bit
             setMinZoomPreference(MIN_ZOOM_LEVEL) // restrict how far you can zoom out
             moveCamera(CameraUpdateFactory.newLatLng(HELSINKI_CITY_CENTER))
+            setOnMarkerClickListener(this@GoogleMapFragment)
         }
     } // onMapReady
 
@@ -213,12 +216,11 @@ class GoogleMapFragment :
                         }
                     }
                 }
-
             } else {
                 Log.w("Error", "Error getting discounts.", task.exception)
             }
         }
-    }
+    } // getDiscountsData
 
     private fun placeDiscountsOnMap(list: List<Discount>) {
 
@@ -256,10 +258,18 @@ class GoogleMapFragment :
         marker.hideInfoWindow()
     }
 
+    override fun onMarkerClick(marker: Marker?): Boolean {
+
+        marker?.showInfoWindow()
+        // using moveCamera leads to a janky transition, but it doesn't work with animateCamera (together with the other call to it)
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(marker?.position))
+        googleMap.animateCamera(CameraUpdateFactory.scrollBy(0f, -160.0f)) // pan the camera upwards, to focus on the info window
+        return true // indicates that we override the default behavior (opening the info window & centering on the marker)
+    }
+
     override fun onInfoWindowLongClick(marker: Marker?) {
 
         activityCallBack!!.showMapDiscount(discountsList[marker?.tag as Int], userPoints, mView)
-
     }
 
     // we need this to show more info than the company name and address
