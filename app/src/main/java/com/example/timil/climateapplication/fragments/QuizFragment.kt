@@ -25,6 +25,7 @@ import android.support.v7.app.AlertDialog
 import android.view.Gravity
 import com.example.timil.climateapplication.AppStatus
 import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
+import com.example.timil.climateapplication.MainActivity.Companion.QUIZ_FRAGMENT_TAG
 import com.example.timil.climateapplication.services.SoundService
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_CORRECT
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_INCORRECT
@@ -252,12 +253,20 @@ class QuizFragment : Fragment() {
     private fun startTimer() {
         timer = object : CountDownTimer(gameTime, interval) {
             override fun onTick(millisUntilFinished: Long) {
-                text_view_quiz_timer.text = context!!.applicationContext.getString(R.string.time_left)
-                    .replace(PLACE_HOLDER.toRegex(), (millisUntilFinished / interval + 1).toString())
+                if (fragmentManager!!.findFragmentByTag(QUIZ_FRAGMENT_TAG)!!.isVisible) {
+                    text_view_quiz_timer.text = context!!.applicationContext.getString(R.string.time_left)
+                        .replace(PLACE_HOLDER.toRegex(), (millisUntilFinished / interval + 1).toString())
+                } else {
+                    timer.cancel()
+                }
             }
             override fun onFinish() {
-                text_view_quiz_timer.text = context!!.applicationContext.getString(R.string.time_is_up)
-                showDialog(null)
+                if (fragmentManager!!.findFragmentByTag(QUIZ_FRAGMENT_TAG)!!.isVisible) {
+                    text_view_quiz_timer.text = context!!.applicationContext.getString(R.string.time_is_up)
+                    showDialog(null)
+                } else {
+                    timer.cancel()
+                }
             }
         }.start()
     }

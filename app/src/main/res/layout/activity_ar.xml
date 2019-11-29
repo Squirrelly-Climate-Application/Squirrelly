@@ -64,6 +64,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
+        android:background="@drawable/sign_in_button"
+        android:textColor="@color/colorAccent"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
         android:text="@string/txt_pause"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

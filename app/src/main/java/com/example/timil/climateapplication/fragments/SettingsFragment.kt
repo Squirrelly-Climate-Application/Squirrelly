@@ -46,20 +46,10 @@ class SettingsFragment: Fragment() {
             }
         }
         music.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                editor.putBoolean(MUSIC_STATUS_TAG, true).apply()
-            }
-            else {
-                editor.putBoolean(MUSIC_STATUS_TAG, false).apply()
-            }
+            editor.putBoolean(MUSIC_STATUS_TAG, isChecked).apply()
         }
         sounds.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                editor.putBoolean(SOUNDS_STATUS_TAG, true).apply()
-            }
-            else {
-                editor.putBoolean(SOUNDS_STATUS_TAG, false).apply()
-            }
+            editor.putBoolean(SOUNDS_STATUS_TAG, isChecked).apply()
         }
     }
 }

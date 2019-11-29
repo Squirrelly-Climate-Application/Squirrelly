@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_ar.*
 import kotlin.math.abs
 import kotlin.math.hypot
 import android.os.CountDownTimer
+import android.preference.PreferenceManager
 import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.rendering.PlaneRenderer
@@ -29,12 +30,16 @@ import java.io.Serializable
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import com.example.timil.climateapplication.AppStatus.Companion.GUIDELINES_STATUS_TAG
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_CO2
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_OIL
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_HIT_PLASTIC
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_LOSE
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_THROW
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_WIN
+import kotlinx.android.synthetic.main.checkbox.view.*
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig
 
 
 /**
@@ -117,6 +122,8 @@ class ArActivity : AppCompatActivity() {
     private var initialArrowLayoutWidth = 0
     private var initialArrowLayoutHeight = 0
 
+    private var stopMusic = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // hide the top UI bar (that shows battery level etc)
@@ -169,12 +176,18 @@ class ArActivity : AppCompatActivity() {
 
             if (!gamePaused) pauseGame() else resumeGame()
         } // onClickListener
+
+        if (AppStatus().showGuidelines(this@ArActivity)) {
+            guidelines()
+        }
     } // onCreate
 
     override fun onResume() {
         super.onResume()
         supportActionBar?.hide()
-        if (AppStatus().musicOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
+        if (stopMusic) {
+            if (AppStatus().musicOn(this)) { startService(Intent(this@ArActivity, SoundService::class.java)) }
+        }
     }
 
     override fun onStop() {
@@ -680,5 +693,53 @@ class ArActivity : AppCompatActivity() {
 
         tv_force.text = getString(R.string.meters_per_second, wind.force.toInt())
     } // adjustWindArrowIndicator
+
+    private fun guidelines() {
+        btn_pause.isEnabled = false
+        pauseGame()
+
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.checkbox, viewGroup)
+        builder.setView(dialogView)
+            .setCancelable(false)
+            .setPositiveButton(R.string.yes) { _, _ ->
+
+                var items = 0
+
+                val config = ShowcaseConfig()
+                config.delay = 0
+                config.shapePadding = 20
+                config.maskColor = applicationContext.getColor(R.color.colorGrayAlpha)
+
+                val sequence = MaterialShowcaseSequence(this)
+                sequence.setConfig(config)
+                sequence.addSequenceItem(frameLayout_arrow, applicationContext.getString(R.string.guide_wind_direction), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(tv_force, applicationContext.getString(R.string.guide_wind_streght), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(tv_hitpoints, applicationContext.getString(R.string.guide_hp), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(tv_throws, applicationContext.getString(R.string.guide_throws), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(btn_pause, applicationContext.getString(R.string.guide_pause), applicationContext.getString(R.string.got_it))
+                sequence.start()
+                sequence.setOnItemDismissedListener { _, _ ->
+                    items += 1
+                    if (items == 5) {
+                        btn_pause.isEnabled = true
+                        resumeGame()
+                        stopMusic = true
+                    }
+                    onResume()
+                }
+            }
+            .setNegativeButton(R.string.no) { _, _ ->
+                btn_pause.isEnabled = true
+                resumeGame()
+            }.show()
+        dialogView.skip.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("tää", "isChecked: $isChecked")
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putBoolean(GUIDELINES_STATUS_TAG, !isChecked).apply()
+        }
+
+
+    }
 
 } // ArActivity

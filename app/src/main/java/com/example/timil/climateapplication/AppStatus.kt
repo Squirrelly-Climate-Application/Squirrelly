@@ -16,6 +16,7 @@ class AppStatus {
         const val VIBRATION_STATUS_TAG = "vibration"
         const val MUSIC_STATUS_TAG = "music"
         const val SOUNDS_STATUS_TAG = "sounds"
+        const val GUIDELINES_STATUS_TAG = "guidelines"
     }
 
     fun isOnline(context: Context): Boolean {
@@ -46,5 +47,10 @@ class AppStatus {
     fun soundsOn(context: Context): Boolean {
         settings = PreferenceManager.getDefaultSharedPreferences(context)
         return settings.getBoolean(SOUNDS_STATUS_TAG, true)
+    }
+
+    fun showGuidelines(context: Context): Boolean {
+        settings = PreferenceManager.getDefaultSharedPreferences(context)
+        return settings.getBoolean(GUIDELINES_STATUS_TAG, true)
     }
 }
