@@ -143,8 +143,6 @@ class GoogleMapFragment :
         }
     } // onMapReady
 
-
-
     //TODO: Should make a class to store all the DB methods in one place
     private fun getDiscountsData(){
         val userId = FirebaseAuth.getInstance().currentUser!!.uid
@@ -226,7 +224,7 @@ class GoogleMapFragment :
 
             val marker = googleMap.addMarker(markerOptionsFrom(it))
             marker.setInfoWindowAnchor(0.5f, 0.5f)
-            marker.setAnchor(0.5f,-2f)
+            // marker.setAnchor(0.5f,-2f) // disabling for now, as it makes the markers drift when zooming the map
             marker.tag = list.indexOf(it) // we need to 'remember' the marker to show the info window correctly
         }
     } // placeDiscountsOnMap
