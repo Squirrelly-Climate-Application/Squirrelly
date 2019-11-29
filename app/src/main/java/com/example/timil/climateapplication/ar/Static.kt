@@ -100,11 +100,10 @@ object Static {
 
         // there's probably a prettier way to do this, but frankly I just don't care
         var sign = if (rGen.nextBoolean()) 1 else -1
-        val newX = localPos.x + rFactor * sign
+        val newX = localPos.x + randomFloatBetween(rFactor/2, rFactor) * sign
         sign = if (rGen.nextBoolean()) 1 else -1
-        val newY = localPos.y + rFactor * sign
-        sign = if (rGen.nextBoolean()) 1 else -1
-        val newZ = localPos.z + rFactor * sign
+        val newY = localPos.y + randomFloatBetween(rFactor/2, rFactor) * sign
+        val newZ = localPos.z + randomFloatBetween(0f, rFactor) // so that the clouds won't fly away from the camera
         return Vector3(newX, newY, newZ)
     } // uniformlyRandomizedPosition
 

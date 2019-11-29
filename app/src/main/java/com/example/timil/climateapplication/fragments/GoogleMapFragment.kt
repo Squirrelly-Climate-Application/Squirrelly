@@ -251,13 +251,6 @@ class GoogleMapFragment :
         return this.icon(BitmapDescriptorFactory.defaultMarker(hue))
     }
 
-    // we need to use this to close the info window, because it's unreliable to
-    // do it by clicking on the marker
-    override fun onInfoWindowClick(marker: Marker) {
-
-        marker.hideInfoWindow()
-    }
-
     override fun onMarkerClick(marker: Marker?): Boolean {
 
         marker?.showInfoWindow()
@@ -265,6 +258,13 @@ class GoogleMapFragment :
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(marker?.position))
         googleMap.animateCamera(CameraUpdateFactory.scrollBy(0f, -160.0f)) // pan the camera upwards, to focus on the info window
         return true // indicates that we override the default behavior (opening the info window & centering on the marker)
+    }
+
+    // we need to use this to close the info window, because it's unreliable to
+    // do it by clicking on the marker
+    override fun onInfoWindowClick(marker: Marker) {
+
+        marker.hideInfoWindow()
     }
 
     override fun onInfoWindowLongClick(marker: Marker?) {

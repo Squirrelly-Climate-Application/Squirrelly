@@ -69,7 +69,7 @@ class Co2Monster private constructor() : Monster() {
 
         // make a light effect at the hit location
         val lightNode = EffectEntity()
-        lightNode.setParent(this) // what else could it even be?
+        lightNode.setParent(this)
         lightNode.light = whiteLight
         lightNode.localPosition = Vector3(0f, 0f, 0.28f) // move the light towards the player, out of the cloud, so it can be seen
         val lightEndListener = object : AnimatorListenerAdapter() {
@@ -91,9 +91,9 @@ class Co2Monster private constructor() : Monster() {
             cloud.localPosition = localPosition //TODO: move it to the hit position somehow (low priority)
             cloud.renderable = monsterRenderable
             cloud.localScale = localScale.scaled(Static.randomFloatBetween(0.1f, 0.2f))
-            cloud.setParent(this)
+            cloud.setParent(parent) // i.e., the camera
 
-            val animDura = Static.randomFloatBetween(1000f, 1800f).toLong()
+            val animDura = Static.randomFloatBetween(1200f, 2000f).toLong()
 
             val endListener = object : AnimatorListenerAdapter() {
 
@@ -106,7 +106,7 @@ class Co2Monster private constructor() : Monster() {
 
             val moveAnim = AnimationFactory.linearMoveAnim(cloud, animDura, cloud.localPosition, Static.uniformlyRandomizedPosition(cloud.localPosition, 0.2f), endListener)
             val spinAnim = AnimationFactory.spinAnim(cloud, animDura, Static.randomizedQuaternion())
-            val scaleAnim = AnimationFactory.scaleAnim(cloud, animDura, Static.randomScale(1.2f, 1.8f))
+            val scaleAnim = AnimationFactory.scaleAnim(cloud, animDura, Static.randomScale(0.4f, 0.7f))
             moveAnim.start()
             spinAnim.start()
             scaleAnim.start()

@@ -23,8 +23,8 @@ enum class AIType {
     BOUNCING
 }
 
-private const val ANIM_LENGTH_MAX = 4000L
-private const val ANIM_LENGTH_MIN = 1000L
+private const val ANIM_LENGTH_MAX = 3600L
+private const val ANIM_LENGTH_MIN = 2000L
 
 private const val BOUNCE_ANIM_DURA = 3000L
 
@@ -69,7 +69,7 @@ class AI(private val node: WorldEntity) {
 
         fun create(node: WorldEntity, AItype: AIType): AI {
 
-            Log.d("HUUH", "monster node localPos when creating AI: " + node.localPosition)
+            // Log.d("HUUH", "monster node localPos when creating AI: " + node.localPosition)
 
             return when (AItype) {
 
