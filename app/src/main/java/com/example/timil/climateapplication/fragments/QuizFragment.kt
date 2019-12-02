@@ -55,7 +55,7 @@ class QuizFragment : Fragment() {
     private lateinit var timer: CountDownTimer
     private lateinit var monsterType: Serializable
 
-    private var points: Int = 4
+    private var points: Int = 5
     private var continueQuiz: Boolean? = null
     private var previousQuestions = arrayListOf<Int>()
     private lateinit var buttonsLinearLayout: LinearLayout
@@ -283,7 +283,7 @@ class QuizFragment : Fragment() {
             }
             true -> {
                 alertDialog.setTitle("Right answer!")
-                points += 2
+                points += 3
                 if (AppStatus().soundsOn(context!!)) {
                     SoundService().soundEffect(context!!, SOUND_EFFECT_CORRECT)
                 }
@@ -314,7 +314,6 @@ class QuizFragment : Fragment() {
                 }
                 false -> { activityCallBack!!.startArActivity(points, monsterType) }
             }
-            //activityCallBack!!.startArActivity(correct, monsterType)
         }
     }
 }
