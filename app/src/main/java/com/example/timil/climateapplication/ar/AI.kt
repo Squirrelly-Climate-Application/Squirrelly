@@ -49,6 +49,8 @@ class AI(private val node: WorldEntity) {
     private val bounceAnimUpScale = Vector3(node.localScale.x * 0.9f, node.localScale.y * 1.1f, node.localScale.z * 0.9f) // stretch the drop when it floats up...
     private val bounceAnimDownScale = Vector3(node.localScale.x * 1.1111111f, node.localScale.y * 0.909090909f, node.localScale.z *1.1111111f) // ... and squeeze it when it floats back down
 
+    private lateinit var durationPattern: DurationPattern
+
     companion object {
 
         private val rGen = Random(System.currentTimeMillis())
@@ -96,7 +98,8 @@ class AI(private val node: WorldEntity) {
 
                     type = AItype
 
-                    val duration = randomDura()
+                    durationPattern = DurationPattern(2000L, 3000L, 4000L)
+                    val duration = durationPattern.current() // i.e., 2000L
 
                     moveAnim = AnimationFactory.linearMoveAnim(
                         node,
@@ -160,7 +163,7 @@ class AI(private val node: WorldEntity) {
 
             AIType.MORPHING -> {
 
-                val dura = randomDura()
+                val dura = durationPattern.next()
 
                 moveAnim?.duration = dura
                 moveAnim?.setObjectValues(node.localPosition, randomTarget())
@@ -247,5 +250,28 @@ class AI(private val node: WorldEntity) {
         val y = yMin + rGen.nextFloat() * (yMax - yMin)
         return Vector3(x, y, -1.0f) // could randomize z-value as well, I guess
     }
+
+    // used for making looping, predictable movement patterns
+    private inner class DurationPattern(vararg durations: Long) {
+
+        private val durationArray = durations.toTypedArray()
+        private var index = 0
+        private val maxIndex = durationArray.size - 1
+
+        fun current(): Long {
+
+            return durationArray[index]
+        }
+
+        fun next(): Long {
+
+            index++
+            if (index > maxIndex) {
+                index = 0
+            }
+            return durationArray[index]
+        }
+
+    } // DurationPattern
 
 } // AI
