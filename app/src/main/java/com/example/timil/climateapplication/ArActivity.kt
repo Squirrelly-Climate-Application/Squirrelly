@@ -1,5 +1,8 @@
 package com.example.timil.climateapplication
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.content.Intent
 import android.graphics.Point
 import android.graphics.Typeface
@@ -37,6 +40,7 @@ import com.example.timil.climateapplication.services.SoundService.Companion.SOUN
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_LOSE
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_THROW
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_WIN
+import com.google.ar.sceneform.math.Quaternion
 import kotlinx.android.synthetic.main.checkbox.view.*
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig
@@ -607,10 +611,33 @@ class ArActivity : AppCompatActivity() {
 
         // Log.d("HUUH", "original localPos: $localPos")
 
-        monsterNodes[1] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
-        monsterNodes[2] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
-        monsterNodes[3] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
-        monsterNodes[4] = OilMonster.createSmall(anchorNode!!, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
+        val rotatePivot = EffectEntity() // easiest way to make the small OilMonsters move in circles (they turn with this point)
+        // reset the starting rotation to fix weird spinning bug
+        rotatePivot.localRotation = Quaternion(Vector3(0f, 1f, 0f), 0f)
+        rotatePivot.setParent(anchorNode)
+        rotatePivot.localPosition = localPos
+
+        monsterNodes[1] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
+        monsterNodes[2] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
+        monsterNodes[3] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
+        monsterNodes[4] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
+
+        val halfSpin1 = Quaternion.axisAngle(Vector3(0f, 1f, 0f), -180f)
+        val halfSpin2 = Quaternion.axisAngle(Vector3(0f, 1f, 0f), 0.1f)
+        val rotationAnim1 = AnimationFactory.multiValueSpinAnim(rotatePivot, 5000L, rotatePivot.localRotation, halfSpin1)
+        val rotationAnim2 = AnimationFactory.multiValueSpinAnim(rotatePivot, 5000L, halfSpin1, halfSpin2)
+        val spinAnim = AnimatorSet().apply {
+
+            play(rotationAnim1).before(rotationAnim2)
+        }
+        spinAnim.addListener(object : AnimatorListenerAdapter() {
+
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                animation?.start()
+            }
+        })
+        spinAnim.start()
 
         updateUI(ViewType.HP, totalMonsterHp)
     } // spawnSmallOilMonsters

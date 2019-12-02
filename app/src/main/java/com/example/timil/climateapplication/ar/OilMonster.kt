@@ -2,6 +2,7 @@ package com.example.timil.climateapplication.ar
 
 import android.util.Log
 import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.collision.Sphere
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
@@ -53,13 +54,13 @@ class OilMonster private constructor() : Monster() {
         } // create
 
         // for creating the smaller OilMonsters (on destruction of their 'mother')
-        fun createSmall(anchorNode: AnchorNode, pos: Vector3): OilMonster {
+        fun createSmall(node: Node, pos: Vector3): OilMonster {
 
             Log.d("HUUH", "creating small monster at position: $pos")
             return OilMonster().apply {
                 localPosition = pos
                 renderable = monsterRenderable
-                setParent(anchorNode)
+                setParent(node)
                 scaleSize(Static.randomFloatBetween(0.34f, 0.5f))
                 isInitialMonster = false
             }.also {

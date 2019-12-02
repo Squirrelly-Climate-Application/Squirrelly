@@ -83,6 +83,23 @@ object AnimationFactory {
         } // apply
     } // spinAnim
 
+    fun multiValueSpinAnim(
+        node: Node,
+        dura: Long,
+        vararg quaternions: Quaternion): ObjectAnimator {
+
+        return ObjectAnimator().apply {
+
+            target = node
+            propertyName = "localRotation"
+            duration = dura
+            interpolator = LinearInterpolator() // default, but let's have it for clarity's sake
+            setAutoCancel(false)
+            setObjectValues(*quaternions)
+            setEvaluator(QuaternionEvaluator())
+        } // apply
+    } // multiValueSpinAnim
+
     // make objects larger or smaller
     fun scaleAnim(
         node: Node,
