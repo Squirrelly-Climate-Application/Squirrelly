@@ -85,7 +85,7 @@ class GoogleMapFragment :
 
     private lateinit var infoView: View
 
-    private val usedColors = mutableListOf<MutableSet<Float>>()
+    private val usedColors = mutableSetOf<Float>()
     private var colorIndex = 0
 
     interface OnLongClick {
@@ -262,28 +262,24 @@ class GoogleMapFragment :
 
         var color = MarkerColor.pickRandom().value
 
-        if (shouldCreateNewColorSet()) {
+        if (colorSetIsFull()) {
 
-            val colorSet = mutableSetOf<Float>()
-            colorSet.add(color)
-            usedColors.add(colorSet)
+            usedColors.clear()
+            usedColors.add(color)
         } else {
 
-            val currentColorSet = usedColors[usedColors.size-1]
-            while (currentColorSet.contains(color)) {
+            while (usedColors.contains(color)) {
+
                 color = pickNextMarkerColor()
             }
-            currentColorSet.add(color)
+            usedColors.add(color)
         }
         return color
     } // randomMarkerColor
 
-    private fun shouldCreateNewColorSet(): Boolean {
+    private fun colorSetIsFull(): Boolean {
 
-        if (usedColors.isEmpty()) return true
-
-        val lastSet = usedColors[usedColors.size-1]
-        if (lastSet.size == MarkerColor.size()) return true
+        if (usedColors.size == MarkerColor.size()) return true
         return false
     }
 
