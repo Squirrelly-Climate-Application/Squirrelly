@@ -110,9 +110,9 @@ class AI(private val node: WorldEntity) {
                     val newScale = Static.randomScale(0.8f, 1.3f)
                     scaleAnim = AnimationFactory.scaleAnim(node, duration, newScale)
 
-                    val newRadius = maxOf(newScale.x, newScale.y, newScale.z) / 2 // / RADIUS_HIT_SCALE_FACTOR
+                    val newRadius = maxOf(newScale.x, newScale.y, newScale.z) / 2 / RADIUS_HIT_SCALE_FACTOR
 
-                    sphereCollisionShapeScaleAnim = AnimationFactory.sphereCollisionShapeScaleAnim(node, duration, newRadius)
+                    // sphereCollisionShapeScaleAnim = AnimationFactory.sphereCollisionShapeScaleAnim(node, duration, newRadius)
 
                     spinAnim = AnimationFactory.spinAnim(node, duration, Static.randomizedQuaternion())
                 } // MORPHING apply
@@ -190,7 +190,7 @@ class AI(private val node: WorldEntity) {
 
         moveAnim?.start()
         scaleAnim?.start()
-        sphereCollisionShapeScaleAnim?.start()
+        // sphereCollisionShapeScaleAnim?.start()
         spinAnim?.start()
     } // execute
 
