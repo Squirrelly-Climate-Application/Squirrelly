@@ -38,6 +38,7 @@ import com.example.timil.climateapplication.fragments.DiscountsFragment.Companio
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_LOGO_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_WEB_LINK_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.SHARED_ELEMENT_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.USER_POINTS_KEY
@@ -274,6 +275,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         bundle.putInt(DISCOUNT_POINTS_KEY, document.data[DISCOUNT_POINTS_KEY].toString().toInt())
         bundle.putInt(USER_POINTS_KEY, userPoints)
         bundle.putString(EXPIRING_DATE_KEY, document.data[EXPIRING_DATE_KEY].toString())
+        bundle.putString(DISCOUNT_WEB_LINK_KEY, document.data[DISCOUNT_WEB_LINK_KEY].toString())
         bundle.putString("discountId", document.id)
 
         viewDiscountFragment.arguments = bundle
@@ -310,6 +312,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         bundle.putInt(DISCOUNT_POINTS_KEY, discount.pointsNeeded)
         bundle.putInt(USER_POINTS_KEY, userPoints)
         bundle.putString(EXPIRING_DATE_KEY, discount.expiringDate)
+        bundle.putString(DISCOUNT_WEB_LINK_KEY, discount.webLink)
         bundle.putString("discountId", discount.id)
 
         viewDiscountFragment.arguments = bundle

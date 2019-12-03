@@ -1,6 +1,9 @@
 package com.example.timil.climateapplication.adapters
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +17,7 @@ import com.example.timil.climateapplication.fragments.DiscountsFragment.Companio
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_LOGO_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_WEB_LINK_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
 import com.google.firebase.firestore.QueryDocumentSnapshot
 
@@ -59,6 +63,15 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         Glide.with((view.context as Activity))
             .load(discountsList!![i].data.getValue(DISCOUNT_COMPANY_LOGO_KEY).toString())
             .into(discountViewHolder.discountLogo)
+        discountViewHolder.discountWebLink.text = discountsList!![i].data.getValue(DISCOUNT_WEB_LINK_KEY).toString()
+            .replace("https://".toRegex(), "")
+            .replace("http://".toRegex(), "")
+
+        discountViewHolder.discountWebLink.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(discountsList!![i].data.getValue(DISCOUNT_WEB_LINK_KEY).toString()))
+            (view.context as Activity).startActivity(browserIntent)
+        }
+
         discountViewHolder.discountTitle.text = discountsList!![i].data.getValue(DISCOUNT_COMPANY_KEY).toString()
         discountViewHolder.discountInfo.text = discountsList!![i].data.getValue(DISCOUNT_INFORMATION_KEY).toString()
         discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue(DISCOUNT_POINTS_KEY).toString())
@@ -78,6 +91,7 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     inner class DiscountViewHolder(var itemRoot: View) : RecyclerView.ViewHolder(itemRoot) {
         var discountLogo: ImageView = itemRoot.findViewById(R.id.image_view_company_logo)
         var discountTitle: TextView = itemRoot.findViewById(R.id.tvDiscountTitle)
+        var discountWebLink: TextView = itemRoot.findViewById(R.id.tvDiscountWebLink)
         var discountInfo: TextView = itemRoot.findViewById(R.id.tvDiscountInfo)
         var discountPoints: TextView = itemRoot.findViewById(R.id.tvDiscountPoints)
         var expiringDate: TextView = itemRoot.findViewById(R.id.tvExpiringDate)

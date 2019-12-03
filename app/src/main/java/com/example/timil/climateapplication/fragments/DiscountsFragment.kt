@@ -46,6 +46,7 @@ class DiscountsFragment : Fragment() {
         const val DISCOUNT_INFORMATION_KEY = "information"
         const val EXPIRING_DATE_KEY = "expiring date"
         const val SHARED_ELEMENT_KEY = "shared element"
+        const val DISCOUNT_WEB_LINK_KEY = "website"
     }
 
     override fun onCreateView(

@@ -58,6 +58,15 @@
                 android:layout_marginBottom="4dp"/>
 
             <TextView
+                android:id="@+id/tvDiscountWebLink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textColor="@color/colorAccent"
+                android:textStyle="italic"
+                android:backgroundTint="@color/fui_transparent"/>
+
+            <TextView
                 android:id="@+id/tvDiscountInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
