@@ -747,7 +747,7 @@ class ArActivity : AppCompatActivity() {
                 val sequence = MaterialShowcaseSequence(this)
                 sequence.setConfig(config)
                 sequence.addSequenceItem(frameLayout_arrow, applicationContext.getString(R.string.guide_wind_direction), applicationContext.getString(R.string.got_it))
-                sequence.addSequenceItem(tv_force, applicationContext.getString(R.string.guide_wind_streght), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(tv_force, applicationContext.getString(R.string.guide_wind_strength), applicationContext.getString(R.string.got_it))
                 sequence.addSequenceItem(tv_hitpoints, applicationContext.getString(R.string.guide_hp), applicationContext.getString(R.string.got_it))
                 sequence.addSequenceItem(tv_throws, applicationContext.getString(R.string.guide_throws), applicationContext.getString(R.string.got_it))
                 sequence.addSequenceItem(btn_pause, applicationContext.getString(R.string.guide_pause), applicationContext.getString(R.string.got_it))

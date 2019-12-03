@@ -27,11 +27,14 @@
             android:layout_gravity="center"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"
+            android:textColor="@color/colorAccent"
+            android:fontFamily="casual"
+            android:textStyle="bold"
             android:gravity="center"
             android:text="@string/settings"
             android:textSize="24sp"/>
 
-        <Switch
+        <android.support.v7.widget.SwitchCompat
             android:id="@+id/vibration"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
@@ -41,9 +44,16 @@
             android:textOn="@string/on"
             android:textOff="@string/off"
             android:showText="true"
+            android:textColor="@color/colorAccent"
+            android:fontFamily="casual"
+            android:textStyle="bold"
+            android:thumb="@drawable/thumb_selector"
+            app:track="@drawable/track_selector"
             tools:checked="true"/>
 
-        <Switch
+
+
+        <android.support.v7.widget.SwitchCompat
             android:id="@+id/music"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
@@ -53,9 +63,14 @@
             android:textOn="@string/on"
             android:textOff="@string/off"
             android:showText="true"
+            android:textColor="@color/colorAccent"
+            android:fontFamily="casual"
+            android:textStyle="bold"
+            android:thumb="@drawable/thumb_selector"
+            app:track="@drawable/track_selector"
             tools:checked="true"/>
 
-        <Switch
+        <android.support.v7.widget.SwitchCompat
             android:id="@+id/sounds"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
@@ -64,6 +79,11 @@
             android:textOn="@string/on"
             android:textOff="@string/off"
             android:showText="true"
+            android:textColor="@color/colorAccent"
+            android:fontFamily="casual"
+            android:textStyle="bold"
+            android:thumb="@drawable/thumb_selector"
+            app:track="@drawable/track_selector"
             tools:checked="true"/>
 
     </LinearLayout>

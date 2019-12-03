@@ -6,9 +6,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_LOGO_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
@@ -24,6 +27,8 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     private var discountsList: MutableList<QueryDocumentSnapshot>? = null
     private var userPoints: Int? = null
     private var proceedToViewFragment: Boolean? = null
+
+    private lateinit var view: View
 
     interface OnDiscountClick {
         fun showDiscount(view: View, document: QueryDocumentSnapshot, userPoints: Int)
@@ -46,11 +51,14 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): DiscountViewHolder {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.discount_recycler_view_item, viewGroup, false)
+        view = LayoutInflater.from(viewGroup.context).inflate(R.layout.discount_recycler_view_item, viewGroup, false)
         return DiscountViewHolder(view)
     }
 
     override fun onBindViewHolder(discountViewHolder: DiscountViewHolder, i: Int) {
+        Glide.with((view.context as Activity))
+            .load(discountsList!![i].data.getValue(DISCOUNT_COMPANY_LOGO_KEY).toString())
+            .into(discountViewHolder.discountLogo)
         discountViewHolder.discountTitle.text = discountsList!![i].data.getValue(DISCOUNT_COMPANY_KEY).toString()
         discountViewHolder.discountInfo.text = discountsList!![i].data.getValue(DISCOUNT_INFORMATION_KEY).toString()
         discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue(DISCOUNT_POINTS_KEY).toString())
@@ -68,6 +76,7 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     }
 
     inner class DiscountViewHolder(var itemRoot: View) : RecyclerView.ViewHolder(itemRoot) {
+        var discountLogo: ImageView = itemRoot.findViewById(R.id.image_view_company_logo)
         var discountTitle: TextView = itemRoot.findViewById(R.id.tvDiscountTitle)
         var discountInfo: TextView = itemRoot.findViewById(R.id.tvDiscountInfo)
         var discountPoints: TextView = itemRoot.findViewById(R.id.tvDiscountPoints)
