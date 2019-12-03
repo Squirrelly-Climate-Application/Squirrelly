@@ -58,6 +58,10 @@ private enum class MarkerColor(val value: Float) {
         private val values = values()
         private val rGen = Random()
 
+        fun size(): Int {
+            return values.size
+        }
+
         fun pickRandom(): MarkerColor {
             return values[rGen.nextInt(values.size)]
         }
@@ -81,7 +85,11 @@ class GoogleMapFragment :
 
     private lateinit var infoView: View
 
+    private val usedColors = mutableListOf<MutableSet<Float>>()
+    private var colorIndex = 0
+
     interface OnLongClick {
+
         fun showMapDiscount(discount: Discount, userPoints: Int, view: View, imageView: ImageView)
     }
 
@@ -105,7 +113,7 @@ class GoogleMapFragment :
         } catch (e: ClassCastException) {
             throw ClassCastException(activity.toString() + " must implement OnLongClick interface.")
         }
-    }
+    } // onAttach
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -151,7 +159,7 @@ class GoogleMapFragment :
             setMinZoomPreference(MIN_ZOOM_LEVEL) // restrict how far you can zoom out
             moveCamera(CameraUpdateFactory.newLatLng(HELSINKI_CITY_CENTER))
             setOnMarkerClickListener(this@GoogleMapFragment)
-        }
+        } // apply
     } // onMapReady
 
     //TODO: Should make a class to store all the DB methods in one place
@@ -235,7 +243,6 @@ class GoogleMapFragment :
 
             val marker = googleMap.addMarker(markerOptionsFrom(it))
             marker.setInfoWindowAnchor(0.5f, 0.5f)
-            // marker.setAnchor(0.5f,-2f) // disabling for now, as it makes the markers drift when zooming the map
             marker.tag = list.indexOf(it) // we need to 'remember' the marker to show the info window correctly
         }
     } // placeDiscountsOnMap
@@ -247,10 +254,46 @@ class GoogleMapFragment :
             .position(discount.geoLocation)
     }
 
-    //TODO: make it take into account already used colors
     private fun randomMarkerColor(): Float {
 
-        return MarkerColor.pickRandom().value
+        // to ensure a uniform distribution of marker colors, we monitor how many of the ten colors
+        // are in use; when all have been used once, we'll create a new empty set of 10 colors
+        // and add new colors to it, etc.
+
+        var color = MarkerColor.pickRandom().value
+
+        if (shouldCreateNewColorSet()) {
+
+            val colorSet = mutableSetOf<Float>()
+            colorSet.add(color)
+            usedColors.add(colorSet)
+        } else {
+
+            val currentColorSet = usedColors[usedColors.size-1]
+            while (currentColorSet.contains(color)) {
+                color = pickNextMarkerColor()
+            }
+            currentColorSet.add(color)
+        }
+        return color
+    } // randomMarkerColor
+
+    private fun shouldCreateNewColorSet(): Boolean {
+
+        if (usedColors.isEmpty()) return true
+
+        val lastSet = usedColors[usedColors.size-1]
+        if (lastSet.size == MarkerColor.size()) return true
+        return false
+    }
+
+    private fun pickNextMarkerColor(): Float {
+
+        colorIndex++
+        if (colorIndex > MarkerColor.size()-1) {
+            colorIndex = 0
+        }
+        return MarkerColor.values()[colorIndex].value
     }
 
     // extension function to simplify things
@@ -263,7 +306,7 @@ class GoogleMapFragment :
         marker?.showInfoWindow()
         // using moveCamera leads to a janky transition, but it doesn't work with animateCamera (together with the other call to it)
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(marker?.position))
-        googleMap.moveCamera(CameraUpdateFactory.scrollBy(0f, -200.0f)) // pan the camera upwards, to focus on the info window
+        googleMap.moveCamera(CameraUpdateFactory.scrollBy(0f, -200.0f)) // move the camera upwards, to focus on the info window
         return true // indicates that we override the default behavior (opening the info window & centering on the marker)
     }
 
@@ -305,7 +348,7 @@ class GoogleMapFragment :
             val discount = discountsList[markerIndex]
             infoView.apply {
 
-                Glide.with((context as Activity))
+                Glide.with(context as Activity)
                     .load(discount.companyLogo)
                     .into(findViewById(R.id.image_view_company_logo))
 
