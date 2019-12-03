@@ -14,9 +14,9 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".MainActivity"
+        <activity android:name=".activities.MainActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".SplashActivity"
+        <activity android:name=".activities.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,9 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ArActivity"
+        <activity android:name=".activities.ArActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".SignInActivity"
+        <activity android:name=".activities.SignInActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"/>
         <meta-data android:name="com.google.ar.core" android:value="required" />

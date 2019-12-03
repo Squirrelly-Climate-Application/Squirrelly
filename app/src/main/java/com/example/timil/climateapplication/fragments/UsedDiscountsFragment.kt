@@ -5,18 +5,13 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import com.example.timil.climateapplication.DbManager
+import com.example.timil.climateapplication.database.DbManager
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QueryDocumentSnapshot
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**

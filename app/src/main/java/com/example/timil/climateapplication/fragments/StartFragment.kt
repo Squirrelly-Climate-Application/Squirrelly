@@ -18,10 +18,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import android.text.format.DateUtils
 import android.widget.Button
-import com.example.timil.climateapplication.CustomButton
-import com.example.timil.climateapplication.MainActivity
-import com.example.timil.climateapplication.MainActivity.Companion.START_FRAGMENT_TAG
-import com.example.timil.climateapplication.OnStartGameListener
+import com.example.timil.climateapplication.activities.MainActivity.Companion.START_FRAGMENT_TAG
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

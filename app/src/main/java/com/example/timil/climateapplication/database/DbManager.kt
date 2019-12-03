@@ -1,4 +1,4 @@
-package com.example.timil.climateapplication
+package com.example.timil.climateapplication.database
 
 import android.icu.text.SimpleDateFormat
 import android.text.format.DateUtils
@@ -10,7 +10,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 import java.util.*
 import kotlin.collections.ArrayList
 
-class DbManager() {
+class DbManager {
 
     private val db: FirebaseFirestore
     private val userId: String
@@ -137,7 +137,7 @@ class DbManager() {
                     else {
                         pointsToReturn = document.data!!.getValue(points).toString().toInt()
                     }
-                    mCallback(pointsToReturn);
+                    mCallback(pointsToReturn)
 
                 } else {
                     Log.d("tester", "No such document")
@@ -164,7 +164,9 @@ class DbManager() {
                             val discounts = ArrayList<QueryDocumentSnapshot>()
                             for (discountDocument in task.result!!) {
                                 val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
-                                val expiringDate = simpleDateFormat.parse(discountDocument.data.getValue(expiring_date).toString()).time
+                                val expiringDate = simpleDateFormat.parse(discountDocument.data.getValue(
+                                    expiring_date
+                                ).toString()).time
                                 if (Date().time < expiringDate || DateUtils.isToday(expiringDate)) {
                                     discounts.add(discountDocument)
                                 }

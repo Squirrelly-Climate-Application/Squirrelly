@@ -1,4 +1,4 @@
-package com.example.timil.climateapplication
+package com.example.timil.climateapplication.database
 
 import com.google.android.gms.maps.model.LatLng
 

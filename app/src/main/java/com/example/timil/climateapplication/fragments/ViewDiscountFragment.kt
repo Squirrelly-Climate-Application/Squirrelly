@@ -11,20 +11,16 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.example.timil.climateapplication.DbManager
+import com.example.timil.climateapplication.database.DbManager
 import com.example.timil.climateapplication.OnDiscountUseListener
 import com.example.timil.climateapplication.R
-import com.example.timil.climateapplication.SwipeButton
+import com.example.timil.climateapplication.ui.SwipeButton
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.SHARED_ELEMENT_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.USER_POINTS_KEY
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import java.util.*
 
 
 /**

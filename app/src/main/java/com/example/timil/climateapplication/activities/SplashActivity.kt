@@ -1,4 +1,4 @@
-package com.example.timil.climateapplication
+package com.example.timil.climateapplication.activities
 
 import android.app.ActivityOptions
 import android.content.Intent
@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.ar.Static
 import com.google.firebase.auth.FirebaseAuth
 

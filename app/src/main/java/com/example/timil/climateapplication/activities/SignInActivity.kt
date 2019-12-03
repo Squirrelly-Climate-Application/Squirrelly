@@ -1,4 +1,4 @@
-package com.example.timil.climateapplication
+package com.example.timil.climateapplication.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -6,8 +6,8 @@ import com.example.timil.climateapplication.fragments.RegisterFragment
 import com.google.firebase.auth.FirebaseAuth
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
-import android.transition.TransitionInflater
 import android.view.ViewGroup
+import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.fragments.SignInFragment
 
 class SignInActivity : AppCompatActivity() {

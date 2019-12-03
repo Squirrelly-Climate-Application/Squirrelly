@@ -14,9 +14,9 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.TextView
-import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
-import com.example.timil.climateapplication.MainActivity.Companion.QUIZ_FRAGMENT_TAG
-import com.example.timil.climateapplication.MonsterType
+import com.example.timil.climateapplication.activities.MainActivity.Companion.MONSTER_TYPE
+import com.example.timil.climateapplication.activities.MainActivity.Companion.QUIZ_FRAGMENT_TAG
+import com.example.timil.climateapplication.activities.MonsterType
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

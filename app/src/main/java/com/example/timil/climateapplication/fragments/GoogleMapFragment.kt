@@ -12,9 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.example.timil.climateapplication.Discount
+import com.example.timil.climateapplication.database.Discount
 import com.example.timil.climateapplication.R
-import com.example.timil.climateapplication.ar.WorldEntity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -203,7 +202,10 @@ class GoogleMapFragment :
                                         (discount.get(DISCOUNT_POINTS_KEY) as Long).toInt(),
                                         (discount.get(DISCOUNT_PERCENT_KEY) as Long).toInt(),
                                         discount.get(DISCOUNT_EXPIRING_DATE_KEY).toString(),
-                                        LatLng(discount.get(DISCOUNT_LATITUDE_KEY) as Double, discount.get(DISCOUNT_LONGITUDE_KEY) as Double),
+                                        LatLng(
+                                            discount.get(DISCOUNT_LATITUDE_KEY) as Double,
+                                            discount.get(DISCOUNT_LONGITUDE_KEY) as Double
+                                        ),
                                         discount.get(DISCOUNT_COMPANY_LOGO_KEY).toString()
                                     )
                                 )

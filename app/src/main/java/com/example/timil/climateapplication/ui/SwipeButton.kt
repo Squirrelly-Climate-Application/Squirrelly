@@ -1,4 +1,4 @@
-package com.example.timil.climateapplication
+package com.example.timil.climateapplication.ui
 
 import android.animation.*
 import android.content.Context
@@ -12,9 +12,8 @@ import kotlinx.android.synthetic.main.custom_swipe_button_layout.view.*
 import android.view.LayoutInflater
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_view_discount.view.*
-import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import android.widget.Toast
+import com.example.timil.climateapplication.OnDiscountUseListener
+import com.example.timil.climateapplication.R
 
 
 class SwipeButton @JvmOverloads constructor(
@@ -40,7 +39,8 @@ class SwipeButton @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.custom_swipe_button_layout, this, true)
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(
-                it, R.styleable.custom_component_attributes, 0, 0
+                it,
+                R.styleable.custom_component_attributes, 0, 0
             )
             typedArray.recycle()
         }

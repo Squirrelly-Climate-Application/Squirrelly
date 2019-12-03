@@ -56,7 +56,7 @@
         android:layout_height="wrap_content"
         android:text="USE DISCOUNT"/-->
 
-    <com.example.timil.climateapplication.SwipeButton
+    <com.example.timil.climateapplication.ui.SwipeButton
         android:id="@+id/btnUseDiscountSwipe"
         android:layout_width="match_parent"
         android:layout_marginStart="50dp"

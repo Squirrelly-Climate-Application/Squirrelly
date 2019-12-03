@@ -1,18 +1,15 @@
-package com.example.timil.climateapplication
+package com.example.timil.climateapplication.ui
 
 import android.animation.*
 import android.content.Context
-import android.graphics.Path
 import android.util.AttributeSet
-import android.view.*
 import android.widget.RelativeLayout
 import android.view.LayoutInflater
 import kotlinx.android.synthetic.main.custom_button_layout.view.*
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
-import android.view.animation.AccelerateInterpolator
-import android.widget.LinearLayout
-import kotlinx.android.synthetic.main.fragment_start.view.*
+import com.example.timil.climateapplication.OnStartGameListener
+import com.example.timil.climateapplication.R
 
 
 class CustomButton @JvmOverloads constructor(
@@ -32,7 +29,8 @@ class CustomButton @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.custom_button_layout, this, true)
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(
-                it, R.styleable.custom_component_attributes, 0, 0
+                it,
+                R.styleable.custom_component_attributes, 0, 0
             )
             typedArray.recycle()
         }

@@ -3,25 +3,16 @@ package com.example.timil.climateapplication.fragments
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.app.SharedElementCallback
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.timil.climateapplication.R
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.LinearLayoutManager
-import android.text.format.DateUtils
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
-import android.util.Log
 import android.widget.ProgressBar
 import android.widget.TextView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QueryDocumentSnapshot
-import android.icu.text.DateFormat
-import android.icu.text.SimpleDateFormat
-import com.example.timil.climateapplication.DbManager
-import java.util.*
+import com.example.timil.climateapplication.database.DbManager
 import kotlin.collections.ArrayList
 
 

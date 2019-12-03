@@ -1,12 +1,10 @@
-package com.example.timil.climateapplication
+package com.example.timil.climateapplication.activities
 
 import android.Manifest
-import android.app.Activity
 import android.app.ActivityOptions
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
@@ -23,11 +21,12 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.example.timil.climateapplication.database.Discount
+import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.fragments.*
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_KEY
@@ -100,12 +99,14 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         navigationView = findViewById(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
 
-        setupFragment(startFragment, START_FRAGMENT_TAG, true)
+        setupFragment(startFragment,
+            START_FRAGMENT_TAG, true)
 
         // intent should have extra data if the Ar game ends and the user has clicked the Discounts button
         val intentExtra = intent.getStringExtra("discountsFragment")
         if (intentExtra != null && intentExtra.isNotEmpty()) {
-            setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
+            setupFragment(tabDiscountsFragment,
+                TAB_DISCOUNTS_FRAGMENT_TAG, false)
         }
 
         val toolBar = findViewById<Toolbar>(R.id.toolbar)
@@ -113,7 +114,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
         drawer = findViewById(R.id.drawer_layout)
 
-        toggle = ActionBarDrawerToggle(this, drawer, toolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        toggle = ActionBarDrawerToggle(this, drawer, toolBar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
         drawer.addDrawerListener(toggle)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
@@ -179,16 +183,20 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
         when (item.itemId) {
             R.id.nav_home -> {
-                setupFragment(startFragment, START_FRAGMENT_TAG, false)
+                setupFragment(startFragment,
+                    START_FRAGMENT_TAG, false)
             }
             R.id.nav_discounts -> {
-                setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
+                setupFragment(tabDiscountsFragment,
+                    TAB_DISCOUNTS_FRAGMENT_TAG, false)
             }
             R.id.nav_discounts_map -> {
-                setupFragment(googleMapFragment, GOOGLEMAP_FRAGMENT_TAG, false)
+                setupFragment(googleMapFragment,
+                    GOOGLEMAP_FRAGMENT_TAG, false)
             }
             R.id.nav_settings -> {
-                setupFragment(settingsFragment, SETTINGS_FRAGMENT_TAG, false)
+                setupFragment(settingsFragment,
+                    SETTINGS_FRAGMENT_TAG, false)
             }
             R.id.nav_logout -> {
                 logOut()
@@ -208,7 +216,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                 fireBaseAuth.signOut()
                 val intent = Intent(this@MainActivity, SignInActivity::class.java)
                 startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this@MainActivity).toBundle())
-                object : CountDownTimer(wait, wait) {
+                object : CountDownTimer(
+                    wait,
+                    wait
+                ) {
                     override fun onTick(millisUntilFinished: Long) {
                     }
                     override fun onFinish() {
@@ -227,14 +238,16 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             makeRequestCamera()
         }
         else {
-            setupFragment(scanFragment, SCAN_FRAGMENT_TAG, true)
+            setupFragment(scanFragment,
+                SCAN_FRAGMENT_TAG, true)
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            setupFragment(scanFragment, SCAN_FRAGMENT_TAG, true)
+            setupFragment(scanFragment,
+                SCAN_FRAGMENT_TAG, true)
         }
     }
 
@@ -267,7 +280,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         viewDiscountFragment.arguments = bundle
         //setupFragment(viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT, true)
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT)
+            .replace(
+                R.id.fragment_container, viewDiscountFragment,
+                VIEW_DISCOUNT_FRAGMENT
+            )
             .addSharedElement(view, view.transitionName)
             .addToBackStack(null)
             .commit()
@@ -279,7 +295,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setCheckedItem(R.id.nav_discounts)
 
-        setupFragment(tabDiscountsFragment, TAB_DISCOUNTS_FRAGMENT_TAG, false)
+        setupFragment(tabDiscountsFragment,
+            TAB_DISCOUNTS_FRAGMENT_TAG, false)
 
         view.transitionName = discount.id
 
@@ -294,7 +311,10 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
         viewDiscountFragment.arguments = bundle
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, viewDiscountFragment, VIEW_DISCOUNT_FRAGMENT)
+            .replace(
+                R.id.fragment_container, viewDiscountFragment,
+                VIEW_DISCOUNT_FRAGMENT
+            )
             .addSharedElement(view, view.transitionName)
             .addToBackStack(null)
             .commit()
@@ -343,7 +363,8 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
                 navigationView.menu.findItem(R.id.nav_discounts).isChecked = false
                 navigationView.menu.findItem(R.id.nav_discounts_map).isChecked = false
                 navigationView.menu.findItem(R.id.nav_settings).isChecked = false
-                setupFragment(startFragment, START_FRAGMENT_TAG, false)
+                setupFragment(startFragment,
+                    START_FRAGMENT_TAG, false)
             }
             else -> {
                 val builder = AlertDialog.Builder(this)

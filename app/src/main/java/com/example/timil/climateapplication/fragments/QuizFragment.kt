@@ -24,8 +24,8 @@ import android.widget.ProgressBar
 import android.support.v7.app.AlertDialog
 import android.view.Gravity
 import com.example.timil.climateapplication.AppStatus
-import com.example.timil.climateapplication.MainActivity.Companion.MONSTER_TYPE
-import com.example.timil.climateapplication.MainActivity.Companion.QUIZ_FRAGMENT_TAG
+import com.example.timil.climateapplication.activities.MainActivity.Companion.MONSTER_TYPE
+import com.example.timil.climateapplication.activities.MainActivity.Companion.QUIZ_FRAGMENT_TAG
 import com.example.timil.climateapplication.services.SoundService
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_CORRECT
 import com.example.timil.climateapplication.services.SoundService.Companion.SOUND_EFFECT_INCORRECT

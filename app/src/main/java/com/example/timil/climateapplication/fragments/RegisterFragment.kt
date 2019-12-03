@@ -9,7 +9,6 @@ import android.os.Handler
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.example.timil.climateapplication.AppStatus
-import com.example.timil.climateapplication.MainActivity
+import com.example.timil.climateapplication.activities.MainActivity
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.Vibrator
 import com.example.timil.climateapplication.Vibrator.Companion.VIBRATION_TIME_SHORT

@@ -60,7 +60,7 @@
 
     </LinearLayout>
 
-    <!--com.example.timil.climateapplication.CustomButton
+    <!--com.example.timil.climateapplication.ui.CustomButton
         android:id="@+id/custom_button_frame"
         android:layout_width="100dp"
         android:layout_height="100dp"
