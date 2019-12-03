@@ -10,7 +10,6 @@ import java.util.*
 
 /**
  * An abstraction to hold monster move patterns (animations).
- * May add other features later on.
  * @author Ville Lohkovuori
  * */
 
@@ -37,7 +36,6 @@ class AI(private val node: WorldEntity) {
 
     private var moveAnim: ObjectAnimator? = null
     private var scaleAnim: ObjectAnimator? = null
-    private var boxCollisionShapeScaleAnim: ObjectAnimator? = null // remove if not used (eventually)
     private var sphereCollisionShapeScaleAnim: ObjectAnimator? = null
     private var spinAnim: ObjectAnimator? = null
 
@@ -68,8 +66,6 @@ class AI(private val node: WorldEntity) {
 
         fun create(node: WorldEntity, AItype: AIType): AI {
 
-            // Log.d("HUUH", "monster node localPos when creating AI: " + node.localPosition)
-
             return when (AItype) {
 
                 AIType.BASIC -> AI(node).apply {
@@ -85,7 +81,6 @@ class AI(private val node: WorldEntity) {
 
                             override fun onAnimationEnd(animation: Animator?) {
 
-                                // Log.d("HUUH", "monster position: " + node.localPosition)
                                 execute() // never stop moving until death
                             }
                         }) // moveAnim
@@ -197,7 +192,6 @@ class AI(private val node: WorldEntity) {
 
         moveAnim?.start()
         scaleAnim?.start()
-        // boxCollisionShapeScaleAnim?.start()
         sphereCollisionShapeScaleAnim?.start()
         spinAnim?.start()
     } // execute
@@ -208,8 +202,6 @@ class AI(private val node: WorldEntity) {
         moveAnim = null
         scaleAnim?.removeAllListeners()
         scaleAnim = null
-        // boxCollisionShapeScaleAnim?.removeAllListeners()
-        // boxCollisionShapeScaleAnim = null
         sphereCollisionShapeScaleAnim?.removeAllListeners()
         sphereCollisionShapeScaleAnim = null
         spinAnim?.removeAllListeners()
@@ -221,7 +213,6 @@ class AI(private val node: WorldEntity) {
         moveAnim?.pause()
         spinAnim?.pause()
         scaleAnim?.pause()
-        // boxCollisionShapeScaleAnim?.pause()
         sphereCollisionShapeScaleAnim?.pause()
     }
 
@@ -230,7 +221,6 @@ class AI(private val node: WorldEntity) {
         moveAnim?.resume()
         spinAnim?.resume()
         scaleAnim?.resume()
-        // boxCollisionShapeScaleAnim?.resume()
         sphereCollisionShapeScaleAnim?.resume()
     }
 

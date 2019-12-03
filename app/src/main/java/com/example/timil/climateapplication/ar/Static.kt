@@ -98,7 +98,6 @@ object Static {
 
     fun uniformlyRandomizedPosition(localPos: Vector3, rFactor: Float): Vector3 {
 
-        // there's probably a prettier way to do this, but frankly I just don't care
         var sign = if (rGen.nextBoolean()) 1 else -1
         val newX = localPos.x + randomFloatBetween(rFactor/2, rFactor) * sign
         sign = if (rGen.nextBoolean()) 1 else -1

@@ -31,7 +31,7 @@ class Projectile private constructor(private val observer: IonThrowAnimEndListen
         // set on app start from Static.kt
         lateinit var projRenderable: ModelRenderable
 
-        private const val FIRST_ANIM_DURA = 1000L //TODO: make them depend on the throw strength somehow
+        private const val FIRST_ANIM_DURA = 1000L
         private const val SECOND_ANIM_DURA = 1000L
 
         // in order to be able to pause the anims, we need this reference
@@ -63,7 +63,6 @@ class Projectile private constructor(private val observer: IonThrowAnimEndListen
         isThrown = true
 
         val finalTarget = Vector3(throwTarget)
-        // Log.d("HUUH", "orig. throwTarget: $throwTarget")
 
         val intermediateTarget = Vector3(throwTarget)
         intermediateTarget.apply {
@@ -76,7 +75,6 @@ class Projectile private constructor(private val observer: IonThrowAnimEndListen
         playLaunchAnimation(intermediateTarget, finalTarget)
     } // launch
 
-    //TODO: optimize this somehow... creating new animations for every throw is very bad!
     private fun playLaunchAnimation(firstTarget: Vector3, endTarget: Vector3) {
 
         val risingAnim = AnimationFactory.linearMoveAnim(

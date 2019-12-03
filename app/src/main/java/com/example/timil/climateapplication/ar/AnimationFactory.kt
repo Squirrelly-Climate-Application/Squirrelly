@@ -63,7 +63,6 @@ object AnimationFactory {
     } // linearMoveAnimNoEndListener
 
     // for making objects spin
-    //TODO: adjust the speed according to the launch speed, maybe?
     fun spinAnim(
         node: Node,
         dura: Long,
@@ -118,26 +117,6 @@ object AnimationFactory {
     } // scaleAnim
 
     // the collisionShape of Renderables needs to be scaled separately from their localScale property
-    fun boxCollisionShapeScaleAnim(
-        node: Node,
-        dura: Long,
-        newSize: Vector3
-    ): ObjectAnimator {
-
-        return ObjectAnimator().apply {
-
-            val box = node.renderable?.collisionShape as Box
-
-            target = box
-            propertyName = "size"
-            duration = dura
-            interpolator = LinearInterpolator()
-            setAutoCancel(false)
-            setObjectValues(box.size, newSize)
-            setEvaluator(Vector3Evaluator())
-        }
-    } // boxCollisionShapeScaleAnim
-
     fun sphereCollisionShapeScaleAnim(
         node: Node,
         dura: Long,
@@ -167,8 +146,7 @@ object AnimationFactory {
             duration = dura / 2
             interpolator = BounceInterpolator()
             setAutoCancel(false)
-            setObjectValues(peakIntensity) // this seems to work, but may need adjustment
-            // setObjectValues(light.intensity)
+            setObjectValues(peakIntensity)
             setEvaluator(FloatEvaluator())
             addListener(endListener)
         } // apply

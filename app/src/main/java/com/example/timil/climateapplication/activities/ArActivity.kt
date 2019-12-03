@@ -115,7 +115,6 @@ class ArActivity : AppCompatActivity() {
     private var screenCenter = Point(0, 0)
 
     // for animating the throw strength indicator bar
-    //TODO: use also for throw strength in Projectile (if needed)
     private var startDistanceY = 0f
     private var startDistanceX = 0f
 
@@ -123,13 +122,12 @@ class ArActivity : AppCompatActivity() {
 
     private var throwTimerExpired = false
     private var gamePaused = false
+    private var stopMusic = false
 
     private lateinit var monsterType: MonsterType
 
     private var initialArrowLayoutWidth = 0
     private var initialArrowLayoutHeight = 0
-
-    private var stopMusic = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -290,16 +288,15 @@ class ArActivity : AppCompatActivity() {
 
         override fun onRiseAnimEnd() {
 
-            // Log.d("HUUH", "localPos after rise: $localPosition")
+            // nothing to be done here (this could be removed)
         }
 
-        // TODO: un-spaghettify the game end logic
         override fun onDropAnimEnd() {
 
             // these shenanigans are needed because the hit detection should only happen once the
             // throwing animation has finished
 
-            // we'll 'touch' the scaled hit point (xx % further than the finger swipe's end point)
+            // we'll 'touch' the scaled ('actual') hit point (xx % further than the finger swipe's end point)
             val actualHitTestMEvent = obtainMotionEvent(actualScaledHitPoint!!) // it always exists if the animation is playing
             val actualHitTestResult = arFragment.arSceneView.scene.hitTest(actualHitTestMEvent)
             val actuallyHitNode = actualHitTestResult.node
@@ -322,9 +319,7 @@ class ArActivity : AppCompatActivity() {
                     }
                 }
 
-                // non-optimal, but ehh, there's very few monsters
                 updateUI(ViewType.HP, totalMonsterHp)
-                Log.d("HUUH", "hit monster!")
 
                 if (!actuallyHitNode.isAlive) {
 
@@ -367,7 +362,11 @@ class ArActivity : AppCompatActivity() {
             textSize = 48f
             fontFeatureSettings
         }
-        toast.setGravity(Gravity.START or Gravity.TOP, motionEvent.x.toInt()-150, motionEvent.y.toInt()-150)
+        toast.setGravity(
+            Gravity.START or Gravity.TOP,
+            motionEvent.x.toInt()-150,
+            motionEvent.y.toInt()-150
+        )
         toast.show()
     } // showHitToast
 
@@ -420,8 +419,6 @@ class ArActivity : AppCompatActivity() {
             dialogView.findViewById<ImageView>(R.id.squirrelly_image_right).background = getDrawable(R.drawable.squirrelly_squirrel_14)
         }
 
-
-        // save the points in the database
         saveScoreToDb(score)
 
         builder.setView(dialogView)
@@ -446,14 +443,12 @@ class ArActivity : AppCompatActivity() {
                 SoundService().soundEffect(this@ArActivity, SOUND_EFFECT_LOSE)
             }
         }
-
-        Log.d("HUUH", "final points: $score")
     } // endGame
 
     private fun updateUI(viewType: ViewType, value: Any) {
 
         when(viewType) {
-            // i'm sure there's a better way to do this than these idiotic casts...
+
             ViewType.HP -> tv_hitpoints.text = getString(R.string.txt_HP, value as Int)
             ViewType.THROWS -> tv_throws.text = getString(R.string.txt_throws, value as Int)
         }
@@ -471,11 +466,6 @@ class ArActivity : AppCompatActivity() {
         arFragment.planeDiscoveryController.hide()
         arFragment.planeDiscoveryController.setInstructionView(null)
         arFragment.arSceneView.planeRenderer.isEnabled = false
-    }
-
-    private fun enablePlaneDetection() {
-        arFragment.planeDiscoveryController.show()
-        arFragment.arSceneView.planeRenderer.isEnabled = true
     }
 
     private fun enableArObjectPlacement() {
@@ -549,12 +539,10 @@ class ArActivity : AppCompatActivity() {
     private fun convertMEventCoordsToScaledScreenTargetPoint(x: Float, y: Float): Point {
 
         val alterXBy = wind.xComp / COORD_SYS_CONVERT_RATIO
-        // Log.d("HUUH", "alter x by: $alterXBy")
 
         val scaledX = screenCenter.x + (x - screenCenter.x) * hitScaleFactor + alterXBy
 
         val alterYBy = wind.yComp / COORD_SYS_CONVERT_RATIO
-        // Log.d("HUUH", "alter y by: $alterYBy")
 
         // reverse axis (from 1920 to 0) and zero-point off-center
         val scaledY = screenHeight - (abs(y - screenHeight)) * hitScaleFactor + alterYBy
@@ -592,7 +580,6 @@ class ArActivity : AppCompatActivity() {
 
                     setUIPower(0)
                 }
-                // Log.d("HUUH", "out of time!")
             }
         }.start()
     } // startThrowTimer
@@ -611,8 +598,6 @@ class ArActivity : AppCompatActivity() {
     } // allMonstersDead
 
     private fun spawnSmallOilMonsters(localPos: Vector3) {
-
-        // Log.d("HUUH", "original localPos: $localPos")
 
         val rotatePivot = EffectEntity() // easiest way to make the small OilMonsters move in circles (they turn with this point)
         // reset the starting rotation to fix weird spinning bug
@@ -714,7 +699,7 @@ class ArActivity : AppCompatActivity() {
     private fun adjustWindArrowIndicator() {
         wind = Wind.create()
 
-        val scaleXyBy = (1 + wind.force / 25) // value range: 1-2
+        val scaleXyBy = (1 + wind.force / Wind.MAX_FORCE) // value range: 1-2
         val newX = (initialArrowLayoutWidth * scaleXyBy).toInt()
         val newY = (initialArrowLayoutHeight * scaleXyBy).toInt()
         iv_arrow.layoutParams.width = newX
@@ -773,6 +758,6 @@ class ArActivity : AppCompatActivity() {
             PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putBoolean(GUIDELINES_STATUS_TAG, !isChecked).apply()
         }
-    }
+    } // guidelines
 
 } // ArActivity

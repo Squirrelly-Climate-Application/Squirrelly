@@ -8,7 +8,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable
 
 /**
  * A monster that looks like an oil drop and will divide in smaller drops on hitting it.
- * This monster is different in the spawn mechanic: it's placed on a surface and can be
+ * This monster is different in its spawn mechanic: it's placed on a surface and can be
  * circled around by the player.
  * @author Ville Lohkovuori
  * */
@@ -32,8 +32,6 @@ class OilMonster private constructor() : Monster() {
             checkForDeath()
         }
 
-    // override var monsterAI = AI.create(this, AIType.BOUNCING)
-
     companion object {
 
         // set on app start from Static.kt
@@ -55,7 +53,6 @@ class OilMonster private constructor() : Monster() {
         // for creating the smaller OilMonsters (on destruction of their 'mother')
         fun createSmall(node: Node, pos: Vector3): OilMonster {
 
-            Log.d("HUUH", "creating small monster at position: $pos")
             return OilMonster().apply {
                 localPosition = pos
                 renderable = monsterRenderable
@@ -73,8 +70,6 @@ class OilMonster private constructor() : Monster() {
     private fun scaleSize(scaleFactor: Float) {
 
         localScale = localScale.scaled(scaleFactor)
-        // TODO: disabling this for now; figure out the correct scaling!
-        // (renderable?.collisionShape as Sphere).radius *= scaleFactor
     }
 
 } // OilMonster

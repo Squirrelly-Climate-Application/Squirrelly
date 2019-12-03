@@ -23,7 +23,6 @@ abstract class Monster : WorldEntity() {
             checkForDeath()
         }
 
-    // how many points you get for killing the monster
     open val pointsValueOnDeath = DEFAULT_DEATH_POINTS_VALUE
 
     open lateinit var monsterAI: AI // it can't be initialized here because of the 'leaking context' warning

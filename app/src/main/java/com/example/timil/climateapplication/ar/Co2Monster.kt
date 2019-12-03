@@ -2,7 +2,6 @@ package com.example.timil.climateapplication.ar
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.util.Log
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Color
@@ -24,7 +23,6 @@ class Co2Monster private constructor() : Monster() {
     override var hitPoints = 5
         set(value) {
             field = value
-            Log.d("HUUH", "hp: $hitPoints")
             checkForDeath()
             playHitAnim() // putting this here is a bit risky in case we'd later add DOT effects, etc
         }
@@ -57,7 +55,6 @@ class Co2Monster private constructor() : Monster() {
         } // create
     } // companion object
 
-    //TODO: simplify it somehow... maybe move some of the logic to another class?
     private fun playHitAnim() {
 
         // move the cloud fast a little bit, so it looks like it has been 'pushed' by the projectile
@@ -88,7 +85,7 @@ class Co2Monster private constructor() : Monster() {
         for (i in 0..numOfClouds) {
 
             val cloud = EffectEntity()
-            cloud.localPosition = localPosition //TODO: move it to the hit position somehow (low priority)
+            cloud.localPosition = localPosition
             cloud.renderable = monsterRenderable
             cloud.localScale = localScale.scaled(Static.randomFloatBetween(0.1f, 0.2f))
             cloud.setParent(parent) // i.e., the camera

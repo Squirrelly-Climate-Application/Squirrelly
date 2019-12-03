@@ -304,7 +304,7 @@ class GoogleMapFragment :
     override fun onMarkerClick(marker: Marker?): Boolean {
 
         marker?.showInfoWindow()
-        // using moveCamera leads to a janky transition, but it doesn't work with animateCamera (together with the other call to it)
+        // using moveCamera leads to a janky transition, but animateCamera doesn't work with multiple calls in a row
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(marker?.position))
         googleMap.moveCamera(CameraUpdateFactory.scrollBy(0f, -200.0f)) // move the camera upwards, to focus on the info window
         return true // indicates that we override the default behavior (opening the info window & centering on the marker)

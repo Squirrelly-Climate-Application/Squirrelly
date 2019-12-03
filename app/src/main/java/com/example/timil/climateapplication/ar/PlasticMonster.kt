@@ -2,7 +2,6 @@ package com.example.timil.climateapplication.ar
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.util.Log
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
@@ -24,7 +23,6 @@ class PlasticMonster private constructor() : Monster() {
     override var hitPoints = 5
         set(value) {
             field = value
-            Log.d("HUUH", "hp: $hitPoints")
             checkForDeath()
             playHitAnim()
         }
