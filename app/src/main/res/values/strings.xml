@@ -14,7 +14,7 @@
     <string name="discount_map">Discount Map</string>
     <string name="menu">Menu</string>
     <string name="user_points">My points: %1$s</string>
-    <string name="discount_cost">Cost: %1$s points</string>
+    <string name="discount_cost">%1$s points</string>
 
     <string name="txt_points">%1$d points</string>
     <string name="txt_discount_percent">for -%1$d %%</string>
@@ -94,8 +94,13 @@
 
     <string name="got_it">GOT IT!</string>
     <string name="guide_wind_direction">This tells you direction of the wind</string>
-    <string name="guide_wind_streght">This tells you the strength of the wind</string>
+    <string name="guide_wind_strength">This tells you the strength of the wind</string>
     <string name="guide_hp">Here are the health points of the monster</string>
     <string name="guide_throws">Here are the amount of throws you have to beat the monster</string>
     <string name="guide_pause">Here you can pause and resume the game any time you want</string>
+
+    <string name="show_guidelines">Show guidelines?</string>
+    <string name="do_not_show_again">Do not show again.</string>
+
+    <string name="long_click">Press and hold info view to proceed to discount.</string>
 </resources>

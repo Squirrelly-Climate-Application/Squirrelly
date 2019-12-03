@@ -10,6 +10,8 @@ import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.os.CountDownTimer
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
@@ -19,23 +21,26 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
-
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import com.example.timil.climateapplication.database.Discount
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import com.example.timil.climateapplication.fragments.*
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_LOGO_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_WEB_LINK_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.SHARED_ELEMENT_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.USER_POINTS_KEY
 import com.google.firebase.firestore.QueryDocumentSnapshot
+import java.io.ByteArrayOutputStream
 import java.io.Serializable
 
 
@@ -267,14 +272,21 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
     // called when opening a discount for more information
     override fun showDiscount(view: View, document: QueryDocumentSnapshot, userPoints: Int) {
+        val iv: ImageView = view.findViewById(R.id.image_view_company_logo)
+        val bitmap = (iv.drawable as BitmapDrawable).bitmap
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        val byteArray = stream.toByteArray()
 
         val bundle = Bundle()
         bundle.putString(SHARED_ELEMENT_KEY, view.transitionName)
+        bundle.putByteArray(DISCOUNT_COMPANY_LOGO_KEY, byteArray)
         bundle.putString(DISCOUNT_COMPANY_KEY, document.data[DISCOUNT_COMPANY_KEY].toString())
         bundle.putString(DISCOUNT_INFORMATION_KEY, document.data[DISCOUNT_INFORMATION_KEY].toString())
         bundle.putInt(DISCOUNT_POINTS_KEY, document.data[DISCOUNT_POINTS_KEY].toString().toInt())
         bundle.putInt(USER_POINTS_KEY, userPoints)
         bundle.putString(EXPIRING_DATE_KEY, document.data[EXPIRING_DATE_KEY].toString())
+        bundle.putString(DISCOUNT_WEB_LINK_KEY, document.data[DISCOUNT_WEB_LINK_KEY].toString())
         bundle.putString("discountId", document.id)
 
         viewDiscountFragment.arguments = bundle
@@ -289,7 +301,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             .commit()
     }
 
-    override fun showMapDiscount(discount: Discount, userPoints: Int, view: View) {
+    override fun showMapDiscount(discount: Discount, userPoints: Int, view: View, imageView: ImageView) {
 
         // navigation drawer highlighted item doesn't update without this
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
@@ -300,13 +312,22 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
 
         view.transitionName = discount.id
 
+
+        val bitmap = (imageView.drawable as BitmapDrawable).bitmap
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        val byteArray = stream.toByteArray()
+
+
         val bundle = Bundle()
         bundle.putString(SHARED_ELEMENT_KEY, view.transitionName)
+        bundle.putByteArray(DISCOUNT_COMPANY_LOGO_KEY, byteArray)
         bundle.putString(DISCOUNT_COMPANY_KEY, discount.companyName)
         bundle.putString(DISCOUNT_INFORMATION_KEY, discount.information)
         bundle.putInt(DISCOUNT_POINTS_KEY, discount.pointsNeeded)
         bundle.putInt(USER_POINTS_KEY, userPoints)
         bundle.putString(EXPIRING_DATE_KEY, discount.expiringDate)
+        bundle.putString(DISCOUNT_WEB_LINK_KEY, discount.webLink)
         bundle.putString("discountId", discount.id)
 
         viewDiscountFragment.arguments = bundle
@@ -319,6 +340,7 @@ class MainActivity : AppCompatActivity(), StartFragment.OnGameStart, QuizFragmen
             .addToBackStack(null)
             .commit()
     }
+
 
     /*
     private fun startSignIn() {

@@ -1,6 +1,9 @@
 package com.example.timil.climateapplication.fragments
 
 
+import android.content.Intent
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.transition.TransitionInflater
@@ -8,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -16,8 +20,10 @@ import com.example.timil.climateapplication.OnDiscountUseListener
 import com.example.timil.climateapplication.R
 import com.example.timil.climateapplication.ui.SwipeButton
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_COMPANY_LOGO_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_INFORMATION_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_POINTS_KEY
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_WEB_LINK_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.SHARED_ELEMENT_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.USER_POINTS_KEY
@@ -29,10 +35,12 @@ import com.example.timil.climateapplication.fragments.DiscountsFragment.Companio
 class ViewDiscountFragment : Fragment() {
 
     private lateinit var root: View
+    private lateinit var discountCompanyLogo: ImageView
     private lateinit var discountCompanyTv: TextView
     private lateinit var discountInformationTv: TextView
     private lateinit var discountPointsTv: TextView
     private lateinit var expiringDateTv: TextView
+    private lateinit var websiteLinkTv: TextView
     //private var btnUseDiscount: Button? = null
     private lateinit var btnUseDiscountSwipe: SwipeButton
     private lateinit var linearLayoutCardView: LinearLayout
@@ -61,10 +69,12 @@ class ViewDiscountFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        discountCompanyTv = root.findViewById(R.id.tvViewDiscountTitle)
-        discountInformationTv = root.findViewById(R.id.tvViewDiscountInfo)
-        discountPointsTv = root.findViewById(R.id.tvViewDiscountPoints)
-        expiringDateTv = root.findViewById(R.id.tvViewExpiringDate)
+        discountCompanyLogo = root.findViewById(R.id.image_view_company_logo)
+        discountCompanyTv = root.findViewById(R.id.tvDiscountTitle)
+        discountInformationTv = root.findViewById(R.id.tvDiscountInfo)
+        discountPointsTv = root.findViewById(R.id.tvDiscountPoints)
+        expiringDateTv = root.findViewById(R.id.tvExpiringDate)
+        websiteLinkTv = root.findViewById(R.id.tvDiscountWebLink)
         //btnUseDiscount = root!!.findViewById(R.id.btnUseDiscount)
         btnUseDiscountSwipe = root.findViewById(R.id.btnUseDiscountSwipe)
         linearLayoutCardView = root.findViewById(R.id.linearLayoutCardView)
@@ -76,8 +86,15 @@ class ViewDiscountFragment : Fragment() {
 
             discountCompanyTv.text = bundle.getString(DISCOUNT_COMPANY_KEY)
             discountInformationTv.text = bundle.getString(DISCOUNT_INFORMATION_KEY)
-            discountPointsTv.text = discountPoints.toString()
+            discountPointsTv.text = context!!.resources.getString(R.string.discount_cost, discountPoints.toString())
             expiringDateTv.text = bundle.getString(EXPIRING_DATE_KEY)
+            websiteLinkTv.text = bundle.getString(DISCOUNT_WEB_LINK_KEY)!!
+                .replace("https://".toRegex(), "")
+                .replace("http://".toRegex(), "")
+
+            val byteArray = bundle.getByteArray(DISCOUNT_COMPANY_LOGO_KEY)!!
+            val logo = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            discountCompanyLogo.setImageBitmap(logo)
 
             linearLayoutCardView.transitionName = bundle.getString(SHARED_ELEMENT_KEY)!!
             /*
@@ -94,7 +111,7 @@ class ViewDiscountFragment : Fragment() {
                 override fun onDiscountUse(): Boolean {
                     return if( userPoints!! >=  discountPoints!!){
                         dbManager.updateUserDataToDb(bundle.getString("discountId")!!, userPoints!!, discountPoints!!) {
-                            fragmentManager!!.popBackStack()
+                            //fragmentManager!!.popBackStack()
                         }
                         true
                     } else {
@@ -103,6 +120,10 @@ class ViewDiscountFragment : Fragment() {
                     }
                 }
             })
+            websiteLinkTv.setOnClickListener {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bundle.getString(DISCOUNT_WEB_LINK_KEY)))
+                activity!!.startActivity(browserIntent)
+            }
 
         } catch (err: Exception) {
             Log.d("TEST", "No bundle data")

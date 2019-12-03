@@ -5,15 +5,19 @@ import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.example.timil.climateapplication.database.Discount
 import com.example.timil.climateapplication.R
+import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_WEB_LINK_KEY
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -75,8 +79,10 @@ class GoogleMapFragment :
     private lateinit var discountsList: MutableList<Discount>
     private var userPoints = 0
 
+    private lateinit var infoView: View
+
     interface OnLongClick {
-        fun showMapDiscount(discount: Discount, userPoints: Int, view: View)
+        fun showMapDiscount(discount: Discount, userPoints: Int, view: View, imageView: ImageView)
     }
 
     companion object {
@@ -118,7 +124,8 @@ class GoogleMapFragment :
 
     override fun onResume() {
         super.onResume()
-        
+        Snackbar.make(mView, context!!.applicationContext.getText(R.string.long_click), Snackbar.LENGTH_LONG)
+            .setAction("Action", null).show()
         discountsList = ArrayList()
         getDiscountsData()
     }
@@ -202,11 +209,9 @@ class GoogleMapFragment :
                                         (discount.get(DISCOUNT_POINTS_KEY) as Long).toInt(),
                                         (discount.get(DISCOUNT_PERCENT_KEY) as Long).toInt(),
                                         discount.get(DISCOUNT_EXPIRING_DATE_KEY).toString(),
-                                        LatLng(
-                                            discount.get(DISCOUNT_LATITUDE_KEY) as Double,
-                                            discount.get(DISCOUNT_LONGITUDE_KEY) as Double
-                                        ),
-                                        discount.get(DISCOUNT_COMPANY_LOGO_KEY).toString()
+                                        LatLng(discount.get(DISCOUNT_LATITUDE_KEY) as Double, discount.get(DISCOUNT_LONGITUDE_KEY) as Double),
+                                        discount.get(DISCOUNT_COMPANY_LOGO_KEY).toString(),
+                                        discount.get(DISCOUNT_WEB_LINK_KEY).toString()
                                     )
                                 )
                             }
@@ -258,7 +263,7 @@ class GoogleMapFragment :
         marker?.showInfoWindow()
         // using moveCamera leads to a janky transition, but it doesn't work with animateCamera (together with the other call to it)
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(marker?.position))
-        googleMap.animateCamera(CameraUpdateFactory.scrollBy(0f, -160.0f)) // pan the camera upwards, to focus on the info window
+        googleMap.moveCamera(CameraUpdateFactory.scrollBy(0f, -200.0f)) // pan the camera upwards, to focus on the info window
         return true // indicates that we override the default behavior (opening the info window & centering on the marker)
     }
 
@@ -270,8 +275,9 @@ class GoogleMapFragment :
     }
 
     override fun onInfoWindowLongClick(marker: Marker?) {
+        val imageView = infoView.findViewById<ImageView>(R.id.image_view_company_logo)
 
-        activityCallBack!!.showMapDiscount(discountsList[marker?.tag as Int], userPoints, mView)
+        activityCallBack!!.showMapDiscount(discountsList[marker?.tag as Int], userPoints, mView, imageView)
     }
 
     // we need this to show more info than the company name and address
@@ -279,7 +285,7 @@ class GoogleMapFragment :
 
         override fun getInfoWindow(marker: Marker?): View {
 
-            val infoView = layoutInflater.inflate(R.layout.custom_info_window, null)
+            infoView = layoutInflater.inflate(R.layout.custom_info_window, null)
 
             // unsafe, but I'm not sure how to deal with the Any? type; even with a cast to Int,
             // it complains about being used in if-checks
@@ -298,6 +304,10 @@ class GoogleMapFragment :
 
             val discount = discountsList[markerIndex]
             infoView.apply {
+
+                Glide.with((context as Activity))
+                    .load(discount.companyLogo)
+                    .into(findViewById(R.id.image_view_company_logo))
 
                 findViewById<TextView>(R.id.tv_company).text = discount.companyName
                 findViewById<TextView>(R.id.tv_address).text = discount.companyAddress

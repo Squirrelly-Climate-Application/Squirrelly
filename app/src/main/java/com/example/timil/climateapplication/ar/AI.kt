@@ -2,11 +2,8 @@ package com.example.timil.climateapplication.ar
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.util.Log
 import android.view.animation.AccelerateDecelerateInterpolator
-import com.google.ar.sceneform.collision.Box
 import com.google.ar.sceneform.collision.Sphere
 import com.google.ar.sceneform.math.Vector3
 import java.util.*

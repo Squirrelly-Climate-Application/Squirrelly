@@ -244,9 +244,7 @@ class ArActivity : AppCompatActivity() {
 
             throwTimerExpired = false
             // we must throw the nut within a certain amount of time or the throw is canceled
-            startThrowTimer(hitNode,
-                THROW_TIME_LIMIT
-            )
+            startThrowTimer(hitNode, THROW_TIME_LIMIT)
         } // if !hitProj && is Projectile
 
         if (throwTimerExpired) return // note: this check should remain exactly here!
@@ -314,9 +312,7 @@ class ArActivity : AppCompatActivity() {
                 showHitToast(actualHitTestMEvent)
 
                 if (AppStatus().vibrationOn(this@ArActivity)) {
-                    Vibrator().vibrate(this@ArActivity,
-                        Vibrator.VIBRATION_TIME_REGULAR
-                    )
+                    Vibrator().vibrate(this@ArActivity, Vibrator.VIBRATION_TIME_REGULAR)
                 }
                 if (AppStatus().soundsOn(this@ArActivity)) {
                     when (monsterType) {
@@ -416,19 +412,12 @@ class ArActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_end_game, viewGroup)
 
         // can't 'see' the views without this trick
-        dialogView.findViewById<TextView>(R.id.tv_end_score).text = getString(
-            R.string.txt_score, score)
-        dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (allMonstersDead) getString(
-            R.string.txt_victory
-        ) else getString(R.string.txt_loss)
+        dialogView.findViewById<TextView>(R.id.tv_end_score).text = getString(R.string.txt_score, score)
+        dialogView.findViewById<TextView>(R.id.tv_loss_victory).text = if (allMonstersDead) getString(R.string.txt_victory) else getString(R.string.txt_loss)
 
         if (allMonstersDead) {
-            dialogView.findViewById<ImageView>(R.id.squirrelly_image_left).background = getDrawable(
-                R.drawable.squirrelly_squirrel_14
-            )
-            dialogView.findViewById<ImageView>(R.id.squirrelly_image_right).background = getDrawable(
-                R.drawable.squirrelly_squirrel_14
-            )
+            dialogView.findViewById<ImageView>(R.id.squirrelly_image_left).background = getDrawable(R.drawable.squirrelly_squirrel_14)
+            dialogView.findViewById<ImageView>(R.id.squirrelly_image_right).background = getDrawable(R.drawable.squirrelly_squirrel_14)
         }
 
 
@@ -465,10 +454,8 @@ class ArActivity : AppCompatActivity() {
 
         when(viewType) {
             // i'm sure there's a better way to do this than these idiotic casts...
-            ViewType.HP -> tv_hitpoints.text = getString(
-                R.string.txt_HP, value as Int)
-            ViewType.THROWS -> tv_throws.text = getString(
-                R.string.txt_throws, value as Int)
+            ViewType.HP -> tv_hitpoints.text = getString(R.string.txt_HP, value as Int)
+            ViewType.THROWS -> tv_throws.text = getString(R.string.txt_throws, value as Int)
         }
     } // updateUI
 
@@ -633,10 +620,6 @@ class ArActivity : AppCompatActivity() {
         rotatePivot.setParent(anchorNode)
         rotatePivot.localPosition = localPos
 
-        //TODO: maybe fix the positioning (atm the pivot is not in the center of the monster group)
-        // rotatePivot.renderable = OilMonster.monsterRenderable
-        // rotatePivot.localScale = rotatePivot.localScale.scaled(0.2f)
-
         monsterNodes[1] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
         monsterNodes[2] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
         monsterNodes[3] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
@@ -765,21 +748,11 @@ class ArActivity : AppCompatActivity() {
 
                 val sequence = MaterialShowcaseSequence(this)
                 sequence.setConfig(config)
-                sequence.addSequenceItem(frameLayout_arrow, applicationContext.getString(R.string.guide_wind_direction), applicationContext.getString(
-                    R.string.got_it
-                ))
-                sequence.addSequenceItem(tv_force, applicationContext.getString(R.string.guide_wind_streght), applicationContext.getString(
-                    R.string.got_it
-                ))
-                sequence.addSequenceItem(tv_hitpoints, applicationContext.getString(R.string.guide_hp), applicationContext.getString(
-                    R.string.got_it
-                ))
-                sequence.addSequenceItem(tv_throws, applicationContext.getString(R.string.guide_throws), applicationContext.getString(
-                    R.string.got_it
-                ))
-                sequence.addSequenceItem(btn_pause, applicationContext.getString(R.string.guide_pause), applicationContext.getString(
-                    R.string.got_it
-                ))
+                sequence.addSequenceItem(frameLayout_arrow, applicationContext.getString(R.string.guide_wind_direction), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(tv_force, applicationContext.getString(R.string.guide_wind_strength), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(tv_hitpoints, applicationContext.getString(R.string.guide_hp), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(tv_throws, applicationContext.getString(R.string.guide_throws), applicationContext.getString(R.string.got_it))
+                sequence.addSequenceItem(btn_pause, applicationContext.getString(R.string.guide_pause), applicationContext.getString(R.string.got_it))
                 sequence.start()
                 sequence.setOnItemDismissedListener { _, _ ->
                     items += 1

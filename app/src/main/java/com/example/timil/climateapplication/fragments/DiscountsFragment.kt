@@ -30,12 +30,14 @@ class DiscountsFragment : Fragment() {
     private val dbManager = DbManager()
 
     companion object {
+        const val DISCOUNT_COMPANY_LOGO_KEY = "companyLogo"
         const val DISCOUNT_POINTS_KEY = "points_needed"
         const val USER_POINTS_KEY = "points"
         const val DISCOUNT_COMPANY_KEY = "company"
         const val DISCOUNT_INFORMATION_KEY = "information"
         const val EXPIRING_DATE_KEY = "expiring date"
         const val SHARED_ELEMENT_KEY = "shared element"
+        const val DISCOUNT_WEB_LINK_KEY = "website"
     }
 
     override fun onCreateView(

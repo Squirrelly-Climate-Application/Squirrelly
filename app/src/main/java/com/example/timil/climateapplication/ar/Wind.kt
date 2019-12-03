@@ -1,6 +1,5 @@
 package com.example.timil.climateapplication.ar
 
-import android.util.Log
 import kotlin.math.*
 
 /**

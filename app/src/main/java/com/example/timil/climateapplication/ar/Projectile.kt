@@ -3,18 +3,14 @@ package com.example.timil.climateapplication.ar
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.util.Log
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
 import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 /**
- * A class for the thrown projectile (acorn in the final app).
+ * A class for the thrown projectile (acorn).
  * @author Ville Lohkovuori
  * */
 

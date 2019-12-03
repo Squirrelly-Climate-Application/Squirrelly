@@ -5,8 +5,6 @@ import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import android.animation.AnimatorListenerAdapter
 import android.animation.FloatEvaluator
-import android.animation.ValueAnimator
-import android.util.Log
 import android.view.animation.BounceInterpolator
 import android.view.animation.LinearInterpolator
 import com.google.ar.sceneform.collision.Box

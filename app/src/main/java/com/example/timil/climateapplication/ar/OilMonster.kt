@@ -3,7 +3,6 @@ package com.example.timil.climateapplication.ar
 import android.util.Log
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Node
-import com.google.ar.sceneform.collision.Sphere
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
 

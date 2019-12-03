@@ -17,5 +17,6 @@ data class Discount(
     val discountPercent: Int,
     val expiringDate: String,
     val geoLocation: LatLng,
-    val companyLogo: String
+    val companyLogo: String,
+    val webLink: String
 )

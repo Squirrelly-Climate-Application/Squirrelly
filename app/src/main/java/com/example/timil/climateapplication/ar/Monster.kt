@@ -1,7 +1,5 @@
 package com.example.timil.climateapplication.ar
 
-import android.util.Log
-
 /**
  * Base class for the AR game monsters.
  * @author Ville Lohkovuori
