@@ -9,11 +9,18 @@ import android.view.ViewGroup
 import com.example.timil.climateapplication.R
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.LinearLayoutManager
+import android.view.animation.AnimationUtils
 import com.example.timil.climateapplication.adapters.DiscountsRecyclerAdapter
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import com.example.timil.climateapplication.database.DbManager
+import kotlinx.android.synthetic.main.fragment_tab_layout.*
 import kotlin.collections.ArrayList
+
+
+
+
 
 
 /**
@@ -58,14 +65,20 @@ class DiscountsFragment : Fragment() {
         dbManager.getUserData(userPoints!!) {
             userPoints = it
 
+            /*
             val tvUserPoints = root.findViewById<TextView>(R.id.tvMyPoints)
-            tvUserPoints.text = resources.getString(R.string.user_points, userPoints.toString())
+            tvUserPoints.text = userPoints.toString()//resources.getString(R.string.user_points, userPoints.toString())
             tvUserPoints.visibility = View.VISIBLE
+            tvUserPoints.setOnClickListener {
+                Toast.makeText(context!!, resources.getString(R.string.user_points), Toast.LENGTH_SHORT).show()
+            }
+            */
         }
         dbManager.getDiscountsData {
 
             progressBar.visibility = View.GONE
             adapter.setDiscounts(it, userPoints!!, true)
+
         }
 
         return root
