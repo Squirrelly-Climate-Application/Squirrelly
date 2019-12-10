@@ -3,9 +3,9 @@
 <android.support.constraint.ConstraintLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/linearLayoutCardView"
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/cardview_light_background"
+        android:background="@drawable/background_card_view_shape"
         android:layout_margin="8dp"
         android:elevation="8dp">
 
@@ -27,7 +27,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="0dp"
                 android:padding="8dp"
-                android:background="@drawable/background_card_view"
+                android:background="@drawable/background_card_view_image"
                 android:layout_gravity="center"
                 android:orientation="vertical">
 
@@ -109,7 +109,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:background="@drawable/background_card_view">
+                android:background="@drawable/background_card_view_swipebutton">
 
             </FrameLayout>
 
