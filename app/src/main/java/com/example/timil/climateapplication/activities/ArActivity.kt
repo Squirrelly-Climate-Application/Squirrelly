@@ -605,10 +605,10 @@ class ArActivity : AppCompatActivity() {
         rotatePivot.setParent(anchorNode)
         rotatePivot.localPosition = localPos
 
-        monsterNodes[1] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
-        monsterNodes[2] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x-0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
-        monsterNodes[3] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z-0.2f))
-        monsterNodes[4] = OilMonster.createSmall(rotatePivot, Vector3(localPos.x+0.2f, localPos.y+Static.randomFloatBetween(-0.05f, 0.05f), localPos.z+0.2f))
+        monsterNodes[1] = OilMonster.createSmall(rotatePivot, Vector3(-0.2f, Static.randomFloatBetween(-0.05f, 0.05f), -0.2f))
+        monsterNodes[2] = OilMonster.createSmall(rotatePivot, Vector3(-0.2f, Static.randomFloatBetween(-0.05f, 0.05f), 0.2f))
+        monsterNodes[3] = OilMonster.createSmall(rotatePivot, Vector3(0.2f, Static.randomFloatBetween(-0.05f, 0.05f), -0.2f))
+        monsterNodes[4] = OilMonster.createSmall(rotatePivot, Vector3(0.2f, Static.randomFloatBetween(-0.05f, 0.05f), 0.2f))
 
         val halfSpin1 = Quaternion.axisAngle(Vector3(0f, 1f, 0f), -180f)
         val halfSpin2 = Quaternion.axisAngle(Vector3(0f, 1f, 0f), 0.1f)
