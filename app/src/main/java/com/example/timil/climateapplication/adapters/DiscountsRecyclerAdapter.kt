@@ -18,6 +18,10 @@ import com.example.timil.climateapplication.fragments.DiscountsFragment.Companio
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.DISCOUNT_WEB_LINK_KEY
 import com.example.timil.climateapplication.fragments.DiscountsFragment.Companion.EXPIRING_DATE_KEY
 import com.google.firebase.firestore.QueryDocumentSnapshot
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
+
+
 
 
 
@@ -31,6 +35,8 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     private var proceedToViewFragment: Boolean? = null
 
     private lateinit var view: View
+
+    var duration: Long = 800
 
     interface OnDiscountClick {
         fun showDiscount(view: View, document: QueryDocumentSnapshot, userPoints: Int)
@@ -61,6 +67,7 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
         Glide.with((view.context as Activity))
             .load(discountsList!![i].data.getValue(DISCOUNT_COMPANY_LOGO_KEY).toString())
             .into(discountViewHolder.discountLogo)
+        /*
         discountViewHolder.discountWebLink.text = discountsList!![i].data.getValue(DISCOUNT_WEB_LINK_KEY).toString()
             .replace("https://".toRegex(), "")
             .replace("http://".toRegex(), "")
@@ -69,9 +76,9 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(discountsList!![i].data.getValue(DISCOUNT_WEB_LINK_KEY).toString()))
             (view.context as Activity).startActivity(browserIntent)
         }
-
+        */
         discountViewHolder.discountTitle.text = discountsList!![i].data.getValue(DISCOUNT_COMPANY_KEY).toString()
-        discountViewHolder.discountInfo.text = discountsList!![i].data.getValue(DISCOUNT_INFORMATION_KEY).toString()
+        //discountViewHolder.discountInfo.text = discountsList!![i].data.getValue(DISCOUNT_INFORMATION_KEY).toString()
         discountViewHolder.discountPoints.text = discountViewHolder.view.context.resources.getString(R.string.discount_cost, discountsList!![i].data.getValue(DISCOUNT_POINTS_KEY).toString())
         discountViewHolder.expiringDate.text = discountsList!![i].data.getValue(EXPIRING_DATE_KEY).toString()
         discountViewHolder.view.transitionName = discountsList!![i].id
@@ -80,6 +87,7 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
                 mCallback!!.showDiscount(discountViewHolder.view, discountsList!![i], userPoints!!)
             }
         }
+        discountViewHolder.animationScaleIn( discountViewHolder.itemRoot )
     }
 
     override fun getItemCount(): Int {
@@ -89,11 +97,29 @@ class DiscountsRecyclerAdapter(private val discounts: MutableList<String>, activ
     inner class DiscountViewHolder(var itemRoot: View) : RecyclerView.ViewHolder(itemRoot) {
         var discountLogo: ImageView = itemRoot.findViewById(R.id.image_view_company_logo)
         var discountTitle: TextView = itemRoot.findViewById(R.id.tvDiscountTitle)
-        var discountWebLink: TextView = itemRoot.findViewById(R.id.tvDiscountWebLink)
-        var discountInfo: TextView = itemRoot.findViewById(R.id.tvDiscountInfo)
+        //var discountWebLink: TextView = itemRoot.findViewById(R.id.tvDiscountWebLink)
+        //var discountInfo: TextView = itemRoot.findViewById(R.id.tvDiscountInfo)
         var discountPoints: TextView = itemRoot.findViewById(R.id.tvDiscountPoints)
         var expiringDate: TextView = itemRoot.findViewById(R.id.tvExpiringDate)
         var view: View = itemRoot
+
+        fun animationScaleIn(view: View) {
+            val animationScaleIn = ScaleAnimation(
+                0.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f
+            )
+
+            animationScaleIn.duration = duration
+            duration += 400
+
+            view.startAnimation(animationScaleIn)
+        }
     }
 
 }

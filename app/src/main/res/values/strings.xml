@@ -13,7 +13,8 @@
     <string name="discounts">Discounts</string>
     <string name="discount_map">Discount Map</string>
     <string name="menu">Menu</string>
-    <string name="user_points">My points: %1$s</string>
+    <!--string name="user_points">My points: %1$s</string-->
+    <string name="user_points">Your points</string>
     <string name="discount_cost">%1$s points</string>
 
     <string name="txt_points">%1$d points</string>

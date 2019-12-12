@@ -44,6 +44,7 @@ class ViewDiscountFragment : Fragment() {
     //private var btnUseDiscount: Button? = null
     private lateinit var btnUseDiscountSwipe: SwipeButton
     private lateinit var linearLayoutCardView: LinearLayout
+    private lateinit var tvUserPoints: TextView
 
     private val dbManager = DbManager()
     private var userPoints: Int? = 0
@@ -110,6 +111,7 @@ class ViewDiscountFragment : Fragment() {
 
                 override fun onDiscountUse(): Boolean {
                     return if( userPoints!! >=  discountPoints!!){
+                        tvUserPoints.text = (userPoints!!-discountPoints!!).toString()
                         dbManager.updateUserDataToDb(bundle.getString("discountId")!!, userPoints!!, discountPoints!!) {
                             //fragmentManager!!.popBackStack()
                         }
@@ -127,6 +129,13 @@ class ViewDiscountFragment : Fragment() {
 
         } catch (err: Exception) {
             Log.d("TEST", "No bundle data")
+        }
+
+        tvUserPoints = root.findViewById<TextView>(R.id.tvMyPoints)
+        tvUserPoints.text = userPoints.toString()//resources.getString(R.string.user_points, userPoints.toString())
+        tvUserPoints.visibility = View.VISIBLE
+        tvUserPoints.setOnClickListener {
+            Toast.makeText(context!!, resources.getString(R.string.user_points), Toast.LENGTH_SHORT).show()
         }
 
     }

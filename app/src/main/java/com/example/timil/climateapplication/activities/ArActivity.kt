@@ -184,6 +184,8 @@ class ArActivity : AppCompatActivity() {
 
         if (AppStatus().showGuidelines(this@ArActivity)) {
             guidelines()
+        } else {
+            stopMusic = true
         }
     } // onCreate
 
